@@ -20,7 +20,7 @@ export function ClosingCta() {
       </Reveal>
       <Reveal delay={200}>
         <div className="mt-8">
-          <Button href="/dashboard">Run a free diagnostic</Button>
+          <Button href="/dashboard/structural/design-audit/new">Run a free diagnostic</Button>
         </div>
       </Reveal>
     </section>

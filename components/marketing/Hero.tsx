@@ -26,7 +26,7 @@ export function Hero() {
       </Reveal>
       <Reveal delay={240}>
         <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
-          <Button href="/dashboard">Run a free diagnostic</Button>
+          <Button href="/dashboard/structural/design-audit/new">Run a free diagnostic</Button>
           <Button href="/dashboard" variant="ghost">
             See a sample report
           </Button>
