@@ -78,12 +78,11 @@ export const PILLARS_NAV: PillarNavItem[] = [
     id: 3,
     slug: "user-testing",
     label: "User Testing",
-    comingSoon: true,
     subTools: [
-      { label: "Eye Tracking", description: "Fixation points and attention sequence — built now, ahead of the rest of this pillar.", href: "/dashboard/eye-tracking" },
+      { label: "Eye Tracking", description: "Fixation points and attention sequence.", href: "/dashboard/eye-tracking" },
       { label: "5-Second Test", description: "First-impression recall — screenshot in, questions in, five seconds, then answers.", href: "/dashboard/five-second" },
       { label: "Usability Testing", description: "A task, a unique participant link, and a real activity log of what they did.", href: "/dashboard/usability-testing" },
-      { label: "Card Sorting & Tree Testing", description: "Category groupings and findability." },
+      { label: "Card Sorting & Tree Testing", description: "How people group your content, and whether they can find it in your nav.", href: "/dashboard/card-sorting" },
     ],
   },
 ];

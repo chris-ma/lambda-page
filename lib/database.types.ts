@@ -119,6 +119,91 @@ export type Database = {
           { foreignKeyName: "usability_events_participant_id_fkey"; columns: ["participant_id"]; isOneToOne: false; referencedRelation: "usability_participants"; referencedColumns: ["id"] },
         ];
       };
+      sort_studies: {
+        Row: { id: string; project_id: string; type: string; name: string; instructions: string | null; sort_mode: string | null; created_at: string };
+        Insert: { id?: string; project_id: string; type: string; name: string; instructions?: string | null; sort_mode?: string | null; created_at?: string };
+        Update: { id?: string; project_id?: string; type?: string; name?: string; instructions?: string | null; sort_mode?: string | null; created_at?: string };
+        Relationships: [
+          { foreignKeyName: "sort_studies_project_id_fkey"; columns: ["project_id"]; isOneToOne: false; referencedRelation: "projects"; referencedColumns: ["id"] },
+        ];
+      };
+      sort_cards: {
+        Row: { id: string; study_id: string; label: string; position: number };
+        Insert: { id?: string; study_id: string; label: string; position?: number };
+        Update: { id?: string; study_id?: string; label?: string; position?: number };
+        Relationships: [
+          { foreignKeyName: "sort_cards_study_id_fkey"; columns: ["study_id"]; isOneToOne: false; referencedRelation: "sort_studies"; referencedColumns: ["id"] },
+        ];
+      };
+      sort_categories: {
+        Row: { id: string; study_id: string; label: string; position: number };
+        Insert: { id?: string; study_id: string; label: string; position?: number };
+        Update: { id?: string; study_id?: string; label?: string; position?: number };
+        Relationships: [
+          { foreignKeyName: "sort_categories_study_id_fkey"; columns: ["study_id"]; isOneToOne: false; referencedRelation: "sort_studies"; referencedColumns: ["id"] },
+        ];
+      };
+      tree_nodes: {
+        Row: { id: string; study_id: string; parent_id: string | null; label: string; position: number };
+        Insert: { id?: string; study_id: string; parent_id?: string | null; label: string; position?: number };
+        Update: { id?: string; study_id?: string; parent_id?: string | null; label?: string; position?: number };
+        Relationships: [
+          { foreignKeyName: "tree_nodes_study_id_fkey"; columns: ["study_id"]; isOneToOne: false; referencedRelation: "sort_studies"; referencedColumns: ["id"] },
+          { foreignKeyName: "tree_nodes_parent_id_fkey"; columns: ["parent_id"]; isOneToOne: false; referencedRelation: "tree_nodes"; referencedColumns: ["id"] },
+        ];
+      };
+      tree_tasks: {
+        Row: { id: string; study_id: string; prompt: string; correct_node_id: string | null; position: number };
+        Insert: { id?: string; study_id: string; prompt: string; correct_node_id?: string | null; position?: number };
+        Update: { id?: string; study_id?: string; prompt?: string; correct_node_id?: string | null; position?: number };
+        Relationships: [
+          { foreignKeyName: "tree_tasks_study_id_fkey"; columns: ["study_id"]; isOneToOne: false; referencedRelation: "sort_studies"; referencedColumns: ["id"] },
+        ];
+      };
+      sort_sessions: {
+        Row: { id: string; study_id: string; duration_ms: number | null; created_at: string };
+        Insert: { id?: string; study_id: string; duration_ms?: number | null; created_at?: string };
+        Update: { id?: string; study_id?: string; duration_ms?: number | null; created_at?: string };
+        Relationships: [
+          { foreignKeyName: "sort_sessions_study_id_fkey"; columns: ["study_id"]; isOneToOne: false; referencedRelation: "sort_studies"; referencedColumns: ["id"] },
+        ];
+      };
+      sort_groups: {
+        Row: { id: string; session_id: string; label: string; reason: string | null; position: number };
+        Insert: { id?: string; session_id: string; label: string; reason?: string | null; position?: number };
+        Update: { id?: string; session_id?: string; label?: string; reason?: string | null; position?: number };
+        Relationships: [
+          { foreignKeyName: "sort_groups_session_id_fkey"; columns: ["session_id"]; isOneToOne: false; referencedRelation: "sort_sessions"; referencedColumns: ["id"] },
+        ];
+      };
+      sort_placements: {
+        Row: { id: string; session_id: string; card_id: string; group_id: string };
+        Insert: { id?: string; session_id: string; card_id: string; group_id: string };
+        Update: { id?: string; session_id?: string; card_id?: string; group_id?: string };
+        Relationships: [
+          { foreignKeyName: "sort_placements_session_id_fkey"; columns: ["session_id"]; isOneToOne: false; referencedRelation: "sort_sessions"; referencedColumns: ["id"] },
+          { foreignKeyName: "sort_placements_card_id_fkey"; columns: ["card_id"]; isOneToOne: false; referencedRelation: "sort_cards"; referencedColumns: ["id"] },
+          { foreignKeyName: "sort_placements_group_id_fkey"; columns: ["group_id"]; isOneToOne: false; referencedRelation: "sort_groups"; referencedColumns: ["id"] },
+        ];
+      };
+      tree_task_results: {
+        Row: { id: string; session_id: string; task_id: string; first_click_node_id: string | null; final_node_id: string | null; success: boolean | null; duration_ms: number | null };
+        Insert: { id?: string; session_id: string; task_id: string; first_click_node_id?: string | null; final_node_id?: string | null; success?: boolean | null; duration_ms?: number | null };
+        Update: { id?: string; session_id?: string; task_id?: string; first_click_node_id?: string | null; final_node_id?: string | null; success?: boolean | null; duration_ms?: number | null };
+        Relationships: [
+          { foreignKeyName: "tree_task_results_session_id_fkey"; columns: ["session_id"]; isOneToOne: false; referencedRelation: "sort_sessions"; referencedColumns: ["id"] },
+          { foreignKeyName: "tree_task_results_task_id_fkey"; columns: ["task_id"]; isOneToOne: false; referencedRelation: "tree_tasks"; referencedColumns: ["id"] },
+        ];
+      };
+      tree_task_path_nodes: {
+        Row: { id: number; result_id: string; node_id: string; position: number };
+        Insert: { id?: number; result_id: string; node_id: string; position: number };
+        Update: { id?: number; result_id?: string; node_id?: string; position?: number };
+        Relationships: [
+          { foreignKeyName: "tree_task_path_nodes_result_id_fkey"; columns: ["result_id"]; isOneToOne: false; referencedRelation: "tree_task_results"; referencedColumns: ["id"] },
+          { foreignKeyName: "tree_task_path_nodes_node_id_fkey"; columns: ["node_id"]; isOneToOne: false; referencedRelation: "tree_nodes"; referencedColumns: ["id"] },
+        ];
+      };
       events: {
         Row: {
           created_at: string; device: string | null; id: string; page_id: string; path: string | null;
