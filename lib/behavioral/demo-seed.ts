@@ -1,5 +1,4 @@
 import type { FieldStat } from "./aggregate";
-import type { SignificanceResult } from "./significance";
 
 /** Deterministic placeholder data shown until a page has real snippet traffic. Always labeled DEMO DATA in the UI. */
 export const DEMO_FUNNEL = [
@@ -40,9 +39,4 @@ export const DEMO_SEGMENTS_DEVICE = [
   { label: "mobile", count: 612 },
   { label: "desktop", count: 341 },
   { label: "tablet", count: 47 },
-];
-
-export const DEMO_AB_RESULTS: SignificanceResult[] = [
-  { label: "Control", rate: 0.041, liftVsControl: null, zScore: null, pValue: null, significant: false, sampleAdequate: true },
-  { label: "Variant B", rate: 0.058, liftVsControl: 0.41, zScore: 2.87, pValue: 0.004, significant: true, sampleAdequate: true },
 ];

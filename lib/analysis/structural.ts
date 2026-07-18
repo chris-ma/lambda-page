@@ -20,6 +20,11 @@ type DomSnapshot = {
   paragraphCount: number;
   internalLinks: number;
   externalLinks: number;
+  hoverRuleCount: number;
+  focusRuleCount: number;
+  errorStateRuleCount: number;
+  colorUsage: { color: string; count: number }[];
+  fontFamiliesUsed: string[];
 };
 
 async function extractDom(page: Page): Promise<DomSnapshot> {
@@ -94,6 +99,39 @@ async function extractDom(page: Page): Promise<DomSnapshot> {
       else if (href.startsWith("/") || href.includes(location.hostname) || href.startsWith("#")) internalLinks++;
     }
 
+    // ---- interaction-state coverage: scan same-origin stylesheets for :hover/:focus/error rules ----
+    let hoverRuleCount = 0;
+    let focusRuleCount = 0;
+    let errorStateRuleCount = 0;
+    for (const sheet of Array.from(document.styleSheets)) {
+      let rules: CSSRuleList;
+      try {
+        rules = sheet.cssRules;
+      } catch {
+        continue; // cross-origin stylesheet, can't read rules
+      }
+      for (const rule of Array.from(rules)) {
+        const text = (rule as CSSStyleRule).selectorText;
+        if (!text) continue;
+        if (text.includes(":hover")) hoverRuleCount++;
+        if (text.includes(":focus")) focusRuleCount++;
+        if (text.includes(":invalid") || /\.error\b|\[aria-invalid/.test(text)) errorStateRuleCount++;
+      }
+    }
+
+    // ---- color + font usage, for brand-consistency comparison ----
+    const colorTally = new Map<string, number>();
+    const fontSet = new Set<string>();
+    for (const el of textEls) {
+      const style = window.getComputedStyle(el);
+      colorTally.set(style.color, (colorTally.get(style.color) || 0) + 1);
+      fontSet.add(style.fontFamily.split(",")[0].trim().replace(/["']/g, ""));
+    }
+    const colorUsage = Array.from(colorTally.entries())
+      .map(([color, count]) => ({ color, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 12);
+
     return {
       headings,
       imgs,
@@ -110,8 +148,29 @@ async function extractDom(page: Page): Promise<DomSnapshot> {
       paragraphCount: document.querySelectorAll("p").length,
       internalLinks,
       externalLinks,
+      hoverRuleCount,
+      focusRuleCount,
+      errorStateRuleCount,
+      colorUsage,
+      fontFamiliesUsed: Array.from(fontSet),
     };
   });
+}
+
+export type BrandSpec = {
+  palette?: string[]; // hex values, e.g. ["#332A22", "#D9A441"]
+  fonts?: string[]; // family names, e.g. ["Bodoni Moda", "Jost"]
+};
+
+function hexToRgb(hex: string): [number, number, number] | null {
+  const m = hex.replace("#", "").match(/^([0-9a-f]{6})$/i);
+  if (!m) return null;
+  const n = parseInt(m[1], 16);
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+}
+
+function colorDistance(a: [number, number, number], b: [number, number, number]): number {
+  return Math.sqrt((a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2 + (a[2] - b[2]) ** 2);
 }
 
 async function fetchText(url: string): Promise<{ ok: boolean; text: string }> {
@@ -123,7 +182,10 @@ async function fetchText(url: string): Promise<{ ok: boolean; text: string }> {
   }
 }
 
-export async function runStructuralAnalysis(targetUrl: string): Promise<{ findings: FindingInput[]; summary: Record<string, unknown> }> {
+export async function runStructuralAnalysis(
+  targetUrl: string,
+  brand?: BrandSpec,
+): Promise<{ findings: FindingInput[]; summary: Record<string, unknown> }> {
   const browser = await launchBrowser();
   const findings: FindingInput[] = [];
 
@@ -205,6 +267,58 @@ export async function runStructuralAnalysis(targetUrl: string): Promise<{ findin
           ? { component: "Design & Content Audit", attribute: "Mobile tap-target size", status: "PASS", value: `${dom.tapTargets.length} checked`, detail: "All interactive elements are at least 24×24px at mobile width." }
           : { component: "Design & Content Audit", attribute: "Mobile tap-target size", status: "FLAGGED", value: `${smallTargets.length}/${dom.tapTargets.length} under 24px`, detail: `Examples: ${smallTargets.slice(0, 3).map((t) => `${t.tag} "${t.text}" (${t.w}×${t.h}px)`).join("; ")}`, fix: "Increase padding so tap targets are at least 24×24px." },
     );
+
+    // ---- Interaction-state definitions (hover / focus / error) ----
+    findings.push(
+      dom.hoverRuleCount > 0
+        ? { component: "Design & Content Audit", attribute: "Hover-state definitions", status: "PASS", value: `${dom.hoverRuleCount} rule(s)`, detail: "Same-origin stylesheets define :hover styles." }
+        : { component: "Design & Content Audit", attribute: "Hover-state definitions", status: "FLAGGED", detail: "No :hover rules found in readable stylesheets (cross-origin CSS can't be inspected).", fix: "Define visible hover states for interactive elements." },
+    );
+    findings.push(
+      dom.focusRuleCount > 0
+        ? { component: "Design & Content Audit", attribute: "Focus-state definitions", status: "PASS", value: `${dom.focusRuleCount} rule(s)`, detail: "Focus styles are defined — important for keyboard accessibility." }
+        : { component: "Design & Content Audit", attribute: "Focus-state definitions", status: "FAILING", detail: "No :focus rules found in readable stylesheets.", fix: "Add visible :focus / :focus-visible styles so keyboard users can see the active element." },
+    );
+    findings.push(
+      dom.errorStateRuleCount > 0
+        ? { component: "Design & Content Audit", attribute: "Error-state definitions", status: "PASS", value: `${dom.errorStateRuleCount} rule(s)`, detail: "Error/invalid-state styling is defined." }
+        : { component: "Design & Content Audit", attribute: "Error-state definitions", status: "INFO", detail: "No :invalid or .error styling found — may be fine if the page has no forms.", fix: "If the page has a form, define a clear error/invalid state." },
+    );
+
+    // ---- Design / brand consistency (against the project's reference spec, if set) ----
+    if (brand?.palette?.length || brand?.fonts?.length) {
+      if (brand.palette?.length) {
+        const refRgbs = brand.palette.map(hexToRgb).filter((c): c is [number, number, number] => c !== null);
+        const offBrand = dom.colorUsage.filter((u) => {
+          const rgb = parseRgb(u.color);
+          if (!rgb) return false;
+          return !refRgbs.some((ref) => colorDistance(rgb, ref) < 24);
+        });
+        findings.push(
+          offBrand.length === 0
+            ? { component: "Design & Content Audit", attribute: "Color palette consistency", status: "PASS", value: `${dom.colorUsage.length} text colors checked`, detail: "All prominent text colors match the defined palette." }
+            : { component: "Design & Content Audit", attribute: "Color palette consistency", status: "FLAGGED", value: `${offBrand.length} off-palette color(s)`, detail: `e.g. ${offBrand.slice(0, 3).map((o) => o.color).join(", ")}`, fix: "Replace off-palette text colors with the nearest defined brand color." },
+        );
+      }
+      if (brand.fonts?.length) {
+        const refFonts = brand.fonts.map((f) => f.toLowerCase());
+        const offFonts = dom.fontFamiliesUsed.filter((f) => f && !refFonts.some((r) => f.toLowerCase().includes(r) || r.includes(f.toLowerCase())));
+        findings.push(
+          offFonts.length === 0
+            ? { component: "Design & Content Audit", attribute: "Font/type-system consistency", status: "PASS", value: dom.fontFamiliesUsed.join(", "), detail: "All fonts match the defined type system." }
+            : { component: "Design & Content Audit", attribute: "Font/type-system consistency", status: "FLAGGED", value: `${offFonts.length} off-system font(s)`, detail: `Unexpected: ${offFonts.join(", ")}`, fix: "Use only the fonts defined in the type system." },
+        );
+      }
+    } else {
+      findings.push({
+        component: "Design & Content Audit",
+        attribute: "Design / brand consistency",
+        status: "INFO",
+        value: `${dom.fontFamiliesUsed.length} font(s), ${dom.colorUsage.length} text colors`,
+        detail: "No reference palette/type system set for this project, so brand consistency can't be scored. Fonts in use: " + dom.fontFamiliesUsed.join(", "),
+        fix: "Set a brand palette and type system on the project to enable this check.",
+      });
+    }
 
     // ---- Content: readability, word count, jargon ----
     const { score, words } = fleschReadingEase(dom.bodyText);

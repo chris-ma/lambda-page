@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getPage } from "@/lib/db/pages";
 import { eventsForPage, eventCountForPage } from "@/lib/db/events";
+import { listABTestsForPage } from "@/lib/db/ab";
 import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
 import { BehavioralDashboard } from "@/components/dashboard/BehavioralDashboard";
 import {
@@ -17,7 +18,6 @@ import {
   DEMO_FORM_FIELDS,
   DEMO_RUM_VITALS,
   DEMO_SEGMENTS_DEVICE,
-  DEMO_AB_RESULTS,
 } from "@/lib/behavioral/demo-seed";
 
 export const dynamic = "force-dynamic";
@@ -29,6 +29,7 @@ export default async function BehavioralPage({ params }: { params: Promise<{ pag
   const page = await getPage(pageId);
   const eventCount = await eventCountForPage(pageId);
   const isDemo = eventCount < REAL_DATA_THRESHOLD;
+  const abTests = await listABTestsForPage(pageId);
 
   let data;
   if (isDemo) {
@@ -38,7 +39,6 @@ export default async function BehavioralPage({ params }: { params: Promise<{ pag
       formFields: DEMO_FORM_FIELDS,
       vitals: DEMO_RUM_VITALS,
       deviceSegments: DEMO_SEGMENTS_DEVICE,
-      abResults: DEMO_AB_RESULTS,
       rageClicks: [] as { selector: string; count: number }[],
     };
   } else {
@@ -49,7 +49,6 @@ export default async function BehavioralPage({ params }: { params: Promise<{ pag
       formFields: computeFormFieldStats(events),
       vitals: computeRumVitals(events),
       deviceSegments: segmentSessionCounts(events, "device"),
-      abResults: DEMO_AB_RESULTS,
       rageClicks: computeRageClicks(events),
     };
   }
@@ -80,7 +79,7 @@ export default async function BehavioralPage({ params }: { params: Promise<{ pag
       </div>
 
       <div className="mt-10">
-        <BehavioralDashboard {...data} isDemo={isDemo} />
+        <BehavioralDashboard {...data} isDemo={isDemo} pageId={page.id} abTests={abTests} />
       </div>
     </div>
   );

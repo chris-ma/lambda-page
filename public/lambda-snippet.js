@@ -169,4 +169,33 @@
   window.lambdaPage.track = function (stage) {
     send("funnel_stage", { stage: stage });
   };
+
+  // ---- A/B testing: cookie/session-consistent variant assignment ----
+  window.lambdaPage.abAssign = function (testId, callback) {
+    var cacheKey = "lp_ab_" + testId;
+    var cached = sessionStorage.getItem(cacheKey);
+    if (cached) {
+      callback(JSON.parse(cached));
+      return;
+    }
+    fetch(endpoint.replace("/api/collect", "/api/ab/" + testId + "/assign"), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ sessionId: sessionId }),
+    })
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        sessionStorage.setItem(cacheKey, JSON.stringify(data));
+        callback(data);
+      })
+      .catch(function () {});
+  };
+  window.lambdaPage.abConvert = function (testId) {
+    fetch(endpoint.replace("/api/collect", "/api/ab/" + testId + "/convert"), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ sessionId: sessionId }),
+      keepalive: true,
+    }).catch(function () {});
+  };
 })();

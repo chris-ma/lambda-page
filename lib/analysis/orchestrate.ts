@@ -1,13 +1,16 @@
 import { createRun, completeRun, failRun } from "@/lib/db/runs";
-import { runStructuralAnalysis } from "./structural";
+import { runStructuralAnalysis, type BrandSpec } from "./structural";
 import { runLabVitals } from "./vitals";
+import { getProjectForPage } from "@/lib/db/projects";
 import type { FindingInput } from "@/lib/db/runs";
 
 export async function runPillar1(pageId: string, targetUrl: string) {
   const run = await createRun({ pageId, pillar: 1, kind: "structural", targetUrl });
   try {
+    const project = await getProjectForPage(pageId);
+    const brand = (project?.palette as BrandSpec | null) ?? undefined;
     const [dom, vitals] = await Promise.allSettled([
-      runStructuralAnalysis(targetUrl),
+      runStructuralAnalysis(targetUrl, brand),
       runLabVitals(targetUrl),
     ]);
 
