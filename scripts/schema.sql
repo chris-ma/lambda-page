@@ -116,6 +116,42 @@ create table if not exists ab_conversions (
   created_at timestamptz not null default now()
 );
 
+-- ── Pillar 3 — Eye Tracking (task-based webcam gaze studies) ────────────────
+-- An eye test captures a screenshot of a target URL as the stimulus; a
+-- participant views it while WebGazer records gaze points (normalized 0..1
+-- over the stimulus, with a millisecond offset for sequencing).
+create table if not exists eye_tests (
+  id uuid primary key default gen_random_uuid(),
+  project_id uuid not null references projects(id) on delete cascade,
+  name text not null,
+  target_url text not null,
+  stimulus bytea,
+  stim_width int,
+  stim_height int,
+  status text not null default 'capturing' check (status in ('capturing', 'ready', 'error')),
+  error text,
+  created_at timestamptz not null default now()
+);
+create index if not exists eye_tests_project_idx on eye_tests(project_id);
+
+create table if not exists eye_sessions (
+  id uuid primary key default gen_random_uuid(),
+  test_id uuid not null references eye_tests(id) on delete cascade,
+  device text,
+  created_at timestamptz not null default now(),
+  ended_at timestamptz
+);
+create index if not exists eye_sessions_test_idx on eye_sessions(test_id);
+
+create table if not exists gaze_points (
+  id bigserial primary key,
+  session_id uuid not null references eye_sessions(id) on delete cascade,
+  x real not null,
+  y real not null,
+  t integer not null
+);
+create index if not exists gaze_points_session_idx on gaze_points(session_id);
+
 insert into projects (name)
 select 'Lambda Page Workspace'
 where not exists (select 1 from projects);
