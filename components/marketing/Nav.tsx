@@ -102,9 +102,14 @@ export function Nav() {
       {active && !mobileOpen && (
         <div className="hidden border-t-2 border-ink bg-paper md:block">
           <div className="mx-auto max-w-[1200px] px-6 py-6">
-            <div className="mb-4 font-mono text-[10px] tracking-wide text-ink-soft uppercase">
-              {active.label} — Sub-Tools
-              {active.comingSoon && <span className="ml-2 text-brick">Coming with User Testing</span>}
+            <div className="mb-4 flex items-center justify-between font-mono text-[10px] tracking-wide text-ink-soft uppercase">
+              <span>
+                {active.label} — Sub-Tools
+                {active.comingSoon && <span className="ml-2 text-brick">Coming with User Testing</span>}
+              </span>
+              <Link href={`/pillars#${active.slug}`} onClick={() => setOpen(null)} className="text-ink hover:text-brick">
+                Why this pillar exists →
+              </Link>
             </div>
             <div className="grid grid-cols-2 gap-x-8 gap-y-5 md:grid-cols-4">
               {active.subTools.map((tool) =>

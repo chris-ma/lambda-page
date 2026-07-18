@@ -5,6 +5,7 @@ export function Footer() {
     <footer className="mt-auto bg-cream px-6 py-14 text-center">
       <div className="mx-auto flex max-w-[900px] flex-wrap items-center justify-center gap-8 font-body text-[13px] text-ink-soft">
         <Link href="/dashboard">Product</Link>
+        <Link href="/pillars">Pillars</Link>
         <Link href="/pricing">Pricing</Link>
         <Link href="/docs">Docs</Link>
         <Link href="/privacy">Privacy</Link>
