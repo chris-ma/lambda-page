@@ -95,6 +95,30 @@ export type Database = {
           { foreignKeyName: "five_second_sessions_test_id_fkey"; columns: ["test_id"]; isOneToOne: false; referencedRelation: "five_second_tests"; referencedColumns: ["id"] },
         ];
       };
+      usability_tests: {
+        Row: { id: string; project_id: string; name: string; target_url: string; task: string; goal_url_pattern: string | null; created_at: string };
+        Insert: { id?: string; project_id: string; name: string; target_url: string; task: string; goal_url_pattern?: string | null; created_at?: string };
+        Update: { id?: string; project_id?: string; name?: string; target_url?: string; task?: string; goal_url_pattern?: string | null; created_at?: string };
+        Relationships: [
+          { foreignKeyName: "usability_tests_project_id_fkey"; columns: ["project_id"]; isOneToOne: false; referencedRelation: "projects"; referencedColumns: ["id"] },
+        ];
+      };
+      usability_participants: {
+        Row: { id: string; test_id: string; code: string; label: string | null; started_at: string | null; last_seen_at: string | null; completed_at: string | null; created_at: string };
+        Insert: { id?: string; test_id: string; code: string; label?: string | null; started_at?: string | null; last_seen_at?: string | null; completed_at?: string | null; created_at?: string };
+        Update: { id?: string; test_id?: string; code?: string; label?: string | null; started_at?: string | null; last_seen_at?: string | null; completed_at?: string | null; created_at?: string };
+        Relationships: [
+          { foreignKeyName: "usability_participants_test_id_fkey"; columns: ["test_id"]; isOneToOne: false; referencedRelation: "usability_tests"; referencedColumns: ["id"] },
+        ];
+      };
+      usability_events: {
+        Row: { id: number; participant_id: string; type: string; url: string | null; selector: string | null; label: string | null; x: number | null; y: number | null; created_at: string };
+        Insert: { id?: number; participant_id: string; type: string; url?: string | null; selector?: string | null; label?: string | null; x?: number | null; y?: number | null; created_at?: string };
+        Update: { id?: number; participant_id?: string; type?: string; url?: string | null; selector?: string | null; label?: string | null; x?: number | null; y?: number | null; created_at?: string };
+        Relationships: [
+          { foreignKeyName: "usability_events_participant_id_fkey"; columns: ["participant_id"]; isOneToOne: false; referencedRelation: "usability_participants"; referencedColumns: ["id"] },
+        ];
+      };
       events: {
         Row: {
           created_at: string; device: string | null; id: string; page_id: string; path: string | null;
