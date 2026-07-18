@@ -2,19 +2,12 @@ import { Button } from "@/components/ui/Button";
 import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
 import { LambdaMark } from "@/components/ui/LambdaMark";
 import { Reveal } from "@/components/ui/Reveal";
+import { HeroBackgroundVideo } from "@/components/marketing/HeroBackgroundVideo";
 
 export function Hero() {
   return (
     <section className="relative overflow-hidden border-b-2 border-ink bg-paper px-6 py-24 text-center">
-      <video
-        className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-20"
-        src="/hero-bg.mp4"
-        autoPlay
-        loop
-        muted
-        playsInline
-        aria-hidden="true"
-      />
+      <HeroBackgroundVideo />
       <div className="relative">
         <Reveal>
           <EyebrowLabel className="justify-center">Lambda Page — Diagnostic Toolkit</EyebrowLabel>
