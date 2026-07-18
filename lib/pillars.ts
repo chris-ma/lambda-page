@@ -81,7 +81,7 @@ export const PILLARS_NAV: PillarNavItem[] = [
     comingSoon: true,
     subTools: [
       { label: "Eye Tracking", description: "Fixation points and attention sequence — built now, ahead of the rest of this pillar.", href: "/dashboard/eye-tracking" },
-      { label: "5-Second Test", description: "Recall accuracy and confidence rating." },
+      { label: "5-Second Test", description: "First-impression recall — screenshot in, questions in, five seconds, then answers.", href: "/dashboard/five-second" },
       { label: "Usability Testing", description: "Task completion, time-on-task, think-aloud friction." },
       { label: "Card Sorting & Tree Testing", description: "Category groupings and findability." },
     ],

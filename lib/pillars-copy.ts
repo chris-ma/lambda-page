@@ -21,6 +21,6 @@ export const PILLAR_COPY: Record<
   3: {
     tagline: "Behavioral data shows where; this shows why",
     why: "A funnel chart can tell you that 40% of visitors drop off at step three. It can't tell you whether that's because the copy confused them, the layout hid the next step, or the price surprised them. Answering \"why\" requires watching or asking real people directly — attention data, task-based sessions, structured comprehension tests — which is a fundamentally different (and slower, more expensive) kind of measurement than an analytics pipeline.",
-    what: "User Testing is the qualitative counterpart to Pillar 02: eye tracking for attention sequence, moderated and unmoderated usability sessions, five-second comprehension tests, and card sorting for how people actually categorize what you've built. Eye Tracking already ships; the rest of this pillar is still being built.",
+    what: "User Testing is the qualitative counterpart to Pillar 02: eye tracking for attention sequence, five-second comprehension tests for first-impression recall, moderated and unmoderated usability sessions, and card sorting for how people actually categorize what you've built. Eye Tracking and the 5-Second Test already ship; usability sessions and card sorting are still being built.",
   },
 };

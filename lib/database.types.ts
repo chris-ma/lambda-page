@@ -71,6 +71,30 @@ export type Database = {
           { foreignKeyName: "competitive_sets_project_id_fkey"; columns: ["project_id"]; isOneToOne: false; referencedRelation: "projects"; referencedColumns: ["id"] },
         ];
       };
+      five_second_tests: {
+        Row: { id: string; project_id: string; name: string; brief: string | null; image: Buffer; image_mime: string; image_width: number; image_height: number; created_at: string };
+        Insert: { id?: string; project_id: string; name: string; brief?: string | null; image: Buffer; image_mime?: string; image_width: number; image_height: number; created_at?: string };
+        Update: { id?: string; project_id?: string; name?: string; brief?: string | null; image?: Buffer; image_mime?: string; image_width?: number; image_height?: number; created_at?: string };
+        Relationships: [
+          { foreignKeyName: "five_second_tests_project_id_fkey"; columns: ["project_id"]; isOneToOne: false; referencedRelation: "projects"; referencedColumns: ["id"] },
+        ];
+      };
+      five_second_questions: {
+        Row: { id: string; test_id: string; prompt: string; position: number };
+        Insert: { id?: string; test_id: string; prompt: string; position?: number };
+        Update: { id?: string; test_id?: string; prompt?: string; position?: number };
+        Relationships: [
+          { foreignKeyName: "five_second_questions_test_id_fkey"; columns: ["test_id"]; isOneToOne: false; referencedRelation: "five_second_tests"; referencedColumns: ["id"] },
+        ];
+      };
+      five_second_sessions: {
+        Row: { id: string; test_id: string; answers: Json; created_at: string };
+        Insert: { id?: string; test_id: string; answers?: Json; created_at?: string };
+        Update: { id?: string; test_id?: string; answers?: Json; created_at?: string };
+        Relationships: [
+          { foreignKeyName: "five_second_sessions_test_id_fkey"; columns: ["test_id"]; isOneToOne: false; referencedRelation: "five_second_tests"; referencedColumns: ["id"] },
+        ];
+      };
       events: {
         Row: {
           created_at: string; device: string | null; id: string; page_id: string; path: string | null;
