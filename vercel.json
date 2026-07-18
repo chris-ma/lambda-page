@@ -2,30 +2,24 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "functions": {
     "app/api/analyze/structural/route.ts": {
-      "memory": 2048,
       "maxDuration": 120
     },
     "app/api/analyze/competitive/route.ts": {
-      "memory": 2048,
       "maxDuration": 60
     },
     "app/api/analyze/competitive-set/route.ts": {
-      "memory": 2048,
       "maxDuration": 180
     },
     "app/api/analyze/design-audit/route.ts": {
-      "memory": 2048,
       "maxDuration": 60
     },
     "app/api/analyze/content-fit/route.ts": {
-      "memory": 2048,
       "maxDuration": 60
     },
     "app/api/analyze/wireframe/route.ts": {
       "maxDuration": 60
     },
     "app/api/eye-tests/route.ts": {
-      "memory": 2048,
       "maxDuration": 60
     }
   }

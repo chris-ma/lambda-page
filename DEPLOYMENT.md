@@ -46,9 +46,12 @@ build-command overrides needed.
   `/tmp` on the first request. `playwright-core` and Lighthouse both drive it.
 - **Locally**: the pre-installed Chromium at `LOCAL_CHROMIUM_PATH`.
 
-`vercel.json` gives the two analysis routes 2048 MB (Chromium + Lighthouse are
-memory-hungry) and their respective timeouts. Both are pinned to the Node.js
-runtime (they use native modules and can't run on Edge).
+`vercel.json` gives the analysis routes their respective `maxDuration`
+timeouts (Chromium + Lighthouse are slow, not just memory-hungry). All are
+pinned to the Node.js runtime (they use native modules and can't run on
+Edge). If your Vercel plan bills on **fixed CPU** rather than **Active
+CPU/Fluid Compute**, you may also want to set a `memory` value per function —
+Active CPU billing ignores it and scales dynamically instead.
 
 Expect the **first** analysis request after a cold start to take a few extra
 seconds while Chromium extracts; subsequent calls on a warm instance are
@@ -76,5 +79,6 @@ faster.
   use, keep them warm or move analysis to a background worker later.
 - **Pooler vs. direct**: always the pooler for the app. Use the direct
   connection only for one-off migrations/psql.
-- **Memory**: 2048 MB is a safe default for Chromium+Lighthouse; lower it in
-  `vercel.json` if you want to trim cost and your target pages are light.
+- **Memory**: only relevant on fixed-CPU billing — `vercel.json` doesn't set
+  it since Active CPU/Fluid Compute (the current default for new projects)
+  ignores the field and scales memory dynamically.
