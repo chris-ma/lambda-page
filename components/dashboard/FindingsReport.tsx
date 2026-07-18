@@ -27,12 +27,22 @@ export function FindingsReport({ findings }: { findings: Finding[] }) {
                 <summary className="flex cursor-pointer list-none items-center gap-3">
                   <StatusIcon status={f.status as Status} size={18} />
                   <span className="flex-1 font-body text-[13.5px] text-ink">{f.attribute}</span>
+                  {f.judgment && (
+                    <span className="border border-dashed border-pink-deep px-1.5 py-0.5 font-mono text-[9px] tracking-wide text-pink-deep uppercase">
+                      AI judgment
+                    </span>
+                  )}
                   {f.value && <span className="font-mono text-[11px] text-ink-soft">{f.value}</span>}
                   <span className="font-mono text-[10px] text-ink-soft transition-transform group-open:rotate-90">
                     ▸
                   </span>
                 </summary>
                 <div className="mt-3 pl-[30px] text-[12.5px] leading-relaxed text-ink-soft">
+                  {f.judgment && (
+                    <p className="mb-2 font-mono text-[10px] text-ink-soft italic">
+                      Claude&rsquo;s read of this material — a judgment call, not a measured fact.
+                    </p>
+                  )}
                   {f.detail && <p>{f.detail}</p>}
                   {f.fix && (
                     <p className="mt-2 border-l-2 border-teal-deep pl-3 text-ink">

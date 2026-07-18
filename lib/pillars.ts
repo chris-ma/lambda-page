@@ -5,7 +5,7 @@ export type PillarNavItem = {
   slug: string;
   label: string;
   comingSoon?: boolean;
-  subTools: { label: string; description: string }[];
+  subTools: { label: string; description: string; href?: string }[];
 };
 
 export const PILLARS_NAV: PillarNavItem[] = [
@@ -14,10 +14,26 @@ export const PILLARS_NAV: PillarNavItem[] = [
     slug: "pre-build",
     label: "Pre-Build",
     subTools: [
-      { label: "Message & Concept Testing", description: "Comprehension, recall, and confidence per headline variant." },
-      { label: "Competitive Scan", description: "Hero framing, pricing visibility, and trust signals — automated." },
-      { label: "Wireframe Testing", description: "Same scrutiny as a finished page, run on a prototype." },
-      { label: "Assumption Interviews", description: "Pricing tolerance and segment validity — a research process, not a dashboard." },
+      {
+        label: "Message & Concept Testing",
+        description: "Claude judges your copy against an audience you describe.",
+        href: "/dashboard/pre-build/content-fit/new",
+      },
+      {
+        label: "Competitive Scan",
+        description: "Scan multiple competitor URLs — findings plus an AI synthesis.",
+        href: "/dashboard/pre-build/competitive/new",
+      },
+      {
+        label: "Wireframe Testing",
+        description: "Upload a prototype screenshot for pinned AI critique.",
+        href: "/dashboard/pre-build/wireframe/new",
+      },
+      {
+        label: "Assumption Interviews",
+        description: "Pricing tolerance and segment validity — a research process, not a dashboard.",
+        href: "/dashboard/pre-build",
+      },
     ],
   },
   {
@@ -25,10 +41,26 @@ export const PILLARS_NAV: PillarNavItem[] = [
     slug: "structural",
     label: "Structural",
     subTools: [
-      { label: "Design & Content Audit", description: "Heading hierarchy, contrast, readability, brand consistency." },
-      { label: "SEO Analysis", description: "Meta tags, structured data, indexability." },
-      { label: "AEO / GEO Analysis", description: "Extractability for answer and generative engines." },
-      { label: "Page Vitals", description: "Lab-based LCP, INP, CLS — no live traffic needed." },
+      {
+        label: "Design & Content Audit",
+        description: "Screenshot + pinned AI critique on hierarchy, clarity, and polish.",
+        href: "/dashboard/structural/design-audit/new",
+      },
+      {
+        label: "SEO Analysis",
+        description: "Meta tags, structured data, indexability — pick a connected page.",
+        href: "/dashboard",
+      },
+      {
+        label: "AEO / GEO Analysis",
+        description: "Extractability for answer and generative engines — pick a connected page.",
+        href: "/dashboard",
+      },
+      {
+        label: "Page Vitals",
+        description: "Lab-based LCP, INP, CLS — pick a connected page.",
+        href: "/dashboard",
+      },
     ],
   },
   {
@@ -36,10 +68,10 @@ export const PILLARS_NAV: PillarNavItem[] = [
     slug: "behavioral",
     label: "Behavioral",
     subTools: [
-      { label: "Heatmaps & Session Replay", description: "Click density, scroll depth, rage-clicks." },
-      { label: "Funnel Analytics", description: "Stage-to-stage drop-off, segmented by device and source." },
-      { label: "Form Field Analytics", description: "Field-level abandonment, time-per-field, validation errors." },
-      { label: "A/B Testing", description: "Conversion rate per variant with real significance testing." },
+      { label: "Heatmaps & Session Replay", description: "Click density, scroll depth, rage-clicks.", href: "/dashboard" },
+      { label: "Funnel Analytics", description: "Stage-to-stage drop-off, segmented by device and source.", href: "/dashboard" },
+      { label: "Form Field Analytics", description: "Field-level abandonment, time-per-field, validation errors.", href: "/dashboard" },
+      { label: "A/B Testing", description: "Conversion rate per variant with real significance testing.", href: "/dashboard" },
     ],
   },
   {
@@ -48,7 +80,7 @@ export const PILLARS_NAV: PillarNavItem[] = [
     label: "User Testing",
     comingSoon: true,
     subTools: [
-      { label: "Eye Tracking", description: "Fixation points and attention sequence." },
+      { label: "Eye Tracking", description: "Fixation points and attention sequence — built now, ahead of the rest of this pillar.", href: "/dashboard/eye-tracking" },
       { label: "5-Second Test", description: "Recall accuracy and confidence rating." },
       { label: "Usability Testing", description: "Task completion, time-on-task, think-aloud friction." },
       { label: "Card Sorting & Tree Testing", description: "Category groupings and findability." },

@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { listCompetitiveRuns } from "@/lib/db/runs";
+import { listCompetitiveSets } from "@/lib/db/competitive-sets";
+import { listRunsByKind } from "@/lib/db/runs";
 import { listMessageTests } from "@/lib/db/message-tests";
 import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
 import { Card } from "@/components/ui/Card";
@@ -9,7 +10,12 @@ import { Tag } from "@/components/ui/Tag";
 export const dynamic = "force-dynamic";
 
 export default async function PreBuildHub() {
-  const [scans, tests] = await Promise.all([listCompetitiveRuns(), listMessageTests()]);
+  const [sets, tests, contentFitRuns, wireframeRuns] = await Promise.all([
+    listCompetitiveSets(),
+    listMessageTests(),
+    listRunsByKind("content_fit"),
+    listRunsByKind("wireframe"),
+  ]);
 
   return (
     <div>
@@ -21,24 +27,25 @@ export default async function PreBuildHub() {
 
       <section className="mt-10">
         <div className="flex flex-wrap items-center justify-between gap-4">
-          <h2 className="font-display text-[18px] font-semibold text-ink">Competitive / Positioning Scans</h2>
+          <h2 className="font-display text-[18px] font-semibold text-ink">Competitive Scan</h2>
           <Button href="/dashboard/pre-build/competitive/new">New scan</Button>
         </div>
         <p className="mt-1.5 text-[12.5px] text-ink-soft">
-          Fully automatable — headless browser + DOM extraction, scored the same way Pillar 01
-          scores a live page.
+          Scan a list of competitor URLs — hero framing, pricing visibility, and trust signals per
+          site (headless browser), then a Claude synthesis of the competitive landscape and how to
+          position against it.
         </p>
-        {scans.length === 0 ? (
+        {sets.length === 0 ? (
           <Card hover={false} className="mt-4 border-dashed p-8 text-center text-[13px] text-ink-soft">
-            No scans yet. Run one against a competitor&rsquo;s landing page.
+            No scans yet. Run one against a set of competitor landing pages.
           </Card>
         ) : (
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
-            {scans.map((s) => (
-              <Link key={s.id} href={`/dashboard/pre-build/competitive/${s.id}`}>
+            {sets.map((s) => (
+              <Link key={s.id} href={`/dashboard/pre-build/competitive-set/${s.id}`}>
                 <Card className="p-5">
                   <div className="flex items-center justify-between gap-3">
-                    <span className="truncate font-body text-[13.5px] text-ink">{s.target_url}</span>
+                    <span className="truncate font-body text-[13.5px] text-ink">{s.name}</span>
                     <Tag status={s.status === "complete" ? "PASS" : s.status === "error" ? "FAILING" : "INFO"} label={s.status} size="sm" />
                   </div>
                   <p className="mt-1.5 font-mono text-[10.5px] text-ink-soft">{new Date(s.created_at).toLocaleString()}</p>
@@ -52,17 +59,74 @@ export default async function PreBuildHub() {
       <section className="mt-14">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <h2 className="font-display text-[18px] font-semibold text-ink">Message & Concept Testing</h2>
-          <Button href="/dashboard/pre-build/message-tests/new">New test</Button>
+          <Button href="/dashboard/pre-build/content-fit/new">New analysis</Button>
         </div>
         <p className="mt-1.5 text-[12.5px] text-ink-soft">
-          Simple to build; the hard part is sourcing an unbiased panel — bring your own
-          respondents to the share link.
+          Claude judges a page&rsquo;s copy against an audience you describe — value proposition,
+          tone, jargon, objection handling. Findings are marked as AI judgment calls, not measured
+          facts.
         </p>
-        {tests.length === 0 ? (
+        {contentFitRuns.length === 0 ? (
           <Card hover={false} className="mt-4 border-dashed p-8 text-center text-[13px] text-ink-soft">
-            No message tests yet. Create headline/message variants to test comprehension and recall.
+            No content/audience-fit analyses yet.
           </Card>
         ) : (
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            {contentFitRuns.map((r) => (
+              <Link key={r.id} href={`/dashboard/pre-build/content-fit/${r.id}`}>
+                <Card className="p-5">
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="truncate font-body text-[13.5px] text-ink">{r.target_url}</span>
+                    <Tag status={r.status === "complete" ? "PASS" : r.status === "error" ? "FAILING" : "INFO"} label={r.status} size="sm" />
+                  </div>
+                  <p className="mt-1.5 font-mono text-[10.5px] text-ink-soft">{new Date(r.created_at).toLocaleString()}</p>
+                </Card>
+              </Link>
+            ))}
+          </div>
+        )}
+      </section>
+
+      <section className="mt-14">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <h2 className="font-display text-[18px] font-semibold text-ink">Wireframe Testing</h2>
+          <Button href="/dashboard/pre-build/wireframe/new">New test</Button>
+        </div>
+        <p className="mt-1.5 text-[12.5px] text-ink-soft">
+          Upload a prototype screenshot (or paste a Figma link for reference) and get pinned visual
+          feedback before a single line of code is written.
+        </p>
+        {wireframeRuns.length === 0 ? (
+          <Card hover={false} className="mt-4 border-dashed p-8 text-center text-[13px] text-ink-soft">
+            No wireframe tests yet. Upload a prototype image to get started.
+          </Card>
+        ) : (
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            {wireframeRuns.map((r) => (
+              <Link key={r.id} href={`/dashboard/pre-build/wireframe/${r.id}`}>
+                <Card className="p-5">
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="truncate font-body text-[13.5px] text-ink">{r.name ?? r.target_url}</span>
+                    <Tag status={r.status === "complete" ? "PASS" : r.status === "error" ? "FAILING" : "INFO"} label={r.status} size="sm" />
+                  </div>
+                  <p className="mt-1.5 font-mono text-[10.5px] text-ink-soft">{new Date(r.created_at).toLocaleString()}</p>
+                </Card>
+              </Link>
+            ))}
+          </div>
+        )}
+      </section>
+
+      <section className="mt-14">
+        <h2 className="font-display text-[18px] font-semibold text-ink">Message & Concept Testing — panel-based</h2>
+        <p className="mt-1.5 text-[12.5px] text-ink-soft">
+          Real respondent comprehension/recall/confidence per headline variant — a shareable link,
+          not automated. Bring your own panel.
+        </p>
+        <div className="mt-4 flex flex-wrap items-center gap-4">
+          <Button href="/dashboard/pre-build/message-tests/new">New panel test</Button>
+        </div>
+        {tests.length > 0 && (
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             {tests.map((t) => (
               <Link key={t.id} href={`/dashboard/pre-build/message-tests/${t.id}`}>
@@ -76,16 +140,7 @@ export default async function PreBuildHub() {
         )}
       </section>
 
-      <section className="mt-14 grid gap-5 sm:grid-cols-2">
-        <Card hover={false} className="border-dashed p-6">
-          <h3 className="font-display text-[16px] font-semibold text-ink">Wireframe / Prototype Testing</h3>
-          <p className="mt-2 text-[12.5px] text-ink-soft">
-            Same attributes as a 5-second test, card sort, and tree test — run against a static
-            image or clickable prototype. This reuses Pillar 03&rsquo;s user-testing tools with
-            prototype input instead of a live URL, so it ships alongside Pillar 03 (User Testing).
-          </p>
-          <Tag status="INFO" label="Coming with Pillar 03" size="sm" className="mt-3" />
-        </Card>
+      <section className="mt-14">
         <Card hover={false} className="border-dashed p-6">
           <h3 className="font-display text-[16px] font-semibold text-ink">Assumption / Customer Interviews</h3>
           <p className="mt-2 text-[12.5px] text-ink-soft">

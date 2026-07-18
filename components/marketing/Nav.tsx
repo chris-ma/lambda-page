@@ -107,12 +107,22 @@ export function Nav() {
               {active.comingSoon && <span className="ml-2 text-brick">Coming with User Testing</span>}
             </div>
             <div className="grid grid-cols-2 gap-x-8 gap-y-5 md:grid-cols-4">
-              {active.subTools.map((tool) => (
-                <div key={tool.label}>
-                  <div className="font-display text-[14px] font-semibold text-ink">{tool.label}</div>
-                  <p className="mt-1.5 max-w-none text-[11.5px] leading-snug text-ink-soft">{tool.description}</p>
-                </div>
-              ))}
+              {active.subTools.map((tool) =>
+                tool.href ? (
+                  <Link key={tool.label} href={tool.href} onClick={() => setOpen(null)} className="group">
+                    <div className="font-display text-[14px] font-semibold text-ink group-hover:text-brick">{tool.label} →</div>
+                    <p className="mt-1.5 max-w-none text-[11.5px] leading-snug text-ink-soft">{tool.description}</p>
+                  </Link>
+                ) : (
+                  <div key={tool.label}>
+                    <div className="flex items-baseline gap-1.5 font-display text-[14px] font-semibold text-ink-soft">
+                      {tool.label}
+                      <span className="font-mono text-[8px] tracking-wide text-ink-soft uppercase">not built yet</span>
+                    </div>
+                    <p className="mt-1.5 max-w-none text-[11.5px] leading-snug text-ink-soft">{tool.description}</p>
+                  </div>
+                ),
+              )}
             </div>
           </div>
         </div>
@@ -130,8 +140,14 @@ export function Nav() {
                 </div>
                 <ul className="mt-2 space-y-1.5">
                   {p.subTools.map((tool) => (
-                    <li key={tool.label} className="font-body text-[13px] text-ink-soft">
-                      {tool.label}
+                    <li key={tool.label} className="font-body text-[13px]">
+                      {tool.href ? (
+                        <Link href={tool.href} onClick={() => setMobileOpen(false)} className="text-ink underline">
+                          {tool.label}
+                        </Link>
+                      ) : (
+                        <span className="text-ink-soft">{tool.label} — not built yet</span>
+                      )}
                     </li>
                   ))}
                 </ul>

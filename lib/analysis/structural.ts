@@ -199,11 +199,11 @@ export async function runStructuralAnalysis(
     // ---- Design & Content Audit: heading hierarchy ----
     const h1Count = dom.headings.filter((h) => h.level === 1).length;
     if (h1Count === 1) {
-      findings.push({ component: "Design & Content Audit", attribute: "Heading hierarchy — single H1", status: "PASS", value: "1", detail: `H1: "${dom.headings.find((h) => h.level === 1)?.text}"` });
+      findings.push({ component: "Content & Accessibility", attribute: "Heading hierarchy — single H1", status: "PASS", value: "1", detail: `H1: "${dom.headings.find((h) => h.level === 1)?.text}"` });
     } else if (h1Count === 0) {
-      findings.push({ component: "Design & Content Audit", attribute: "Heading hierarchy — single H1", status: "FAILING", value: "0", detail: "No H1 found on the page.", fix: "Add exactly one H1 that states the page's primary subject." });
+      findings.push({ component: "Content & Accessibility", attribute: "Heading hierarchy — single H1", status: "FAILING", value: "0", detail: "No H1 found on the page.", fix: "Add exactly one H1 that states the page's primary subject." });
     } else {
-      findings.push({ component: "Design & Content Audit", attribute: "Heading hierarchy — single H1", status: "FAILING", value: String(h1Count), detail: `${h1Count} H1 elements found.`, fix: "Reduce to a single H1; demote the others to H2 or lower." });
+      findings.push({ component: "Content & Accessibility", attribute: "Heading hierarchy — single H1", status: "FAILING", value: String(h1Count), detail: `${h1Count} H1 elements found.`, fix: "Reduce to a single H1; demote the others to H2 or lower." });
     }
 
     let skipped = 0;
@@ -212,8 +212,8 @@ export async function runStructuralAnalysis(
     }
     findings.push(
       skipped === 0
-        ? { component: "Design & Content Audit", attribute: "Heading nesting", status: "PASS", value: "0 skipped levels", detail: "No heading levels are skipped." }
-        : { component: "Design & Content Audit", attribute: "Heading nesting", status: "FLAGGED", value: `${skipped} skipped level(s)`, detail: "One or more headings skip a level (e.g. H2 to H4).", fix: "Adjust heading levels so each step down is sequential." },
+        ? { component: "Content & Accessibility", attribute: "Heading nesting", status: "PASS", value: "0 skipped levels", detail: "No heading levels are skipped." }
+        : { component: "Content & Accessibility", attribute: "Heading nesting", status: "FLAGGED", value: `${skipped} skipped level(s)`, detail: "One or more headings skip a level (e.g. H2 to H4).", fix: "Adjust heading levels so each step down is sequential." },
     );
 
     // ---- Contrast ----
@@ -234,12 +234,12 @@ export async function runStructuralAnalysis(
       }
     }
     if (contrastChecked === 0) {
-      findings.push({ component: "Design & Content Audit", attribute: "Color contrast (WCAG AA)", status: "INFO", detail: "No text samples with resolvable colors were found to check." });
+      findings.push({ component: "Content & Accessibility", attribute: "Color contrast (WCAG AA)", status: "INFO", detail: "No text samples with resolvable colors were found to check." });
     } else if (contrastFails === 0) {
-      findings.push({ component: "Design & Content Audit", attribute: "Color contrast (WCAG AA)", status: "PASS", value: `${contrastChecked} elements checked`, detail: "All sampled text passes WCAG AA contrast." });
+      findings.push({ component: "Content & Accessibility", attribute: "Color contrast (WCAG AA)", status: "PASS", value: `${contrastChecked} elements checked`, detail: "All sampled text passes WCAG AA contrast." });
     } else {
       findings.push({
-        component: "Design & Content Audit",
+        component: "Content & Accessibility",
         attribute: "Color contrast (WCAG AA)",
         status: contrastFails / contrastChecked > 0.15 ? "FAILING" : "FLAGGED",
         value: `${contrastFails}/${contrastChecked} fail`,
@@ -252,37 +252,37 @@ export async function runStructuralAnalysis(
     const missingAlt = dom.imgs.filter((i) => !i.hasAlt);
     findings.push(
       dom.imgs.length === 0
-        ? { component: "Design & Content Audit", attribute: "Image alt text", status: "INFO", detail: "No <img> elements found on the page." }
+        ? { component: "Content & Accessibility", attribute: "Image alt text", status: "INFO", detail: "No <img> elements found on the page." }
         : missingAlt.length === 0
-          ? { component: "Design & Content Audit", attribute: "Image alt text", status: "PASS", value: `${dom.imgs.length}/${dom.imgs.length}`, detail: "Every image has non-empty alt text." }
-          : { component: "Design & Content Audit", attribute: "Image alt text", status: "FAILING", value: `${missingAlt.length}/${dom.imgs.length} missing`, detail: `${missingAlt.length} image(s) missing alt text, e.g. ${missingAlt[0]?.src.slice(0, 60)}`, fix: "Add descriptive alt text to every content image; use alt=\"\" only for purely decorative images." },
+          ? { component: "Content & Accessibility", attribute: "Image alt text", status: "PASS", value: `${dom.imgs.length}/${dom.imgs.length}`, detail: "Every image has non-empty alt text." }
+          : { component: "Content & Accessibility", attribute: "Image alt text", status: "FAILING", value: `${missingAlt.length}/${dom.imgs.length} missing`, detail: `${missingAlt.length} image(s) missing alt text, e.g. ${missingAlt[0]?.src.slice(0, 60)}`, fix: "Add descriptive alt text to every content image; use alt=\"\" only for purely decorative images." },
     );
 
     // ---- Tap targets (mobile ≥24×24) ----
     const smallTargets = dom.tapTargets.filter((t) => t.w > 0 && t.h > 0 && (t.w < 24 || t.h < 24));
     findings.push(
       dom.tapTargets.length === 0
-        ? { component: "Design & Content Audit", attribute: "Mobile tap-target size", status: "INFO", detail: "No interactive elements found to measure." }
+        ? { component: "Content & Accessibility", attribute: "Mobile tap-target size", status: "INFO", detail: "No interactive elements found to measure." }
         : smallTargets.length === 0
-          ? { component: "Design & Content Audit", attribute: "Mobile tap-target size", status: "PASS", value: `${dom.tapTargets.length} checked`, detail: "All interactive elements are at least 24×24px at mobile width." }
-          : { component: "Design & Content Audit", attribute: "Mobile tap-target size", status: "FLAGGED", value: `${smallTargets.length}/${dom.tapTargets.length} under 24px`, detail: `Examples: ${smallTargets.slice(0, 3).map((t) => `${t.tag} "${t.text}" (${t.w}×${t.h}px)`).join("; ")}`, fix: "Increase padding so tap targets are at least 24×24px." },
+          ? { component: "Content & Accessibility", attribute: "Mobile tap-target size", status: "PASS", value: `${dom.tapTargets.length} checked`, detail: "All interactive elements are at least 24×24px at mobile width." }
+          : { component: "Content & Accessibility", attribute: "Mobile tap-target size", status: "FLAGGED", value: `${smallTargets.length}/${dom.tapTargets.length} under 24px`, detail: `Examples: ${smallTargets.slice(0, 3).map((t) => `${t.tag} "${t.text}" (${t.w}×${t.h}px)`).join("; ")}`, fix: "Increase padding so tap targets are at least 24×24px." },
     );
 
     // ---- Interaction-state definitions (hover / focus / error) ----
     findings.push(
       dom.hoverRuleCount > 0
-        ? { component: "Design & Content Audit", attribute: "Hover-state definitions", status: "PASS", value: `${dom.hoverRuleCount} rule(s)`, detail: "Same-origin stylesheets define :hover styles." }
-        : { component: "Design & Content Audit", attribute: "Hover-state definitions", status: "FLAGGED", detail: "No :hover rules found in readable stylesheets (cross-origin CSS can't be inspected).", fix: "Define visible hover states for interactive elements." },
+        ? { component: "Content & Accessibility", attribute: "Hover-state definitions", status: "PASS", value: `${dom.hoverRuleCount} rule(s)`, detail: "Same-origin stylesheets define :hover styles." }
+        : { component: "Content & Accessibility", attribute: "Hover-state definitions", status: "FLAGGED", detail: "No :hover rules found in readable stylesheets (cross-origin CSS can't be inspected).", fix: "Define visible hover states for interactive elements." },
     );
     findings.push(
       dom.focusRuleCount > 0
-        ? { component: "Design & Content Audit", attribute: "Focus-state definitions", status: "PASS", value: `${dom.focusRuleCount} rule(s)`, detail: "Focus styles are defined — important for keyboard accessibility." }
-        : { component: "Design & Content Audit", attribute: "Focus-state definitions", status: "FAILING", detail: "No :focus rules found in readable stylesheets.", fix: "Add visible :focus / :focus-visible styles so keyboard users can see the active element." },
+        ? { component: "Content & Accessibility", attribute: "Focus-state definitions", status: "PASS", value: `${dom.focusRuleCount} rule(s)`, detail: "Focus styles are defined — important for keyboard accessibility." }
+        : { component: "Content & Accessibility", attribute: "Focus-state definitions", status: "FAILING", detail: "No :focus rules found in readable stylesheets.", fix: "Add visible :focus / :focus-visible styles so keyboard users can see the active element." },
     );
     findings.push(
       dom.errorStateRuleCount > 0
-        ? { component: "Design & Content Audit", attribute: "Error-state definitions", status: "PASS", value: `${dom.errorStateRuleCount} rule(s)`, detail: "Error/invalid-state styling is defined." }
-        : { component: "Design & Content Audit", attribute: "Error-state definitions", status: "INFO", detail: "No :invalid or .error styling found — may be fine if the page has no forms.", fix: "If the page has a form, define a clear error/invalid state." },
+        ? { component: "Content & Accessibility", attribute: "Error-state definitions", status: "PASS", value: `${dom.errorStateRuleCount} rule(s)`, detail: "Error/invalid-state styling is defined." }
+        : { component: "Content & Accessibility", attribute: "Error-state definitions", status: "INFO", detail: "No :invalid or .error styling found — may be fine if the page has no forms.", fix: "If the page has a form, define a clear error/invalid state." },
     );
 
     // ---- Design / brand consistency (against the project's reference spec, if set) ----
@@ -296,8 +296,8 @@ export async function runStructuralAnalysis(
         });
         findings.push(
           offBrand.length === 0
-            ? { component: "Design & Content Audit", attribute: "Color palette consistency", status: "PASS", value: `${dom.colorUsage.length} text colors checked`, detail: "All prominent text colors match the defined palette." }
-            : { component: "Design & Content Audit", attribute: "Color palette consistency", status: "FLAGGED", value: `${offBrand.length} off-palette color(s)`, detail: `e.g. ${offBrand.slice(0, 3).map((o) => o.color).join(", ")}`, fix: "Replace off-palette text colors with the nearest defined brand color." },
+            ? { component: "Content & Accessibility", attribute: "Color palette consistency", status: "PASS", value: `${dom.colorUsage.length} text colors checked`, detail: "All prominent text colors match the defined palette." }
+            : { component: "Content & Accessibility", attribute: "Color palette consistency", status: "FLAGGED", value: `${offBrand.length} off-palette color(s)`, detail: `e.g. ${offBrand.slice(0, 3).map((o) => o.color).join(", ")}`, fix: "Replace off-palette text colors with the nearest defined brand color." },
         );
       }
       if (brand.fonts?.length) {
@@ -305,13 +305,13 @@ export async function runStructuralAnalysis(
         const offFonts = dom.fontFamiliesUsed.filter((f) => f && !refFonts.some((r) => f.toLowerCase().includes(r) || r.includes(f.toLowerCase())));
         findings.push(
           offFonts.length === 0
-            ? { component: "Design & Content Audit", attribute: "Font/type-system consistency", status: "PASS", value: dom.fontFamiliesUsed.join(", "), detail: "All fonts match the defined type system." }
-            : { component: "Design & Content Audit", attribute: "Font/type-system consistency", status: "FLAGGED", value: `${offFonts.length} off-system font(s)`, detail: `Unexpected: ${offFonts.join(", ")}`, fix: "Use only the fonts defined in the type system." },
+            ? { component: "Content & Accessibility", attribute: "Font/type-system consistency", status: "PASS", value: dom.fontFamiliesUsed.join(", "), detail: "All fonts match the defined type system." }
+            : { component: "Content & Accessibility", attribute: "Font/type-system consistency", status: "FLAGGED", value: `${offFonts.length} off-system font(s)`, detail: `Unexpected: ${offFonts.join(", ")}`, fix: "Use only the fonts defined in the type system." },
         );
       }
     } else {
       findings.push({
-        component: "Design & Content Audit",
+        component: "Content & Accessibility",
         attribute: "Design / brand consistency",
         status: "INFO",
         value: `${dom.fontFamiliesUsed.length} font(s), ${dom.colorUsage.length} text colors`,
@@ -323,18 +323,18 @@ export async function runStructuralAnalysis(
     // ---- Content: readability, word count, jargon ----
     const { score, words } = fleschReadingEase(dom.bodyText);
     findings.push({
-      component: "Design & Content Audit",
+      component: "Content & Accessibility",
       attribute: "Readability (Flesch Reading Ease)",
       status: score >= 50 ? "PASS" : score >= 30 ? "FLAGGED" : "FAILING",
       value: `${score} — ${readabilityLabel(score)}`,
       detail: `Computed from ${words} words of visible body text.`,
       fix: score < 50 ? "Shorten sentences and prefer plain words over multi-syllable jargon." : undefined,
     });
-    findings.push({ component: "Design & Content Audit", attribute: "Word count", status: "INFO", value: `${words} words`, detail: "Total visible body copy." });
+    findings.push({ component: "Content & Accessibility", attribute: "Word count", status: "INFO", value: `${words} words`, detail: "Total visible body copy." });
 
     const { density, hits } = jargonDensity(dom.bodyText);
     findings.push({
-      component: "Design & Content Audit",
+      component: "Content & Accessibility",
       attribute: "Jargon density",
       status: density > 0.01 ? "FLAGGED" : "PASS",
       value: `${(density * 100).toFixed(2)}%`,

@@ -4,6 +4,7 @@ import { LambdaMark } from "@/components/ui/LambdaMark";
 const LINKS = [
   { href: "/dashboard", label: "Pages" },
   { href: "/dashboard/pre-build", label: "Pre-Build (00)" },
+  { href: "/dashboard/structural", label: "Structural (01)" },
   { href: "/dashboard/eye-tracking", label: "Eye Tracking (03)" },
 ];
 

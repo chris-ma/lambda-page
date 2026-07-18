@@ -43,17 +43,32 @@ export type Database = {
         Row: {
           completed_at: string | null; created_at: string; error: string | null; id: string; kind: string;
           page_id: string | null; pillar: number; status: string; summary: Json | null; target_url: string;
+          stimulus: Buffer | null; stim_width: number | null; stim_height: number | null; stim_mime: string; context: string | null;
+          name: string | null; set_id: string | null;
         };
         Insert: {
           completed_at?: string | null; created_at?: string; error?: string | null; id?: string; kind: string;
           page_id?: string | null; pillar: number; status?: string; summary?: Json | null; target_url: string;
+          stimulus?: Buffer | null; stim_width?: number | null; stim_height?: number | null; stim_mime?: string; context?: string | null;
+          name?: string | null; set_id?: string | null;
         };
         Update: {
           completed_at?: string | null; created_at?: string; error?: string | null; id?: string; kind?: string;
           page_id?: string | null; pillar?: number; status?: string; summary?: Json | null; target_url?: string;
+          stimulus?: Buffer | null; stim_width?: number | null; stim_height?: number | null; stim_mime?: string; context?: string | null;
+          name?: string | null; set_id?: string | null;
         };
         Relationships: [
           { foreignKeyName: "analysis_runs_page_id_fkey"; columns: ["page_id"]; isOneToOne: false; referencedRelation: "pages"; referencedColumns: ["id"] },
+          { foreignKeyName: "analysis_runs_set_id_fkey"; columns: ["set_id"]; isOneToOne: false; referencedRelation: "competitive_sets"; referencedColumns: ["id"] },
+        ];
+      };
+      competitive_sets: {
+        Row: { created_at: string; error: string | null; id: string; name: string; project_id: string; status: string; synthesis: string | null };
+        Insert: { created_at?: string; error?: string | null; id?: string; name: string; project_id: string; status?: string; synthesis?: string | null };
+        Update: { created_at?: string; error?: string | null; id?: string; name?: string; project_id?: string; status?: string; synthesis?: string | null };
+        Relationships: [
+          { foreignKeyName: "competitive_sets_project_id_fkey"; columns: ["project_id"]; isOneToOne: false; referencedRelation: "projects"; referencedColumns: ["id"] },
         ];
       };
       events: {
@@ -74,9 +89,9 @@ export type Database = {
         ];
       };
       findings: {
-        Row: { attribute: string; component: string; created_at: string; detail: string | null; fix: string | null; id: string; run_id: string; status: string; value: string | null };
-        Insert: { attribute: string; component: string; created_at?: string; detail?: string | null; fix?: string | null; id?: string; run_id: string; status: string; value?: string | null };
-        Update: { attribute?: string; component?: string; created_at?: string; detail?: string | null; fix?: string | null; id?: string; run_id?: string; status?: string; value?: string | null };
+        Row: { attribute: string; component: string; created_at: string; detail: string | null; fix: string | null; id: string; run_id: string; status: string; value: string | null; x: number | null; y: number | null; judgment: boolean };
+        Insert: { attribute: string; component: string; created_at?: string; detail?: string | null; fix?: string | null; id?: string; run_id: string; status: string; value?: string | null; x?: number | null; y?: number | null; judgment?: boolean };
+        Update: { attribute?: string; component?: string; created_at?: string; detail?: string | null; fix?: string | null; id?: string; run_id?: string; status?: string; value?: string | null; x?: number | null; y?: number | null; judgment?: boolean };
         Relationships: [
           { foreignKeyName: "findings_run_id_fkey"; columns: ["run_id"]; isOneToOne: false; referencedRelation: "analysis_runs"; referencedColumns: ["id"] },
         ];

@@ -21,7 +21,7 @@ export async function runPillar1(pageId: string, targetUrl: string) {
       findings.push(...dom.value.findings);
       Object.assign(summary, dom.value.summary);
     } else {
-      findings.push({ component: "Design & Content Audit", attribute: "Page render", status: "FAILING", detail: `Could not render the page: ${String(dom.reason?.message ?? dom.reason)}`, fix: "Confirm the URL is publicly reachable and does not block headless browsers." });
+      findings.push({ component: "Content & Accessibility", attribute: "Page render", status: "FAILING", detail: `Could not render the page: ${String(dom.reason?.message ?? dom.reason)}`, fix: "Confirm the URL is publicly reachable and does not block headless browsers." });
     }
 
     if (vitals.status === "fulfilled") {

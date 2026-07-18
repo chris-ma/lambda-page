@@ -23,6 +23,7 @@ Variables). See `.env.example` for the full list.
 | `DATABASE_URL` | Supabase **Transaction pooler** string (port `6543`). Dashboard → Connect → Transaction pooler; paste in the DB password. **Not** the direct `5432` connection — serverless concurrency exhausts it. |
 | `DEFAULT_PROJECT_ID` | `111dff8e-bf1b-4864-874e-75d13ff7a3a0` (the workspace row in the Supabase DB — different from the local dev value). |
 | `NEXT_PUBLIC_APP_URL` | The deployment's absolute URL, e.g. `https://your-app.vercel.app` or your custom domain. Used to build the tracking-snippet install tag. |
+| `ANTHROPIC_API_KEY` | Required for the four Claude-powered tools (`lib/ai/*`): Message & Concept Testing (content/audience-fit), Competitive Scan (cross-site synthesis), Wireframe Testing, and Design & Content Audit. No fallback exists — without this set, those four runs fail immediately with a clear error message persisted on the run (`ANTHROPIC_API_KEY is not configured…`); every other tool in the product works without it. |
 
 `DATABASE_URL` shape:
 ```
@@ -64,6 +65,10 @@ faster.
 4. Install the snippet shown on a page's Behavioral tab onto a test page and
    confirm events land in `/api/collect` (CORS is already open on the
    collection + A/B endpoints for cross-origin embedding).
+5. With `ANTHROPIC_API_KEY` set, run one of each Claude-powered tool
+   (Message & Concept Testing, Competitive Scan, Wireframe Testing, Design &
+   Content Audit) and confirm findings come back marked as AI judgment calls,
+   not measured facts.
 
 ## Notes / tuning
 
