@@ -143,7 +143,8 @@ export function EyeCapture({ testId, sim }: { testId: string; sim: boolean }) {
         return;
       }
 
-      await loadScript("/vendor/webgazer.js");
+      // Version-pinned filename so it can be cached immutably (see next.config).
+      await loadScript("/vendor/webgazer-2.1.0.js");
       const wg = window.webgazer;
       if (!wg) throw new Error("WebGazer failed to load");
       wg.setRegression("ridge")
