@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getPage } from "@/lib/db/pages";
 import { runPillar1 } from "@/lib/analysis/orchestrate";
 
+export const runtime = "nodejs";
 export const maxDuration = 120;
 
 export async function POST(request: Request) {

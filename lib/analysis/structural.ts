@@ -1,4 +1,4 @@
-import type { Page } from "playwright";
+import type { Page } from "playwright-core";
 import { launchBrowser } from "./browser";
 import { contrastRatio, parseRgb, blendOverWhite, passesAA } from "./contrast";
 import { fleschReadingEase, jargonDensity, readabilityLabel } from "./content";

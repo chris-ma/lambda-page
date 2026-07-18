@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createRun, completeRun, failRun } from "@/lib/db/runs";
 import { runCompetitiveScan } from "@/lib/analysis/competitive";
 
+export const runtime = "nodejs";
 export const maxDuration = 60;
 
 export async function POST(request: Request) {

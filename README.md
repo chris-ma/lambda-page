@@ -16,13 +16,11 @@ is a nav stub only.
 A real Supabase Postgres project (`lambda-page`) is already provisioned with this schema applied.
 This dev environment's network policy blocks direct access to `*.supabase.co` from the app
 server, so **local development runs against a local Postgres instance** with the identical
-schema instead (`lib/db/client.ts` explains why). To point at the real project once deployed
-somewhere with normal network access:
+schema instead (`lib/db/client.ts` explains why).
 
-1. Get the DB password from the Supabase dashboard for the `lambda-page` project
-   (`tkkonpdoyhwpadosduzs`).
-2. Set `DATABASE_URL=postgresql://postgres:[password]@db.tkkonpdoyhwpadosduzs.supabase.co:5432/postgres`
-3. No code changes needed — `lib/db/client.ts` is the only place `DATABASE_URL` is read.
+For deploying to Vercel (Supabase pooler URL, env vars, the serverless Chromium setup, and
+post-deploy checks), see **[DEPLOYMENT.md](./DEPLOYMENT.md)**. TLS is enabled automatically for
+any non-local `DATABASE_URL`, so pointing at Supabase is just an env-var change.
 
 ### Local setup
 

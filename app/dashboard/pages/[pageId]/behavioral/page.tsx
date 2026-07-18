@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getPage } from "@/lib/db/pages";
 import { eventsForPage, eventCountForPage } from "@/lib/db/events";
 import { listABTestsForPage } from "@/lib/db/ab";
+import { appBaseUrl } from "@/lib/app-url";
 import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
 import { BehavioralDashboard } from "@/components/dashboard/BehavioralDashboard";
 import {
@@ -53,7 +54,10 @@ export default async function BehavioralPage({ params }: { params: Promise<{ pag
     };
   }
 
-  const snippetTag = `<script src="/lambda-snippet.js" data-tracking-id="${page.tracking_id}" async></script>`;
+  // Absolute src + data-endpoint so the snippet works when embedded on the
+  // customer's own domain (relative URLs would resolve against their origin).
+  const base = appBaseUrl();
+  const snippetTag = `<script src="${base}/lambda-snippet.js" data-tracking-id="${page.tracking_id}" data-endpoint="${base}" async></script>`;
 
   return (
     <div>

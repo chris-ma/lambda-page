@@ -1,6 +1,6 @@
 import * as chromeLauncher from "chrome-launcher";
 import lighthouse from "lighthouse";
-import { EXECUTABLE_PATH } from "./browser";
+import { resolveChromium } from "./browser";
 import type { FindingInput } from "@/lib/db/runs";
 
 const THRESHOLDS = {
@@ -16,9 +16,12 @@ function statusFor(value: number, t: { pass: number; flag: number }): "PASS" | "
 }
 
 export async function runLabVitals(targetUrl: string): Promise<{ findings: FindingInput[]; summary: Record<string, unknown> }> {
+  const target = await resolveChromium();
   const chrome = await chromeLauncher.launch({
-    chromePath: EXECUTABLE_PATH,
-    chromeFlags: ["--headless=new", "--no-sandbox", "--disable-dev-shm-usage"],
+    chromePath: target.executablePath,
+    // chrome-launcher adds --remote-debugging-port itself; merge in the
+    // serverless/local flags resolveChromium picked plus headless.
+    chromeFlags: ["--headless=new", ...target.args],
   });
 
   try {
