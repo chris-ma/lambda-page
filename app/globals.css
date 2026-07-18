@@ -1,0 +1,129 @@
+@import "tailwindcss";
+
+@theme {
+  --color-cream: #f3e9d2;
+  --color-cream-2: #ede0c4;
+  --color-paper: #fbf6ea;
+  --color-ink: #332a22;
+  --color-ink-soft: #5c4f41;
+  --color-pink: #de9c93;
+  --color-pink-deep: #c97a70;
+  --color-mustard: #d9a441;
+  --color-mustard-deep: #b8842b;
+  --color-teal: #4e8580;
+  --color-teal-deep: #396460;
+  --color-brick: #bd5a3f;
+
+  --font-display: var(--font-display-raw), Georgia, serif;
+  --font-body: var(--font-body-raw), Arial, sans-serif;
+  --font-mono: var(--font-mono-raw), "Courier New", monospace;
+
+  --shadow-depth-sm: 3px 3px 0 rgba(51, 42, 34, 0.18);
+  --shadow-depth-md: 6px 6px 0 rgba(51, 42, 34, 0.18);
+  --shadow-depth-lg: 9px 9px 0 rgba(51, 42, 34, 0.22);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+body {
+  position: relative;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 999;
+  opacity: 0.05;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Depth-shadow card lift, used across cards/buttons/tags per brand bible Plate applications */
+.depth {
+  box-shadow: var(--shadow-depth-md);
+  transition:
+    transform 0.22s cubic-bezier(0.2, 0.7, 0.3, 1),
+    box-shadow 0.22s cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+.depth:hover {
+  transform: translate(-3px, -3px);
+  box-shadow: var(--shadow-depth-lg);
+}
+
+/* Hatch fill — the λ mark and active-state pattern */
+.hatch-fill {
+  background-image: repeating-linear-gradient(
+    45deg,
+    rgba(51, 42, 34, 0.22) 0,
+    rgba(51, 42, 34, 0.22) 1px,
+    transparent 1px,
+    transparent 5px
+  );
+}
+
+/* Scroll reveal, per Plate XIV Motion spec: 650ms staggered, slight settle */
+.reveal {
+  opacity: 0;
+  transform: translateY(22px);
+  transition:
+    opacity 0.65s cubic-bezier(0.2, 0.7, 0.3, 1),
+    transform 0.65s cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+.reveal.in-view {
+  opacity: 1;
+  transform: translateY(0);
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-brick);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.eyebrow::before,
+.eyebrow::after {
+  content: "";
+  width: 26px;
+  height: 1px;
+  background: var(--color-brick);
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.55;
+    transform: scale(0.92);
+  }
+}
+.pulse-circle {
+  animation: pulse 1.8s ease-in-out infinite;
+}
