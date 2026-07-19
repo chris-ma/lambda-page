@@ -25,8 +25,15 @@ export const dynamic = "force-dynamic";
 
 const REAL_DATA_THRESHOLD = 20;
 
-export default async function BehavioralPage({ params }: { params: Promise<{ pageId: string }> }) {
+export default async function BehavioralPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ pageId: string }>;
+  searchParams: Promise<{ tab?: string }>;
+}) {
   const { pageId } = await params;
+  const { tab } = await searchParams;
   const page = await getPage(pageId);
   const eventCount = await eventCountForPage(pageId);
   const isDemo = eventCount < REAL_DATA_THRESHOLD;
@@ -83,7 +90,7 @@ export default async function BehavioralPage({ params }: { params: Promise<{ pag
       </div>
 
       <div className="mt-10">
-        <BehavioralDashboard {...data} isDemo={isDemo} pageId={page.id} abTests={abTests} />
+        <BehavioralDashboard {...data} isDemo={isDemo} pageId={page.id} abTests={abTests} initialTab={tab} />
       </div>
     </div>
   );

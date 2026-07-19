@@ -34,6 +34,7 @@ export function BehavioralDashboard({
   isDemo,
   pageId,
   abTests,
+  initialTab,
 }: {
   funnel: FunnelStage[];
   heatmap: number[];
@@ -44,8 +45,12 @@ export function BehavioralDashboard({
   isDemo: boolean;
   pageId: string;
   abTests: ABTest[];
+  initialTab?: string;
 }) {
-  const [tab, setTab] = useState<(typeof TABS)[number]>("Heatmap");
+  const validInitialTab = (TABS as readonly string[]).includes(initialTab ?? "")
+    ? (initialTab as (typeof TABS)[number])
+    : "Heatmap";
+  const [tab, setTab] = useState<(typeof TABS)[number]>(validInitialTab);
 
   return (
     <div>

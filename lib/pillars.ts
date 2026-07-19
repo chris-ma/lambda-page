@@ -49,17 +49,17 @@ export const PILLARS_NAV: PillarNavItem[] = [
       {
         label: "SEO Analysis",
         description: "Meta tags, structured data, indexability — pick a connected page.",
-        href: "/dashboard",
+        href: "/dashboard/structural",
       },
       {
         label: "AEO / GEO Analysis",
         description: "Extractability for answer and generative engines — pick a connected page.",
-        href: "/dashboard",
+        href: "/dashboard/structural",
       },
       {
         label: "Page Vitals",
         description: "Lab-based LCP, INP, CLS — pick a connected page.",
-        href: "/dashboard",
+        href: "/dashboard/structural",
       },
     ],
   },
@@ -68,10 +68,10 @@ export const PILLARS_NAV: PillarNavItem[] = [
     slug: "behavioral",
     label: "Behavioral",
     subTools: [
-      { label: "Heatmaps & Session Replay", description: "Click density, scroll depth, rage-clicks.", href: "/dashboard" },
-      { label: "Funnel Analytics", description: "Stage-to-stage drop-off, segmented by device and source.", href: "/dashboard" },
-      { label: "Form Field Analytics", description: "Field-level abandonment, time-per-field, validation errors.", href: "/dashboard" },
-      { label: "A/B Testing", description: "Conversion rate per variant with real significance testing.", href: "/dashboard" },
+      { label: "Heatmaps & Session Replay", description: "Click density, scroll depth, rage-clicks.", href: "/dashboard/behavioral?tab=heatmap" },
+      { label: "Funnel Analytics", description: "Stage-to-stage drop-off, segmented by device and source.", href: "/dashboard/behavioral?tab=funnel" },
+      { label: "Form Field Analytics", description: "Field-level abandonment, time-per-field, validation errors.", href: "/dashboard/behavioral?tab=forms" },
+      { label: "A/B Testing", description: "Conversion rate per variant with real significance testing.", href: "/dashboard/behavioral?tab=ab" },
     ],
   },
   {
