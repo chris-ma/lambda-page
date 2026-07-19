@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Card } from "@/components/ui/Card";
 import { Tag } from "@/components/ui/Tag";
+import { LambdaMark } from "@/components/ui/LambdaMark";
 import { worstStatus, type Status } from "@/lib/status";
 import type { Database } from "@/lib/database.types";
 
@@ -32,7 +33,10 @@ export function PillarSummaryCard({
           {worst && <Tag status={worst} size="sm" />}
         </div>
         {run?.status === "running" && (
-          <p className="mt-3 font-mono text-[11px] text-ink-soft">Running…</p>
+          <div className="mt-3 flex items-center gap-2">
+            <LambdaMark tossing size={18} />
+            <p className="font-mono text-[11px] text-ink-soft">Running…</p>
+          </div>
         )}
         {run?.status === "error" && (
           <p className="mt-3 font-mono text-[11px] text-brick">Last run failed: {run.error}</p>

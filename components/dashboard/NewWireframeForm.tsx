@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Button } from "@/components/ui/Button";
+import { LambdaMark } from "@/components/ui/LambdaMark";
 
 function readFile(file: File): Promise<{ base64: string; mediaType: string; width: number; height: number }> {
   return new Promise((resolve, reject) => {
@@ -103,7 +104,12 @@ export function NewWireframeForm() {
           {loading ? "Analyzing…" : "Get feedback"}
         </Button>
       </div>
-      {loading && <p className="mt-2 font-mono text-[11px] text-ink-soft">Claude is reviewing the prototype — 15-30 seconds.</p>}
+      {loading && (
+        <div className="mt-4 flex items-center gap-3">
+          <LambdaMark tossing size={32} />
+          <p className="font-mono text-[11px] text-ink-soft">Claude is reviewing the prototype — 15-30 seconds.</p>
+        </div>
+      )}
       {error && <p className="mt-2 font-mono text-[11px] text-brick">{error}</p>}
     </form>
   );

@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Button } from "@/components/ui/Button";
+import { LambdaMark } from "@/components/ui/LambdaMark";
 
 export function RunAnalysisButton({
   endpoint,
@@ -40,9 +41,12 @@ export function RunAnalysisButton({
         {loading ? "Running diagnostic…" : label}
       </Button>
       {loading && (
-        <p className="mt-2 font-mono text-[11px] text-ink-soft">
-          Scanning structure, content, and vitals — this takes 20-40 seconds.
-        </p>
+        <div className="mt-4 flex items-center gap-3">
+          <LambdaMark tossing size={32} />
+          <p className="font-mono text-[11px] text-ink-soft">
+            Scanning structure, content, and vitals — this takes 20-40 seconds.
+          </p>
+        </div>
       )}
       {error && <p className="mt-2 font-mono text-[11px] text-brick">{error}</p>}
     </div>

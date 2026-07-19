@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Button } from "@/components/ui/Button";
+import { LambdaMark } from "@/components/ui/LambdaMark";
 
 export function NewContentFitForm() {
   const [url, setUrl] = useState("");
@@ -63,9 +64,12 @@ export function NewContentFitForm() {
         </Button>
       </div>
       {loading && (
-        <p className="mt-2 font-mono text-[11px] text-ink-soft">
-          Reading the rendered page and judging it against your audience — 15-30 seconds.
-        </p>
+        <div className="mt-4 flex items-center gap-3">
+          <LambdaMark tossing size={32} />
+          <p className="font-mono text-[11px] text-ink-soft">
+            Reading the rendered page and judging it against your audience — 15-30 seconds.
+          </p>
+        </div>
       )}
       {error && <p className="mt-2 font-mono text-[11px] text-brick">{error}</p>}
     </form>
