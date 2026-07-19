@@ -10,15 +10,19 @@ const nextConfig: NextConfig = {
   // dynamic path inside its bundled core, which @vercel/nft's static import
   // analysis doesn't follow — so the trace for these routes drops it, and
   // `import { chromium } from "playwright-core"` throws "Cannot find module
-  // .../playwright-core/browsers.json" in the deployed function. Force the
-  // whole package into the trace for every route that transitively imports
+  // .../playwright-core/browsers.json" in the deployed function. Same
+  // problem for @sparticuz/chromium's bin/ directory — its Brotli-packed
+  // Chromium binary is only ever referenced via a runtime path join
+  // (sparticuz.executablePath()), so nft drops it too and the function
+  // throws "input directory .../chromium/bin does not exist". Force both
+  // whole packages into the trace for every route that transitively imports
   // lib/analysis/browser.ts.
   outputFileTracingIncludes: {
-    "/api/analyze/structural": ["./node_modules/playwright-core/**/*"],
-    "/api/analyze/competitive": ["./node_modules/playwright-core/**/*"],
-    "/api/analyze/competitive-set": ["./node_modules/playwright-core/**/*"],
-    "/api/analyze/design-audit": ["./node_modules/playwright-core/**/*"],
-    "/api/analyze/content-fit": ["./node_modules/playwright-core/**/*"],
+    "/api/analyze/structural": ["./node_modules/playwright-core/**/*", "./node_modules/@sparticuz/chromium/**/*"],
+    "/api/analyze/competitive": ["./node_modules/playwright-core/**/*", "./node_modules/@sparticuz/chromium/**/*"],
+    "/api/analyze/competitive-set": ["./node_modules/playwright-core/**/*", "./node_modules/@sparticuz/chromium/**/*"],
+    "/api/analyze/design-audit": ["./node_modules/playwright-core/**/*", "./node_modules/@sparticuz/chromium/**/*"],
+    "/api/analyze/content-fit": ["./node_modules/playwright-core/**/*", "./node_modules/@sparticuz/chromium/**/*"],
   },
   async headers() {
     return [
