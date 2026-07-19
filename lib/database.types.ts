@@ -6,6 +6,66 @@ export type Database = {
   };
   public: {
     Tables: {
+      eye_sites: {
+        Row: { id: string; project_id: string; name: string; domain: string; api_key: string; created_at: string };
+        Insert: { id?: string; project_id: string; name: string; domain: string; api_key?: string; created_at?: string };
+        Update: { id?: string; project_id?: string; name?: string; domain?: string; api_key?: string; created_at?: string };
+        Relationships: [
+          { foreignKeyName: "eye_sites_project_id_fkey"; columns: ["project_id"]; isOneToOne: false; referencedRelation: "projects"; referencedColumns: ["id"] },
+        ];
+      };
+      eye_pages: {
+        Row: { id: string; site_id: string; name: string; page_url: string; page_key: string; eye_tracking: boolean; created_at: string };
+        Insert: { id?: string; site_id: string; name: string; page_url: string; page_key?: string; eye_tracking?: boolean; created_at?: string };
+        Update: { id?: string; site_id?: string; name?: string; page_url?: string; page_key?: string; eye_tracking?: boolean; created_at?: string };
+        Relationships: [
+          { foreignKeyName: "eye_pages_site_id_fkey"; columns: ["site_id"]; isOneToOne: false; referencedRelation: "eye_sites"; referencedColumns: ["id"] },
+        ];
+      };
+      eye_page_sessions: {
+        Row: {
+          id: string; site_id: string; page_id: string; page_url: string; viewport_width: number; viewport_height: number;
+          page_scroll_height: number | null; user_agent: string | null; created_at: string; ended_at: string | null;
+        };
+        Insert: {
+          id?: string; site_id: string; page_id: string; page_url: string; viewport_width?: number; viewport_height?: number;
+          page_scroll_height?: number | null; user_agent?: string | null; created_at?: string; ended_at?: string | null;
+        };
+        Update: {
+          id?: string; site_id?: string; page_id?: string; page_url?: string; viewport_width?: number; viewport_height?: number;
+          page_scroll_height?: number | null; user_agent?: string | null; created_at?: string; ended_at?: string | null;
+        };
+        Relationships: [
+          { foreignKeyName: "eye_page_sessions_site_id_fkey"; columns: ["site_id"]; isOneToOne: false; referencedRelation: "eye_sites"; referencedColumns: ["id"] },
+          { foreignKeyName: "eye_page_sessions_page_id_fkey"; columns: ["page_id"]; isOneToOne: false; referencedRelation: "eye_pages"; referencedColumns: ["id"] },
+        ];
+      };
+      eye_page_events: {
+        Row: { id: number; session_id: string; site_id: string; page_id: string; event_type: string; x: number; y: number; created_at: string };
+        Insert: { id?: number; session_id: string; site_id: string; page_id: string; event_type: string; x: number; y: number; created_at?: string };
+        Update: { id?: number; session_id?: string; site_id?: string; page_id?: string; event_type?: string; x?: number; y?: number; created_at?: string };
+        Relationships: [
+          { foreignKeyName: "eye_page_events_session_id_fkey"; columns: ["session_id"]; isOneToOne: false; referencedRelation: "eye_page_sessions"; referencedColumns: ["id"] },
+          { foreignKeyName: "eye_page_events_page_id_fkey"; columns: ["page_id"]; isOneToOne: false; referencedRelation: "eye_pages"; referencedColumns: ["id"] },
+        ];
+      };
+      eye_page_screenshots: {
+        Row: {
+          id: string; page_id: string; device_type: string; image: Buffer; image_mime: string;
+          viewport_width: number | null; page_height: number | null; captured_at: string;
+        };
+        Insert: {
+          id?: string; page_id: string; device_type: string; image: Buffer; image_mime?: string;
+          viewport_width?: number | null; page_height?: number | null; captured_at?: string;
+        };
+        Update: {
+          id?: string; page_id?: string; device_type?: string; image?: Buffer; image_mime?: string;
+          viewport_width?: number | null; page_height?: number | null; captured_at?: string;
+        };
+        Relationships: [
+          { foreignKeyName: "eye_page_screenshots_page_id_fkey"; columns: ["page_id"]; isOneToOne: false; referencedRelation: "eye_pages"; referencedColumns: ["id"] },
+        ];
+      };
       ab_assignments: {
         Row: { created_at: string; id: string; session_id: string; test_id: string; variant_id: string };
         Insert: { created_at?: string; id?: string; session_id: string; test_id: string; variant_id: string };

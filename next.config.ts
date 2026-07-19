@@ -19,7 +19,6 @@ const nextConfig: NextConfig = {
     "/api/analyze/competitive-set": ["./node_modules/playwright-core/**/*"],
     "/api/analyze/design-audit": ["./node_modules/playwright-core/**/*"],
     "/api/analyze/content-fit": ["./node_modules/playwright-core/**/*"],
-    "/api/eye-tests": ["./node_modules/playwright-core/**/*"],
   },
   async headers() {
     return [

@@ -1,49 +1,48 @@
 import Link from "next/link";
-import { listEyeTests } from "@/lib/db/eye";
+import { listSites } from "@/lib/db/eye";
 import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
 import { Card } from "@/components/ui/Card";
-import { Button } from "@/components/ui/Button";
-import { Tag } from "@/components/ui/Tag";
+import { NewEyeSiteForm } from "@/components/dashboard/NewEyeSiteForm";
 
 export const dynamic = "force-dynamic";
 
 export default async function EyeTrackingHub() {
-  const tests = await listEyeTests();
+  const sites = await listSites();
 
   return (
     <div>
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <EyebrowLabel>Pillar 03 — User Testing</EyebrowLabel>
-          <h1 className="mt-3 font-display text-[28px] font-semibold text-ink">Eye Tracking</h1>
-          <p className="mt-2 max-w-[620px] text-[13.5px] text-ink-soft">
-            Webcam-based gaze studies against a captured page — fixation points, gaze duration, and
-            attention sequence. Deliberate, task-based sessions with recruited participants, never
-            silent instrumentation on production.
-          </p>
-        </div>
-        <Button href="/dashboard/eye-tracking/new">New eye test</Button>
+      <EyebrowLabel>Pillar 03 — User Testing</EyebrowLabel>
+      <h1 className="mt-3 font-display text-[28px] font-semibold text-ink">Eye Tracking</h1>
+      <p className="mt-2 max-w-[640px] text-[13.5px] text-ink-soft">
+        Register a site, add the pages you want tracked, and drop the embed snippet in each
+        page&rsquo;s <code className="font-mono text-[12px]">&lt;head&gt;</code>. Mouse, click, scroll,
+        and touch tracking start immediately; webcam gaze capture is opt-in per visitor via an
+        on-page consent banner, and only offered on pages where it&rsquo;s enabled.
+      </p>
+
+      <div className="mt-8 max-w-[720px]">
+        <NewEyeSiteForm />
       </div>
 
-      {tests.length === 0 ? (
-        <Card hover={false} className="mt-10 border-dashed p-10 text-center">
-          <div className="font-display text-[16px] font-semibold text-ink">No eye-tracking tests yet</div>
+      <h2 className="mt-14 font-display text-[19px] font-semibold text-ink">Sites</h2>
+
+      {sites.length === 0 ? (
+        <Card hover={false} className="mt-4 border-dashed p-10 text-center">
+          <div className="font-display text-[16px] font-semibold text-ink">No sites yet</div>
           <p className="mx-auto mt-2 max-w-none text-[13.5px] text-ink-soft">
-            Create a test against a URL — Lambda Page captures it as a stimulus and gives you a
-            participant link.
+            Register a site above to get its API key and start adding tracked pages.
           </p>
         </Card>
       ) : (
-        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {tests.map((t) => (
-            <Link key={t.id} href={`/dashboard/eye-tracking/${t.id}`}>
+        <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {sites.map((s) => (
+            <Link key={s.id} href={`/dashboard/eye-tracking/${s.id}`}>
               <Card className="h-full p-5">
-                <div className="flex items-center justify-between gap-3">
-                  <span className="font-display text-[15px] font-semibold text-ink">{t.name}</span>
-                  <Tag status={t.status === "ready" ? "PASS" : t.status === "error" ? "FAILING" : "INFO"} label={t.status} size="sm" />
-                </div>
-                <p className="mt-2 truncate font-mono text-[10.5px] text-ink-soft">{t.target_url}</p>
-                <p className="mt-1 font-mono text-[10px] text-ink-soft">{new Date(t.created_at).toLocaleString()}</p>
+                <div className="font-display text-[15px] font-semibold text-ink">{s.name}</div>
+                <p className="mt-1.5 font-mono text-[11px] text-ink-soft">{s.domain}</p>
+                <p className="mt-2 font-mono text-[10px] text-ink-soft">
+                  Registered {new Date(s.created_at).toLocaleDateString()}
+                </p>
               </Card>
             </Link>
           ))}

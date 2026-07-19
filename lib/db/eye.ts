@@ -1,130 +1,190 @@
 import { query, queryOne } from "./client";
 import { DEFAULT_PROJECT_ID } from "@/lib/config";
+import type { Database } from "@/lib/database.types";
 
-export type EyeTest = {
-  id: string;
-  project_id: string;
-  name: string;
-  target_url: string;
-  stim_width: number | null;
-  stim_height: number | null;
-  status: "capturing" | "ready" | "error";
-  error: string | null;
-  created_at: string;
-};
+export type EyeSite = Database["public"]["Tables"]["eye_sites"]["Row"];
+export type EyePage = Database["public"]["Tables"]["eye_pages"]["Row"];
+export type EyeEventType = "mouse_move" | "click" | "eye_gaze" | "scroll" | "long_press" | "pinch" | "double_tap";
+export type DeviceType = "desktop" | "tablet" | "mobile";
 
-export type GazePoint = { x: number; y: number; t: number };
-
-export async function listEyeTests(): Promise<EyeTest[]> {
-  return query<EyeTest>(
-    `select id, project_id, name, target_url, stim_width, stim_height, status, error, created_at
-     from eye_tests where project_id = $1 order by created_at desc`,
-    [DEFAULT_PROJECT_ID],
-  );
+export function deviceFromViewportWidth(width: number): DeviceType {
+  if (width >= 1024) return "desktop";
+  if (width >= 768) return "tablet";
+  return "mobile";
 }
 
-export async function getEyeTest(id: string): Promise<EyeTest> {
-  const test = await queryOne<EyeTest>(
-    `select id, project_id, name, target_url, stim_width, stim_height, status, error, created_at
-     from eye_tests where id = $1`,
-    [id],
-  );
-  if (!test) throw new Error(`Eye test not found: ${id}`);
-  return test;
+// ------------------------------------------------------------------ sites --
+
+export async function listSites(): Promise<EyeSite[]> {
+  return query<EyeSite>(`select * from eye_sites where project_id = $1 order by created_at desc`, [DEFAULT_PROJECT_ID]);
 }
 
-export async function createEyeTest(name: string, targetUrl: string): Promise<EyeTest> {
-  const normalized = targetUrl.startsWith("http") ? targetUrl : `https://${targetUrl}`;
-  const test = await queryOne<EyeTest>(
-    `insert into eye_tests (project_id, name, target_url, status)
-     values ($1, $2, $3, 'capturing')
-     returning id, project_id, name, target_url, stim_width, stim_height, status, error, created_at`,
+export async function getSite(id: string): Promise<EyeSite> {
+  const site = await queryOne<EyeSite>(`select * from eye_sites where id = $1`, [id]);
+  if (!site) throw new Error(`Site not found: ${id}`);
+  return site;
+}
+
+export async function createSite(name: string, domain: string): Promise<EyeSite> {
+  const normalized = domain.replace(/^https?:\/\//, "").replace(/\/$/, "");
+  const site = await queryOne<EyeSite>(
+    `insert into eye_sites (project_id, name, domain) values ($1, $2, $3) returning *`,
     [DEFAULT_PROJECT_ID, name, normalized],
   );
-  if (!test) throw new Error("Failed to create eye test");
-  return test;
+  if (!site) throw new Error("Failed to create site");
+  return site;
 }
 
-export async function setStimulus(id: string, png: Buffer, width: number, height: number) {
-  await query(
-    `update eye_tests set stimulus = $2, stim_width = $3, stim_height = $4, status = 'ready', error = null where id = $1`,
-    [id, png, width, height],
+export async function getSiteByApiKey(apiKey: string): Promise<EyeSite | null> {
+  return queryOne<EyeSite>(`select * from eye_sites where api_key = $1`, [apiKey]);
+}
+
+// ------------------------------------------------------------------ pages --
+
+export async function listPagesForSite(siteId: string): Promise<EyePage[]> {
+  return query<EyePage>(`select * from eye_pages where site_id = $1 order by created_at desc`, [siteId]);
+}
+
+export async function getPage(id: string): Promise<EyePage> {
+  const page = await queryOne<EyePage>(`select * from eye_pages where id = $1`, [id]);
+  if (!page) throw new Error(`Page not found: ${id}`);
+  return page;
+}
+
+export async function createPage(siteId: string, name: string, pageUrl: string, eyeTracking: boolean): Promise<EyePage> {
+  const normalized = pageUrl.startsWith("http") ? pageUrl : `https://${pageUrl}`;
+  const page = await queryOne<EyePage>(
+    `insert into eye_pages (site_id, name, page_url, eye_tracking) values ($1, $2, $3, $4) returning *`,
+    [siteId, name, normalized, eyeTracking],
   );
+  if (!page) throw new Error("Failed to create page");
+  return page;
 }
 
-export async function setEyeTestError(id: string, message: string) {
-  await query(`update eye_tests set status = 'error', error = $2 where id = $1`, [id, message]);
+export async function getPageByKeys(apiKey: string, pageKey: string): Promise<{ site: EyeSite; page: EyePage } | null> {
+  const site = await getSiteByApiKey(apiKey);
+  if (!site) return null;
+  const page = await queryOne<EyePage>(`select * from eye_pages where page_key = $1 and site_id = $2`, [pageKey, site.id]);
+  if (!page) return null;
+  return { site, page };
 }
 
-export async function getStimulus(id: string): Promise<Buffer | null> {
-  const row = await queryOne<{ stimulus: Buffer | null }>(`select stimulus from eye_tests where id = $1`, [id]);
-  return row?.stimulus ?? null;
-}
+// --------------------------------------------------------------- sessions --
 
-export async function createEyeSession(testId: string, device: string | null): Promise<string> {
+export async function createSession(params: {
+  siteId: string;
+  pageId: string;
+  pageUrl: string;
+  viewportWidth: number;
+  viewportHeight: number;
+  pageScrollHeight: number | null;
+  userAgent: string | null;
+}): Promise<string> {
   const row = await queryOne<{ id: string }>(
-    `insert into eye_sessions (test_id, device) values ($1, $2) returning id`,
-    [testId, device],
+    `insert into eye_page_sessions (site_id, page_id, page_url, viewport_width, viewport_height, page_scroll_height, user_agent)
+     values ($1, $2, $3, $4, $5, $6, $7) returning id`,
+    [params.siteId, params.pageId, params.pageUrl, params.viewportWidth, params.viewportHeight, params.pageScrollHeight, params.userAgent],
   );
-  if (!row) throw new Error("Failed to create eye session");
+  if (!row) throw new Error("Failed to create session");
   return row.id;
 }
 
-export async function endEyeSession(sessionId: string) {
-  await query(`update eye_sessions set ended_at = now() where id = $1 and ended_at is null`, [sessionId]);
+export async function endSession(sessionId: string): Promise<void> {
+  await query(`update eye_page_sessions set ended_at = now() where id = $1 and ended_at is null`, [sessionId]);
 }
 
-export async function insertGaze(sessionId: string, points: GazePoint[]) {
-  if (points.length === 0) return;
-  // Build a single multi-row insert.
+// ----------------------------------------------------------------- events --
+
+export async function insertEvents(
+  sessionId: string,
+  siteId: string,
+  pageId: string,
+  events: { type: EyeEventType; x: number; y: number }[],
+): Promise<void> {
+  if (events.length === 0) return;
   const values: string[] = [];
-  const params: unknown[] = [sessionId];
-  points.forEach((p, i) => {
+  const params: unknown[] = [sessionId, siteId, pageId];
+  events.forEach((e, i) => {
     const base = i * 3;
-    values.push(`($1, $${base + 2}, $${base + 3}, $${base + 4})`);
-    params.push(Math.max(0, Math.min(1, p.x)), Math.max(0, Math.min(1, p.y)), Math.round(p.t));
+    values.push(`($1, $2, $3, $${base + 4}, $${base + 5}, $${base + 6})`);
+    params.push(e.type, Math.max(0, Math.min(1, e.x)), Math.max(0, Math.min(1, e.y)));
   });
-  await query(`insert into gaze_points (session_id, x, y, t) values ${values.join(", ")}`, params);
+  await query(`insert into eye_page_events (session_id, site_id, page_id, event_type, x, y) values ${values.join(", ")}`, params);
 }
 
-export async function gazeForTest(testId: string): Promise<GazePoint[]> {
-  return query<GazePoint>(
-    `select g.x, g.y, g.t
-     from gaze_points g
-     join eye_sessions s on s.id = g.session_id
-     where s.test_id = $1
-     order by g.session_id, g.t asc`,
-    [testId],
-  );
-}
+export type PageEvent = { event_type: EyeEventType; x: number; y: number; created_at: string };
 
-export async function gazeBySession(testId: string): Promise<Map<string, GazePoint[]>> {
-  const rows = await query<{ session_id: string; x: number; y: number; t: number }>(
-    `select g.session_id, g.x, g.y, g.t
-     from gaze_points g
-     join eye_sessions s on s.id = g.session_id
-     where s.test_id = $1
-     order by g.session_id, g.t asc`,
-    [testId],
-  );
-  const map = new Map<string, GazePoint[]>();
-  for (const r of rows) {
-    if (!map.has(r.session_id)) map.set(r.session_id, []);
-    map.get(r.session_id)!.push({ x: r.x, y: r.y, t: r.t });
+export async function eventsForPage(pageId: string, since?: Date, deviceType?: DeviceType): Promise<PageEvent[]> {
+  const conditions = ["e.page_id = $1"];
+  const params: unknown[] = [pageId];
+  if (since) {
+    params.push(since.toISOString());
+    conditions.push(`e.created_at >= $${params.length}`);
   }
-  return map;
+  if (deviceType) {
+    params.push(deviceType);
+    conditions.push(`(case when s.viewport_width >= 1024 then 'desktop' when s.viewport_width >= 768 then 'tablet' else 'mobile' end) = $${params.length}`);
+  }
+  return query<PageEvent>(
+    `select e.event_type, e.x, e.y, e.created_at
+     from eye_page_events e
+     join eye_page_sessions s on s.id = e.session_id
+     where ${conditions.join(" and ")}
+     order by e.created_at asc`,
+    params,
+  );
 }
 
-export async function eyeTestStats(testId: string): Promise<{ participants: number; gazeCount: number }> {
-  const row = await queryOne<{ participants: string; gaze_count: string }>(
-    `select count(distinct s.id)::text as participants, count(g.id)::text as gaze_count
-     from eye_sessions s
-     left join gaze_points g on g.session_id = s.id
-     where s.test_id = $1`,
-    [testId],
+export async function deviceCountsForPage(pageId: string, since?: Date): Promise<Record<DeviceType, number>> {
+  const params: unknown[] = [pageId];
+  let sinceClause = "";
+  if (since) {
+    params.push(since.toISOString());
+    sinceClause = `and created_at >= $${params.length}`;
+  }
+  const rows = await query<{ device: DeviceType; count: string }>(
+    `select (case when viewport_width >= 1024 then 'desktop' when viewport_width >= 768 then 'tablet' else 'mobile' end) as device, count(*)::text as count
+     from eye_page_sessions
+     where page_id = $1 ${sinceClause}
+     group by 1`,
+    params,
   );
-  return {
-    participants: parseInt(row?.participants ?? "0", 10),
-    gazeCount: parseInt(row?.gaze_count ?? "0", 10),
-  };
+  const counts: Record<DeviceType, number> = { desktop: 0, tablet: 0, mobile: 0 };
+  for (const r of rows) counts[r.device] = parseInt(r.count, 10);
+  return counts;
+}
+
+// ------------------------------------------------------------- screenshots --
+
+export async function setScreenshot(
+  pageId: string,
+  deviceType: DeviceType,
+  image: Buffer,
+  mime: string,
+  viewportWidth: number | null,
+  pageHeight: number | null,
+): Promise<void> {
+  await query(
+    `insert into eye_page_screenshots (page_id, device_type, image, image_mime, viewport_width, page_height, captured_at)
+     values ($1, $2, $3, $4, $5, $6, now())
+     on conflict (page_id, device_type) do update set image = excluded.image, image_mime = excluded.image_mime,
+       viewport_width = excluded.viewport_width, page_height = excluded.page_height, captured_at = now()`,
+    [pageId, deviceType, image, mime, viewportWidth, pageHeight],
+  );
+}
+
+export type ScreenshotMeta = { image: Buffer; image_mime: string; viewport_width: number | null; page_height: number | null };
+
+export async function getScreenshot(pageId: string, deviceType: DeviceType): Promise<ScreenshotMeta | null> {
+  return queryOne<ScreenshotMeta>(
+    `select image, image_mime, viewport_width, page_height from eye_page_screenshots where page_id = $1 and device_type = $2`,
+    [pageId, deviceType],
+  );
+}
+
+// ----------------------------------------------------------------- upkeep --
+
+export async function resetPageData(pageId: string): Promise<void> {
+  await query(`delete from eye_page_sessions where page_id = $1`, [pageId]);
+  await query(`delete from eye_page_screenshots where page_id = $1`, [pageId]);
 }
