@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Button } from "@/components/ui/Button";
+import { NestedNodeBuilder, newNodeId, type NodeDraft } from "@/components/dashboard/NestedNodeBuilder";
 
 function EditableList({
   items,
@@ -55,7 +56,10 @@ export function NewCardSortForm() {
   const [instructions, setInstructions] = useState("Group these into categories that make sense to you.");
   const [sortMode, setSortMode] = useState<"open" | "closed">("open");
   const [cards, setCards] = useState<string[]>(["", "", ""]);
-  const [categories, setCategories] = useState<string[]>(["", ""]);
+  const [categories, setCategories] = useState<NodeDraft[]>([
+    { tempId: newNodeId(), parentTempId: null, label: "" },
+    { tempId: newNodeId(), parentTempId: null, label: "" },
+  ]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
@@ -67,7 +71,7 @@ export function NewCardSortForm() {
       setError("Add at least 2 cards.");
       return;
     }
-    const cleanCategories = categories.map((c) => c.trim()).filter(Boolean);
+    const cleanCategories = categories.filter((c) => c.label.trim());
     if (sortMode === "closed" && cleanCategories.length < 2) {
       setError("A closed sort needs at least 2 categories.");
       return;
@@ -136,9 +140,11 @@ export function NewCardSortForm() {
 
       {sortMode === "closed" && (
         <>
-          <label className="mt-5 block font-mono text-[10.5px] tracking-wide text-ink-soft uppercase">Categories</label>
+          <label className="mt-5 block font-mono text-[10.5px] tracking-wide text-ink-soft uppercase">
+            Categories — use &ldquo;+ child&rdquo; to nest a sub-category under another
+          </label>
           <div className="mt-2">
-            <EditableList items={categories} setItems={setCategories} placeholder={(i) => `Category ${i + 1}`} addLabel="+ Add category" />
+            <NestedNodeBuilder nodes={categories} setNodes={setCategories} placeholder="Category" addTopLabel="+ Add category" />
           </div>
         </>
       )}

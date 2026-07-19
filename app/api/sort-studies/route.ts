@@ -1,5 +1,16 @@
 import { NextResponse } from "next/server";
-import { createCardSortStudy, createTreeTestStudy, type TreeNodeDraft } from "@/lib/db/sorting";
+import { createCardSortStudy, createTreeTestStudy, type TreeNodeDraft, type NestedDraft } from "@/lib/db/sorting";
+
+function parseNestedDrafts(value: unknown): NestedDraft[] {
+  if (!Array.isArray(value)) return [];
+  return value
+    .map((n) => ({
+      tempId: String((n as NestedDraft)?.tempId ?? ""),
+      parentTempId: (n as NestedDraft)?.parentTempId ? String((n as NestedDraft).parentTempId) : null,
+      label: String((n as NestedDraft)?.label ?? "").trim(),
+    }))
+    .filter((n) => n.tempId && n.label);
+}
 
 export async function POST(request: Request) {
   const body = await request.json().catch(() => null);
@@ -10,7 +21,7 @@ export async function POST(request: Request) {
     const instructions: string = body?.instructions?.trim() ?? "";
     const sortMode = body?.sortMode === "closed" ? "closed" : "open";
     const cards: string[] = Array.isArray(body?.cards) ? body.cards.map((c: unknown) => String(c).trim()).filter(Boolean) : [];
-    const categories: string[] = Array.isArray(body?.categories) ? body.categories.map((c: unknown) => String(c).trim()).filter(Boolean) : [];
+    const categories = parseNestedDrafts(body?.categories);
 
     if (!name) return NextResponse.json({ error: "name is required" }, { status: 400 });
     if (cards.length < 2) return NextResponse.json({ error: "Add at least 2 cards" }, { status: 400 });

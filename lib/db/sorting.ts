@@ -25,12 +25,40 @@ export async function getStudy(id: string): Promise<Study> {
   return s;
 }
 
+export type NestedDraft = { tempId: string; parentTempId: string | null; label: string };
+export type TreeNodeDraft = NestedDraft;
+
+/**
+ * Inserts a flat list of tempId/parentTempId drafts as a real self-referencing
+ * tree, level by level, so a parent's real id exists before its children
+ * reference it. Shared by tree_nodes (tree test) and sort_categories
+ * (hierarchical card sort) — same shape, different table.
+ */
+async function insertNestedDrafts<TRow extends { id: string }>(
+  drafts: NestedDraft[],
+  insertRow: (parentId: string | null, label: string, position: number) => Promise<TRow | null>,
+): Promise<Map<string, string>> {
+  const realId = new Map<string, string>();
+  const remaining = [...drafts];
+  let position = 0;
+  let guard = 0;
+  while (remaining.length > 0 && guard++ < 10000) {
+    const idx = remaining.findIndex((n) => n.parentTempId === null || realId.has(n.parentTempId));
+    if (idx === -1) break; // orphaned reference — drop the rest rather than looping forever
+    const [node] = remaining.splice(idx, 1);
+    const parentId = node.parentTempId ? (realId.get(node.parentTempId) ?? null) : null;
+    const row = await insertRow(parentId, node.label, position++);
+    if (row) realId.set(node.tempId, row.id);
+  }
+  return realId;
+}
+
 export async function createCardSortStudy(params: {
   name: string;
   instructions: string;
   sortMode: "open" | "closed";
   cards: string[];
-  categories: string[]; // only used when sortMode === "closed"
+  categories: NestedDraft[]; // only used when sortMode === "closed"
 }): Promise<Study> {
   const study = await queryOne<Study>(
     `insert into sort_studies (project_id, type, name, instructions, sort_mode) values ($1, 'card_sort', $2, $3, $4) returning *`,
@@ -41,14 +69,15 @@ export async function createCardSortStudy(params: {
     await query(`insert into sort_cards (study_id, label, position) values ($1, $2, $3)`, [study.id, params.cards[i], i]);
   }
   if (params.sortMode === "closed") {
-    for (let i = 0; i < params.categories.length; i++) {
-      await query(`insert into sort_categories (study_id, label, position) values ($1, $2, $3)`, [study.id, params.categories[i], i]);
-    }
+    await insertNestedDrafts(params.categories, (parentId, label, position) =>
+      queryOne<Category>(
+        `insert into sort_categories (study_id, parent_id, label, position) values ($1, $2, $3, $4) returning *`,
+        [study.id, parentId, label, position],
+      ),
+    );
   }
   return study;
 }
-
-export type TreeNodeDraft = { tempId: string; parentTempId: string | null; label: string };
 
 export async function createTreeTestStudy(params: {
   name: string;
@@ -62,22 +91,12 @@ export async function createTreeTestStudy(params: {
   );
   if (!study) throw new Error("Failed to create tree test study");
 
-  // Insert level by level so a parent's real id exists before its children reference it.
-  const realId = new Map<string, string>();
-  const remaining = [...params.nodes];
-  let position = 0;
-  let guard = 0;
-  while (remaining.length > 0 && guard++ < 10000) {
-    const idx = remaining.findIndex((n) => n.parentTempId === null || realId.has(n.parentTempId));
-    if (idx === -1) break; // orphaned reference — drop the rest rather than looping forever
-    const [node] = remaining.splice(idx, 1);
-    const parentId = node.parentTempId ? (realId.get(node.parentTempId) ?? null) : null;
-    const row = await queryOne<TreeNodeRow>(
+  const realId = await insertNestedDrafts(params.nodes, (parentId, label, position) =>
+    queryOne<TreeNodeRow>(
       `insert into tree_nodes (study_id, parent_id, label, position) values ($1, $2, $3, $4) returning *`,
-      [study.id, parentId, node.label, position++],
-    );
-    if (row) realId.set(node.tempId, row.id);
-  }
+      [study.id, parentId, label, position],
+    ),
+  );
 
   for (let i = 0; i < params.tasks.length; i++) {
     const t = params.tasks[i];

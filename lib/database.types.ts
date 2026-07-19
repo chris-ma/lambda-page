@@ -136,11 +136,12 @@ export type Database = {
         ];
       };
       sort_categories: {
-        Row: { id: string; study_id: string; label: string; position: number };
-        Insert: { id?: string; study_id: string; label: string; position?: number };
-        Update: { id?: string; study_id?: string; label?: string; position?: number };
+        Row: { id: string; study_id: string; parent_id: string | null; label: string; position: number };
+        Insert: { id?: string; study_id: string; parent_id?: string | null; label: string; position?: number };
+        Update: { id?: string; study_id?: string; parent_id?: string | null; label?: string; position?: number };
         Relationships: [
           { foreignKeyName: "sort_categories_study_id_fkey"; columns: ["study_id"]; isOneToOne: false; referencedRelation: "sort_studies"; referencedColumns: ["id"] },
+          { foreignKeyName: "sort_categories_parent_id_fkey"; columns: ["parent_id"]; isOneToOne: false; referencedRelation: "sort_categories"; referencedColumns: ["id"] },
         ];
       };
       tree_nodes: {
