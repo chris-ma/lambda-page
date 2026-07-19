@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Button } from "@/components/ui/Button";
-import { LambdaMark } from "@/components/ui/LambdaMark";
+import { ThinkingOverlay } from "@/components/ui/ThinkingOverlay";
 
 export function NewDesignAuditForm() {
   const [url, setUrl] = useState("");
@@ -45,15 +45,8 @@ export function NewDesignAuditForm() {
           {loading ? "Auditing…" : "Run design & content audit"}
         </Button>
       </div>
-      {loading && (
-        <div className="mt-4 flex items-center gap-3">
-          <LambdaMark tossing size={32} />
-          <p className="font-mono text-[11px] text-ink-soft">
-            Capturing a screenshot and getting Claude&rsquo;s visual critique — 20-40 seconds.
-          </p>
-        </div>
-      )}
       {error && <p className="mt-2 font-mono text-[11px] text-brick">{error}</p>}
+      {loading && <ThinkingOverlay label="Capturing a screenshot and getting Claude's visual critique — 20-40 seconds." />}
     </form>
   );
 }

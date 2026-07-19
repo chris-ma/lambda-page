@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Button } from "@/components/ui/Button";
-import { LambdaMark } from "@/components/ui/LambdaMark";
+import { ThinkingOverlay } from "@/components/ui/ThinkingOverlay";
 
 export function NewContentFitForm() {
   const [url, setUrl] = useState("");
@@ -63,14 +63,7 @@ export function NewContentFitForm() {
           {loading ? "Analyzing…" : "Analyze content fit"}
         </Button>
       </div>
-      {loading && (
-        <div className="mt-4 flex items-center gap-3">
-          <LambdaMark tossing size={32} />
-          <p className="font-mono text-[11px] text-ink-soft">
-            Reading the rendered page and judging it against your audience — 15-30 seconds.
-          </p>
-        </div>
-      )}
+      {loading && <ThinkingOverlay label="Reading the rendered page and judging it against your audience — 15-30 seconds." />}
       {error && <p className="mt-2 font-mono text-[11px] text-brick">{error}</p>}
     </form>
   );

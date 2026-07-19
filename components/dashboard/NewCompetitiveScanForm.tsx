@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Button } from "@/components/ui/Button";
-import { LambdaMark } from "@/components/ui/LambdaMark";
+import { ThinkingOverlay } from "@/components/ui/ThinkingOverlay";
 
 export function NewCompetitiveScanForm() {
   const [name, setName] = useState("");
@@ -64,13 +64,7 @@ export function NewCompetitiveScanForm() {
         </Button>
       </div>
       {loading && (
-        <div className="mt-4 flex items-center gap-3">
-          <LambdaMark tossing size={32} />
-          <p className="font-mono text-[11px] text-ink-soft">
-            Rendering each page, extracting positioning signals, then synthesizing — this can take a
-            couple minutes for several URLs.
-          </p>
-        </div>
+        <ThinkingOverlay label="Rendering each page, extracting positioning signals, then synthesizing — this can take a couple minutes for several URLs." />
       )}
       {error && <p className="mt-2 font-mono text-[11px] text-brick">{error}</p>}
     </form>

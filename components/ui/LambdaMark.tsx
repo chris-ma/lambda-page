@@ -9,13 +9,10 @@ export function LambdaMark({
   variant = "badge",
   size = 44,
   className,
-  tossing = false,
 }: {
   variant?: "badge" | "plate";
   size?: number;
   className?: string;
-  /** Loops a coin-toss flip — use for "Claude is thinking" waits, not decoration. */
-  tossing?: boolean;
 }) {
   if (variant === "plate") {
     return (
@@ -79,10 +76,7 @@ export function LambdaMark({
   return (
     <div
       className={cn(
-        "hatch-fill inline-flex shrink-0 items-center justify-center rounded-full border-2 border-ink bg-mustard font-display font-bold text-ink",
-        tossing
-          ? "animate-coin-toss"
-          : "transition-transform duration-500 [transition-timing-function:cubic-bezier(.2,.8,.3,1.3)] hover:rotate-180",
+        "hatch-fill inline-flex shrink-0 items-center justify-center rounded-full border-2 border-ink bg-mustard font-display font-bold text-ink transition-transform duration-500 [transition-timing-function:cubic-bezier(.2,.8,.3,1.3)] hover:rotate-180",
         className,
       )}
       style={{ width: size, height: size, fontSize: size * 0.46 }}

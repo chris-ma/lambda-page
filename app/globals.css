@@ -38,26 +38,6 @@ html {
   }
 }
 
-/* Coin-toss loop for the λ badge — the one loading state in this app that's
-   allowed to be playful, reserved for genuine "Claude is thinking" waits
-   (screenshot capture + LLM calls), not decoration. Squash on the X axis to
-   read as an edge-on flip rather than a flat spin, with a slight lift so it
-   reads as tossed rather than just squashed. */
-@keyframes lambda-coin-toss {
-  0% {
-    transform: translateY(0) scaleX(1);
-  }
-  50% {
-    transform: translateY(-7px) scaleX(0.12);
-  }
-  100% {
-    transform: translateY(0) scaleX(1);
-  }
-}
-.animate-coin-toss {
-  animation: lambda-coin-toss 0.9s cubic-bezier(0.45, 0, 0.55, 1) infinite;
-}
-
 body {
   position: relative;
 }
