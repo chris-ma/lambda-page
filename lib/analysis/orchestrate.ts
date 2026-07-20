@@ -9,10 +9,22 @@ export async function runPillar1(pageId: string, targetUrl: string) {
   try {
     const project = await getProjectForPage(pageId);
     const brand = (project?.palette as BrandSpec | null) ?? undefined;
-    const [dom, vitals] = await Promise.allSettled([
-      runStructuralAnalysis(targetUrl, brand),
-      runLabVitals(targetUrl),
-    ]);
+    // Sequential, not Promise.all — each pass launches its own full headless
+    // Chromium process (Playwright for the DOM pass, chrome-launcher for
+    // Lighthouse), and running both at once in a memory-constrained
+    // serverless function starves the second browser of the memory/CPU it
+    // needs to open its remote-debugging port in time, failing every real
+    // run with "connect ECONNREFUSED 127.0.0.1:<port>" even though nothing
+    // throws at the top level (allSettled turns it into a quiet FAILING
+    // finding, so it never showed up in server error monitoring).
+    const dom = await runStructuralAnalysis(targetUrl, brand).then(
+      (value) => ({ status: "fulfilled" as const, value }),
+      (reason) => ({ status: "rejected" as const, reason }),
+    );
+    const vitals = await runLabVitals(targetUrl).then(
+      (value) => ({ status: "fulfilled" as const, value }),
+      (reason) => ({ status: "rejected" as const, reason }),
+    );
 
     const findings: FindingInput[] = [];
     const summary: Record<string, unknown> = {};
