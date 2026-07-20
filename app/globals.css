@@ -1,11 +1,12 @@
 @import "tailwindcss";
 
 @theme {
-  --color-cream: #f3e9d2;
-  --color-cream-2: #ede0c4;
-  --color-paper: #fbf6ea;
-  --color-ink: #332a22;
-  --color-ink-soft: #5c4f41;
+  --color-cream: #fafafa;
+  --color-cream-2: #f0f0f0;
+  --color-paper: #ffffff;
+  --color-ink: #171717;
+  --color-ink-soft: #555555;
+  --color-line: #dddddd;
   --color-pink: #de9c93;
   --color-pink-deep: #c97a70;
   --color-mustard: #d9a441;
@@ -15,27 +16,18 @@
   --color-brick: #bd5a3f;
 
   --font-display: var(--font-display-raw), Georgia, serif;
-  --font-body: var(--font-body-raw), Arial, sans-serif;
-  --font-mono: var(--font-mono-raw), "Courier New", monospace;
+  --font-body: Georgia, Cambria, "Times New Roman", Times, serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Courier New", monospace;
 
-  /*
-   * Layered "raised card stock" shadows — a tight contact shadow plus a
-   * wider ambient one, with a faint inset top highlight/bottom shade so the
-   * edge itself reads as a bevel. Replaces the old flat 1-layer offset
-   * (Npx Npx 0 ...) that had no blur at all, which is what made every
-   * surface read as a flat sticker cut out and pasted down rather than an
-   * actually raised object.
-   */
-  --shadow-depth-xs: inset 0 1px 0 rgba(255, 255, 255, 0.45), inset 0 -1px 0 rgba(51, 42, 34, 0.1), 0 1px 1px rgba(51, 42, 34, 0.14),
-    0 3px 6px rgba(51, 42, 34, 0.12);
-  --shadow-depth-sm: inset 0 1px 0 rgba(255, 255, 255, 0.45), inset 0 -1px 0 rgba(51, 42, 34, 0.1), 0 1px 2px rgba(51, 42, 34, 0.12),
-    0 4px 8px rgba(51, 42, 34, 0.13), 0 9px 20px rgba(51, 42, 34, 0.09);
-  --shadow-depth-md: inset 0 1px 0 rgba(255, 255, 255, 0.5), inset 0 -1px 0 rgba(51, 42, 34, 0.1), 0 1px 2px rgba(51, 42, 34, 0.12),
-    0 7px 14px rgba(51, 42, 34, 0.15), 0 18px 34px rgba(51, 42, 34, 0.11);
-  --shadow-depth-lg: inset 0 1px 0 rgba(255, 255, 255, 0.55), inset 0 -1px 0 rgba(51, 42, 34, 0.1), 0 2px 4px rgba(51, 42, 34, 0.14),
-    0 12px 22px rgba(51, 42, 34, 0.17), 0 28px 50px rgba(51, 42, 34, 0.13);
-  /* A surface pressed into the page — active/pressed buttons and toggles. */
-  --shadow-depth-press: inset 0 2px 6px rgba(51, 42, 34, 0.3), inset 0 1px 2px rgba(51, 42, 34, 0.18);
+  /* Retired with the flat editorial reskin — every shadow-depth-* utility
+     now resolves to no shadow at all, so any component still referencing
+     one (rather than having been revisited directly) degrades safely flat
+     instead of leaving a stray 3D bevel behind. */
+  --shadow-depth-xs: none;
+  --shadow-depth-sm: none;
+  --shadow-depth-md: none;
+  --shadow-depth-lg: none;
+  --shadow-depth-press: none;
 }
 
 html {
@@ -57,66 +49,46 @@ body {
   position: relative;
 }
 
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 999;
-  opacity: 0.05;
-  mix-blend-mode: multiply;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+/* Editorial heading reset — plain-CSS rules sit outside Tailwind's layered
+   utilities, so this wins over any font-semibold/font-bold a component
+   still carries from the old treatment without having to touch every
+   heading className individually. */
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  margin: 0;
 }
 
-/* Depth-shadow card lift, used across cards/buttons/tags per brand bible Plate applications */
-.depth {
-  box-shadow: var(--shadow-depth-md);
-  transition:
-    transform 0.22s cubic-bezier(0.2, 0.7, 0.3, 1),
-    box-shadow 0.22s cubic-bezier(0.2, 0.7, 0.3, 1);
-}
-.depth:hover {
-  transform: translateY(-4px) scale(1.008);
-  box-shadow: var(--shadow-depth-lg);
-}
-
-/*
- * Per-surface paper grain — the same fractal-noise texture as the
- * page-level overlay below, but painted on the element itself (behind its
- * content, via ::before) so individual cards/buttons/badges read as cut
- * card stock rather than flat vector fill. Needs `position: relative` on
- * the element, which every consumer already has via `border-2`'s box.
- */
+/* Retired grain/sheen surfaces — kept as no-ops (rather than deleted) so
+   the handful of components still passing these classNames degrade to
+   plain flat surfaces instead of needing every call site edited. */
 .texture {
   position: relative;
 }
 .texture::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  /* Match the host's own corner radius (e.g. the rounded-full λ badge) —
-     otherwise this rectangular noise layer's corners poke out past a round
-     or rounded-corner parent, since background-image clipping doesn't
-     apply to a separately-painted pseudo-element. */
-  border-radius: inherit;
-  pointer-events: none;
-  opacity: 0.1;
-  mix-blend-mode: multiply;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  content: none;
 }
-
-/* A faint top-light sheen on saturated surfaces (mustard/teal buttons, the
-   λ badge) implying a gently domed, not flat, material. */
 .sheen {
-  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0) 45%, rgba(51, 42, 34, 0.05) 100%);
+  background-image: none;
+}
+.depth {
+  transition: border-color 0.15s ease;
+}
+.depth:hover {
+  border-color: var(--color-ink);
 }
 
-/* Hatch fill — the λ mark and active-state pattern */
+/* Hatch fill — the λ mark's engraved-plate texture. A deliberate signature
+   detail, not "grain," so it survives the flat reskin. */
 .hatch-fill {
   background-image: repeating-linear-gradient(
     45deg,
-    rgba(51, 42, 34, 0.22) 0,
-    rgba(51, 42, 34, 0.22) 1px,
+    rgba(23, 23, 23, 0.22) 0,
+    rgba(23, 23, 23, 0.22) 1px,
     transparent 1px,
     transparent 5px
   );
@@ -146,17 +118,10 @@ body::before {
   font-size: 11px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--color-brick);
+  color: var(--color-ink-soft);
   display: flex;
   align-items: center;
   gap: 12px;
-}
-.eyebrow::before,
-.eyebrow::after {
-  content: "";
-  width: 26px;
-  height: 1px;
-  background: var(--color-brick);
 }
 
 @keyframes pulse {

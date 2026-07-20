@@ -35,7 +35,7 @@ export function Tag({
     <span
       className={cn(
         "inline-flex items-center gap-2 border-1.5 font-mono uppercase tracking-wide",
-        size === "md" ? "texture px-4 py-2 text-[11px] bg-paper border-2 shadow-depth-xs" : "px-2 py-1 text-[9.5px]",
+        size === "md" ? "px-4 py-2 text-[11px] bg-paper border-2" : "px-2 py-1 text-[9.5px]",
         size === "sm" && TEXT[status],
         size === "md" && "border-ink text-ink",
         className,

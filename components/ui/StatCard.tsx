@@ -1,4 +1,3 @@
-import { Card } from "./Card";
 import { cn } from "@/lib/utils";
 
 export function StatCard({
@@ -12,9 +11,9 @@ export function StatCard({
   accent?: string;
 }) {
   return (
-    <Card className="p-6">
-      <div className={cn("font-display text-[44px] leading-none font-semibold", accent ?? "text-ink")}>{value}</div>
+    <div className="border-t-2 border-ink pt-6">
+      <div className={cn("font-display text-[44px] leading-none", accent ?? "text-ink")}>{value}</div>
       <p className="mt-4 max-w-none text-[14px] leading-relaxed text-ink-soft">{description}</p>
-    </Card>
+    </div>
   );
 }

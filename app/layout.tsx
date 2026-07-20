@@ -1,30 +1,16 @@
 import type { Metadata } from "next";
-import { Fraunces, Jost, Special_Elite } from "next/font/google";
+import { Playfair_Display } from "next/font/google";
 import "./globals.css";
 
-// Fraunces over the old Bodoni Moda: still a serif with real editorial
-// character, but Bodoni's hairline/thick-stroke contrast gets illegible
-// fast below display sizes — Fraunces keeps sturdier strokes at every
-// weight and ships an optical-size axis so text stays readable from
-// small card headings up to the hero.
-const fraunces = Fraunces({
+// Playfair Display — the high-contrast editorial serif this reskin is built
+// around. Body copy and mono labels fall back to system stacks (Georgia,
+// ui-monospace) rather than loading web fonts for them, matching the
+// reference stylesheet exactly.
+const playfair = Playfair_Display({
   variable: "--font-display-raw",
   subsets: ["latin"],
-  weight: "variable",
+  weight: ["400", "500", "600", "700", "900"],
   style: ["normal", "italic"],
-  axes: ["opsz"],
-});
-
-const jost = Jost({
-  variable: "--font-body-raw",
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
-});
-
-const specialElite = Special_Elite({
-  variable: "--font-mono-raw",
-  subsets: ["latin"],
-  weight: ["400"],
 });
 
 export const metadata: Metadata = {
@@ -39,11 +25,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      className={`${fraunces.variable} ${jost.variable} ${specialElite.variable} h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col bg-cream text-ink font-body">{children}</body>
+    <html lang="en" className={`${playfair.variable} h-full antialiased`}>
+      <body className="min-h-full flex flex-col bg-paper text-ink font-body">{children}</body>
     </html>
   );
 }

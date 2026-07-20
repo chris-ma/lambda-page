@@ -41,7 +41,7 @@ export function VanWestendorpChart({ result, currency = "$" }: { result: VanWest
       <svg viewBox={`0 0 ${W} ${H}`} className="w-full" role="img" aria-label="Van Westendorp price sensitivity chart">
         {yTicks.map((t) => (
           <g key={t}>
-            <line x1={PAD.left} x2={W - PAD.right} y1={y(t)} y2={y(t)} stroke="#332A22" strokeOpacity={0.12} strokeWidth={1} />
+            <line x1={PAD.left} x2={W - PAD.right} y1={y(t)} y2={y(t)} stroke="#171717" strokeOpacity={0.12} strokeWidth={1} />
             <text x={PAD.left - 8} y={y(t)} textAnchor="end" dominantBaseline="middle" fontFamily="var(--font-mono)" fontSize={9} fill="#5C4F41">
               {t}%
             </text>
@@ -53,8 +53,8 @@ export function VanWestendorpChart({ result, currency = "$" }: { result: VanWest
             {Math.round(t)}
           </text>
         ))}
-        <line x1={PAD.left} x2={PAD.left} y1={PAD.top} y2={H - PAD.bottom} stroke="#332A22" strokeWidth={1.5} />
-        <line x1={PAD.left} x2={W - PAD.right} y1={H - PAD.bottom} y2={H - PAD.bottom} stroke="#332A22" strokeWidth={1.5} />
+        <line x1={PAD.left} x2={PAD.left} y1={PAD.top} y2={H - PAD.bottom} stroke="#171717" strokeWidth={1.5} />
+        <line x1={PAD.left} x2={W - PAD.right} y1={H - PAD.bottom} y2={H - PAD.bottom} stroke="#171717" strokeWidth={1.5} />
 
         {CURVE_STYLE.map(({ key, color }) => {
           const pts = result.curves[key];
@@ -72,7 +72,7 @@ export function VanWestendorpChart({ result, currency = "$" }: { result: VanWest
               x2={x(price)}
               y1={PAD.top}
               y2={H - PAD.bottom}
-              stroke="#332A22"
+              stroke="#171717"
               strokeWidth={1}
               strokeDasharray="2 3"
               strokeOpacity={0.5}

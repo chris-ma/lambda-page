@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 export function Nav() {
   const [open, setOpen] = useState<number | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [progress, setProgress] = useState(0);
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -22,6 +23,18 @@ export function Nav() {
     }
     document.addEventListener("mousedown", onClick);
     return () => document.removeEventListener("mousedown", onClick);
+  }, []);
+
+  // Reading-progress bar in the masthead — how far down the page you are.
+  useEffect(() => {
+    function onScroll() {
+      const doc = document.documentElement;
+      const scrollable = doc.scrollHeight - doc.clientHeight;
+      setProgress(scrollable > 0 ? (doc.scrollTop / scrollable) * 100 : 0);
+    }
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   // Close the mobile menu on resize up to desktop so state can't get stuck open.
@@ -47,8 +60,13 @@ export function Nav() {
         <nav className="mx-auto flex h-[80px] max-w-[1200px] items-center justify-between px-6">
           <Link href="/" className="flex items-center gap-3" onClick={() => setMobileOpen(false)}>
             <LambdaMark size={38} />
-            <span className="font-display text-[19px] font-semibold tracking-tight text-ink">Lambda Page</span>
+            <span className="font-display text-[19px] text-ink">Lambda Page</span>
           </Link>
+
+        {/* Reading-progress bar */}
+        <div className="relative mx-10 hidden h-[2px] max-w-[260px] flex-1 bg-line lg:block">
+          <div className="absolute inset-y-0 left-0 bg-ink transition-[width] duration-100" style={{ width: `${progress}%` }} />
+        </div>
 
         {/* Desktop nav */}
         <div className="hidden items-center gap-7 md:flex">
@@ -90,7 +108,7 @@ export function Nav() {
           onClick={() => { setMobileOpen((v) => !v); setOpen(null); }}
           className="flex h-10 w-10 items-center justify-center border-2 border-ink bg-paper md:hidden"
         >
-          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="#332A22" strokeWidth="2" strokeLinecap="round">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="#171717" strokeWidth="2" strokeLinecap="round">
             {mobileOpen ? (
               <>
                 <line x1="3" y1="3" x2="15" y2="15" />

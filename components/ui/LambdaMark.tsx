@@ -31,7 +31,7 @@ export function LambdaMark({
             patternTransform="rotate(45)"
             patternUnits="userSpaceOnUse"
           >
-            <line x1="0" y1="0" x2="0" y2="6" stroke="#332A22" strokeWidth="1" opacity="0.4" />
+            <line x1="0" y1="0" x2="0" y2="6" stroke="#171717" strokeWidth="1" opacity="0.4" />
           </pattern>
           <path
             id="lp-circle-path"
@@ -43,28 +43,28 @@ export function LambdaMark({
           cy="80"
           r="72"
           fill="none"
-          stroke="#332A22"
+          stroke="#171717"
           strokeWidth="1.5"
           strokeDasharray="1 5"
         />
-        <circle cx="80" cy="80" r="60" fill="none" stroke="#332A22" strokeWidth="1" />
+        <circle cx="80" cy="80" r="60" fill="none" stroke="#171717" strokeWidth="1" />
         <g style={{ transformOrigin: "80px 80px" }}>
           <circle cx="80" cy="80" r="46" fill="#D9A441" />
           <circle cx="80" cy="80" r="46" fill="url(#lp-hatch)" />
-          <circle cx="80" cy="80" r="46" fill="none" stroke="#332A22" strokeWidth="2" />
+          <circle cx="80" cy="80" r="46" fill="none" stroke="#171717" strokeWidth="2" />
           <text
             x="80"
             y="97"
             fontFamily="var(--font-display)"
             fontWeight="700"
             fontSize="46"
-            fill="#332A22"
+            fill="#171717"
             textAnchor="middle"
           >
             λ
           </text>
         </g>
-        <text fontFamily="var(--font-mono)" fontSize="8.5" letterSpacing="2.5" fill="#332A22">
+        <text fontFamily="var(--font-mono)" fontSize="8.5" letterSpacing="2.5" fill="#171717">
           <textPath href="#lp-circle-path" startOffset="50%" textAnchor="middle">
             LANDING PAGE FUNCTION
           </textPath>
@@ -76,7 +76,7 @@ export function LambdaMark({
   return (
     <div
       className={cn(
-        "hatch-fill texture inline-flex shrink-0 items-center justify-center rounded-full border-2 border-ink bg-mustard font-display font-bold text-ink shadow-depth-xs transition-transform duration-500 [transition-timing-function:cubic-bezier(.2,.8,.3,1.3)] hover:rotate-180",
+        "hatch-fill inline-flex shrink-0 items-center justify-center rounded-full border-2 border-ink bg-mustard font-display font-bold text-ink transition-transform duration-500 [transition-timing-function:cubic-bezier(.2,.8,.3,1.3)] hover:rotate-180",
         className,
       )}
       style={{ width: size, height: size, fontSize: size * 0.46 }}

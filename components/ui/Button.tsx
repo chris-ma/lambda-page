@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 type Variant = "primary" | "ghost" | "ink";
 
 const base =
-  "sheen texture inline-flex items-center justify-center gap-2 border-2 border-ink px-5 py-3 font-mono text-[12.5px] font-semibold tracking-[0.08em] uppercase shadow-depth-sm transition-[transform,box-shadow] duration-150 ease-out hover:-translate-y-0.5 hover:shadow-depth-md active:translate-y-px active:shadow-depth-press active:duration-75";
+  "inline-flex items-center justify-center gap-2 border-2 border-ink px-5 py-3 font-mono text-[12.5px] font-semibold tracking-[0.08em] uppercase transition-opacity duration-150 hover:opacity-80 active:opacity-70";
 
 const variants: Record<Variant, string> = {
   // Ink text on mustard — brand bible's own demo used paper-on-mustard, which

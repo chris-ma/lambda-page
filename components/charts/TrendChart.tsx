@@ -29,7 +29,7 @@ export function TrendChart({
   return (
     <div className="border-2 border-ink bg-paper p-5">
       <svg width="100%" height={h} viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="xMidYMid meet">
-        <g stroke="#332A22" strokeOpacity="0.12" strokeWidth="1">
+        <g stroke="#171717" strokeOpacity="0.12" strokeWidth="1">
           <line x1={padL} y1={padT} x2={padL} y2={h - padB} />
           <line x1={padL} y1={h - padB} x2={w - padR} y2={h - padB} />
           {gridLines.map((gy) => (
@@ -43,7 +43,7 @@ export function TrendChart({
               y1={y(target)}
               x2={w - padR}
               y2={y(target)}
-              stroke="#332A22"
+              stroke="#171717"
               strokeWidth="1"
               strokeDasharray="3 4"
               opacity="0.5"

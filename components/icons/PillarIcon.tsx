@@ -51,7 +51,7 @@ export const PILLAR_COLOR: Record<
 export function PillarIcon({ pillar, size = 26 }: { pillar: PillarId; size?: number }) {
   // Ink stroke always — this icon sits on chips of all four accent colors,
   // and ink is the one tone that reads clearly against each of them.
-  const stroke = "#332A22";
+  const stroke = "#171717";
   return (
     <svg width={size} height={size} viewBox="0 0 26 26" aria-hidden="true">
       {pillar === 0 && (
