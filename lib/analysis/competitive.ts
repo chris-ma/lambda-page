@@ -72,7 +72,13 @@ export async function runCompetitiveScan(targetUrl: string): Promise<{ findings:
 
     findings.push({ component: "Competitive Scan", attribute: "Page title", status: "INFO", value: data.title });
 
-    return { findings, summary: { hostname, framing, trustHitCount: trustHits.length } };
+    return {
+      findings,
+      // bodyTextSample feeds the buying-driver scoring pass (lib/ai/competitive-synthesis.ts) —
+      // the rule-based findings above don't carry enough signal on their own for dimensions
+      // like feature depth or brand.
+      summary: { hostname, framing, trustHitCount: trustHits.length, bodyTextSample: data.bodyTextSample.slice(0, 6000) },
+    };
   } finally {
     await browser.close();
   }

@@ -4,13 +4,24 @@ import { runsForSet } from "@/lib/db/runs";
 import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
 import { Tag } from "@/components/ui/Tag";
 import { Card } from "@/components/ui/Card";
+import { BuyingDriversRadarChart } from "@/components/charts/BuyingDriversRadarChart";
+import type { BuyingDriverResult } from "@/lib/ai/competitive-synthesis";
 
 export const dynamic = "force-dynamic";
+
+function hostnameOf(url: string): string {
+  try {
+    return new URL(url).hostname.replace(/^www\./, "");
+  } catch {
+    return url;
+  }
+}
 
 export default async function CompetitiveSetPage({ params }: { params: Promise<{ setId: string }> }) {
   const { setId } = await params;
   const set = await getCompetitiveSet(setId);
   const runs = await runsForSet(setId);
+  const buyingDrivers = set.buying_drivers as BuyingDriverResult | null;
 
   return (
     <div>
@@ -42,6 +53,26 @@ export default async function CompetitiveSetPage({ params }: { params: Promise<{
             {set.synthesis.split(/\n{2,}/).map((para, i) => (
               <p key={i}>{para}</p>
             ))}
+          </div>
+        </Card>
+      )}
+
+      {buyingDrivers && buyingDrivers.competitors.length > 0 && (
+        <Card hover={false} className="mt-8 p-6">
+          <div className="flex items-center justify-between">
+            <h2 className="font-display text-[17px] font-semibold text-ink">Buying drivers</h2>
+            <span className="font-mono text-[10px] uppercase tracking-wide text-pink-deep">AI judgment — directional</span>
+          </div>
+          <p className="mt-1.5 text-[12.5px] text-ink-soft">
+            Price, feature depth, ease of use, support quality, brand, traffic/visibility, content
+            quality, and market share — scored from the scraped page content, not verified
+            metrics.
+          </p>
+          <div className="mt-6">
+            <BuyingDriversRadarChart
+              result={buyingDrivers}
+              hostnames={Object.fromEntries(buyingDrivers.competitors.map((c) => [c.url, hostnameOf(c.url)]))}
+            />
           </div>
         </Card>
       )}

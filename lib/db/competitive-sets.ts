@@ -1,6 +1,7 @@
 import { query, queryOne } from "./client";
 import { DEFAULT_PROJECT_ID } from "@/lib/config";
 import type { Database } from "@/lib/database.types";
+import type { BuyingDriverResult } from "@/lib/ai/competitive-synthesis";
 
 type CompetitiveSet = Database["public"]["Tables"]["competitive_sets"]["Row"];
 
@@ -13,8 +14,12 @@ export async function createCompetitiveSet(name: string): Promise<CompetitiveSet
   return set;
 }
 
-export async function completeCompetitiveSet(id: string, synthesis: string) {
-  await query(`update competitive_sets set status = 'complete', synthesis = $2 where id = $1`, [id, synthesis]);
+export async function completeCompetitiveSet(id: string, synthesis: string, buyingDrivers: BuyingDriverResult | null) {
+  await query(`update competitive_sets set status = 'complete', synthesis = $2, buying_drivers = $3 where id = $1`, [
+    id,
+    synthesis,
+    buyingDrivers ? JSON.stringify(buyingDrivers) : null,
+  ]);
 }
 
 export async function failCompetitiveSet(id: string, message: string) {

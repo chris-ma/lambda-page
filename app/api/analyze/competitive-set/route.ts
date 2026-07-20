@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { createCompetitiveSet, completeCompetitiveSet, failCompetitiveSet } from "@/lib/db/competitive-sets";
 import { createRun, completeRun, failRun } from "@/lib/db/runs";
 import { runCompetitiveScan } from "@/lib/analysis/competitive";
-import { synthesizeCompetitiveSet } from "@/lib/ai/competitive-synthesis";
+import { synthesizeCompetitiveSet, scoreBuyingDrivers, type BuyingDriverResult } from "@/lib/ai/competitive-synthesis";
 import type { FindingInput } from "@/lib/db/runs";
 
 export const runtime = "nodejs";
@@ -44,8 +44,13 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Every competitor URL failed to scan." }, { status: 500 });
     }
 
-    const synthesis = await synthesizeCompetitiveSet(perSite);
-    await completeCompetitiveSet(set.id, synthesis);
+    const [synthesis, buyingDrivers] = await Promise.all([
+      synthesizeCompetitiveSet(perSite),
+      // The buying-driver radar needs at least two competitors to be a
+      // comparison; skip it (not an error) for a single-URL scan.
+      perSite.length >= 2 ? scoreBuyingDrivers(perSite).catch((): BuyingDriverResult | null => null) : Promise.resolve(null),
+    ]);
+    await completeCompetitiveSet(set.id, synthesis, buyingDrivers);
     return NextResponse.json({ setId: set.id }, { status: 201 });
   } catch (err) {
     await failCompetitiveSet(set.id, err instanceof Error ? err.message : String(err));
