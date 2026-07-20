@@ -31,8 +31,8 @@ export const PILLARS_NAV: PillarNavItem[] = [
       },
       {
         label: "Assumption Interviews",
-        description: "Pricing tolerance and segment validity — a research process, not a dashboard.",
-        href: "/dashboard/pre-build",
+        description: "Pricing tolerance (Van Westendorp) and assumption validation — a real interview link, real panel.",
+        href: "/dashboard/pre-build/assumption-interviews",
       },
     ],
   },

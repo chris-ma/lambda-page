@@ -66,6 +66,65 @@ export type Database = {
           { foreignKeyName: "eye_page_screenshots_page_id_fkey"; columns: ["page_id"]; isOneToOne: false; referencedRelation: "eye_pages"; referencedColumns: ["id"] },
         ];
       };
+      assumption_studies: {
+        Row: { id: string; project_id: string; name: string; context: string | null; include_pricing: boolean; price_product_label: string | null; created_at: string };
+        Insert: { id?: string; project_id: string; name: string; context?: string | null; include_pricing?: boolean; price_product_label?: string | null; created_at?: string };
+        Update: { id?: string; project_id?: string; name?: string; context?: string | null; include_pricing?: boolean; price_product_label?: string | null; created_at?: string };
+        Relationships: [
+          { foreignKeyName: "assumption_studies_project_id_fkey"; columns: ["project_id"]; isOneToOne: false; referencedRelation: "projects"; referencedColumns: ["id"] },
+        ];
+      };
+      assumption_statements: {
+        Row: { id: string; study_id: string; statement: string; position: number };
+        Insert: { id?: string; study_id: string; statement: string; position?: number };
+        Update: { id?: string; study_id?: string; statement?: string; position?: number };
+        Relationships: [
+          { foreignKeyName: "assumption_statements_study_id_fkey"; columns: ["study_id"]; isOneToOne: false; referencedRelation: "assumption_studies"; referencedColumns: ["id"] },
+        ];
+      };
+      assumption_open_questions: {
+        Row: { id: string; study_id: string; prompt: string; position: number };
+        Insert: { id?: string; study_id: string; prompt: string; position?: number };
+        Update: { id?: string; study_id?: string; prompt?: string; position?: number };
+        Relationships: [
+          { foreignKeyName: "assumption_open_questions_study_id_fkey"; columns: ["study_id"]; isOneToOne: false; referencedRelation: "assumption_studies"; referencedColumns: ["id"] },
+        ];
+      };
+      assumption_sessions: {
+        Row: {
+          id: string; study_id: string; price_too_cheap: number | null; price_bargain: number | null;
+          price_expensive: number | null; price_too_expensive: number | null; created_at: string;
+        };
+        Insert: {
+          id?: string; study_id: string; price_too_cheap?: number | null; price_bargain?: number | null;
+          price_expensive?: number | null; price_too_expensive?: number | null; created_at?: string;
+        };
+        Update: {
+          id?: string; study_id?: string; price_too_cheap?: number | null; price_bargain?: number | null;
+          price_expensive?: number | null; price_too_expensive?: number | null; created_at?: string;
+        };
+        Relationships: [
+          { foreignKeyName: "assumption_sessions_study_id_fkey"; columns: ["study_id"]; isOneToOne: false; referencedRelation: "assumption_studies"; referencedColumns: ["id"] },
+        ];
+      };
+      assumption_statement_responses: {
+        Row: { id: string; session_id: string; statement_id: string; verdict: string; comment: string | null };
+        Insert: { id?: string; session_id: string; statement_id: string; verdict: string; comment?: string | null };
+        Update: { id?: string; session_id?: string; statement_id?: string; verdict?: string; comment?: string | null };
+        Relationships: [
+          { foreignKeyName: "assumption_statement_responses_session_id_fkey"; columns: ["session_id"]; isOneToOne: false; referencedRelation: "assumption_sessions"; referencedColumns: ["id"] },
+          { foreignKeyName: "assumption_statement_responses_statement_id_fkey"; columns: ["statement_id"]; isOneToOne: false; referencedRelation: "assumption_statements"; referencedColumns: ["id"] },
+        ];
+      };
+      assumption_open_responses: {
+        Row: { id: string; session_id: string; question_id: string; response: string | null };
+        Insert: { id?: string; session_id: string; question_id: string; response?: string | null };
+        Update: { id?: string; session_id?: string; question_id?: string; response?: string | null };
+        Relationships: [
+          { foreignKeyName: "assumption_open_responses_session_id_fkey"; columns: ["session_id"]; isOneToOne: false; referencedRelation: "assumption_sessions"; referencedColumns: ["id"] },
+          { foreignKeyName: "assumption_open_responses_question_id_fkey"; columns: ["question_id"]; isOneToOne: false; referencedRelation: "assumption_open_questions"; referencedColumns: ["id"] },
+        ];
+      };
       ab_assignments: {
         Row: { created_at: string; id: string; session_id: string; test_id: string; variant_id: string };
         Insert: { created_at?: string; id?: string; session_id: string; test_id: string; variant_id: string };

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { listCompetitiveSets } from "@/lib/db/competitive-sets";
 import { listRunsByKind } from "@/lib/db/runs";
 import { listMessageTests } from "@/lib/db/message-tests";
+import { listStudies as listAssumptionStudies } from "@/lib/db/assumption";
 import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -10,11 +11,12 @@ import { Tag } from "@/components/ui/Tag";
 export const dynamic = "force-dynamic";
 
 export default async function PreBuildHub() {
-  const [sets, tests, contentFitRuns, wireframeRuns] = await Promise.all([
+  const [sets, tests, contentFitRuns, wireframeRuns, assumptionStudies] = await Promise.all([
     listCompetitiveSets(),
     listMessageTests(),
     listRunsByKind("content_fit"),
     listRunsByKind("wireframe"),
+    listAssumptionStudies(),
   ]);
 
   return (
@@ -141,16 +143,31 @@ export default async function PreBuildHub() {
       </section>
 
       <section className="mt-14">
-        <Card hover={false} className="border-dashed p-6">
-          <h3 className="font-display text-[16px] font-semibold text-ink">Assumption / Customer Interviews</h3>
-          <p className="mt-2 text-[12.5px] text-ink-soft">
-            Pricing tolerance, segment precision, addressable market validity — this is a research
-            process, not a software build. An AI-interview tool is a viable buy-vs-build option
-            here until there&rsquo;s a large enough owned audience to recruit a naive panel
-            internally.
-          </p>
-          <Tag status="INFO" label="Buy vs. build — no in-app tool" size="sm" className="mt-3" />
-        </Card>
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <h2 className="font-display text-[18px] font-semibold text-ink">Assumption Interviews</h2>
+            <p className="mt-1.5 max-w-[560px] text-[12.5px] text-ink-soft">
+              Pricing tolerance (Van Westendorp) and assumption confirm/contradict — a real
+              interview link, real panel, not simulated.
+            </p>
+          </div>
+          <Button href="/dashboard/pre-build/assumption-interviews/new">New study</Button>
+        </div>
+        {assumptionStudies.length > 0 && (
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            {assumptionStudies.map((s) => (
+              <Link key={s.id} href={`/dashboard/pre-build/assumption-interviews/${s.id}`}>
+                <Card className="p-5">
+                  <div className="flex items-start justify-between gap-2">
+                    <span className="font-body text-[13.5px] text-ink">{s.name}</span>
+                    {s.include_pricing && <Tag status="INFO" label="Pricing" size="sm" />}
+                  </div>
+                  <p className="mt-1.5 font-mono text-[10.5px] text-ink-soft">{new Date(s.created_at).toLocaleString()}</p>
+                </Card>
+              </Link>
+            ))}
+          </div>
+        )}
       </section>
     </div>
   );
