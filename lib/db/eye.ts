@@ -39,6 +39,34 @@ export async function getSiteByApiKey(apiKey: string): Promise<EyeSite | null> {
   return queryOne<EyeSite>(`select * from eye_sites where api_key = $1`, [apiKey]);
 }
 
+// -------------------------------------------------------------- projects --
+// A "project" is the one-step unit the dashboard creates: name it, give it
+// the URL to track, submit — under the hood that's one eye_sites row (for
+// the API key / domain) plus one eye_pages row (the tracked URL), created
+// together so the UI never makes the caller manage sites and pages
+// separately.
+
+export type EyeProject = EyePage & { api_key: string; domain: string };
+
+export async function createProject(name: string, url: string, eyeTracking: boolean): Promise<{ site: EyeSite; page: EyePage }> {
+  const normalizedUrl = url.startsWith("http") ? url : `https://${url}`;
+  const domain = new URL(normalizedUrl).hostname;
+  const site = await createSite(name, domain);
+  const page = await createPage(site.id, name, normalizedUrl, eyeTracking);
+  return { site, page };
+}
+
+export async function listProjects(): Promise<EyeProject[]> {
+  return query<EyeProject>(
+    `select p.*, s.api_key, s.domain
+     from eye_pages p
+     join eye_sites s on s.id = p.site_id
+     where s.project_id = $1
+     order by p.created_at desc`,
+    [DEFAULT_PROJECT_ID],
+  );
+}
+
 // ------------------------------------------------------------------ pages --
 
 export async function listPagesForSite(siteId: string): Promise<EyePage[]> {

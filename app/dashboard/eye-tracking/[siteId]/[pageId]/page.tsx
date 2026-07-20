@@ -37,8 +37,8 @@ export default async function EyePageDetail({ params }: { params: Promise<{ site
 
   return (
     <div>
-      <Link href={`/dashboard/eye-tracking/${site.id}`} className="font-mono text-[11px] text-ink-soft">
-        ← {site.name}
+      <Link href="/dashboard/eye-tracking" className="font-mono text-[11px] text-ink-soft">
+        ← Eye Tracking
       </Link>
       <EyebrowLabel className="mt-3">Pillar 03 — User Testing</EyebrowLabel>
       <div className="mt-4">
