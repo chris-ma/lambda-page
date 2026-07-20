@@ -1,12 +1,18 @@
 import type { Metadata } from "next";
-import { Bodoni_Moda, Jost, Special_Elite } from "next/font/google";
+import { Fraunces, Jost, Special_Elite } from "next/font/google";
 import "./globals.css";
 
-const bodoni = Bodoni_Moda({
+// Fraunces over the old Bodoni Moda: still a serif with real editorial
+// character, but Bodoni's hairline/thick-stroke contrast gets illegible
+// fast below display sizes — Fraunces keeps sturdier strokes at every
+// weight and ships an optical-size axis so text stays readable from
+// small card headings up to the hero.
+const fraunces = Fraunces({
   variable: "--font-display-raw",
   subsets: ["latin"],
-  weight: ["500", "600", "700"],
+  weight: "variable",
   style: ["normal", "italic"],
+  axes: ["opsz"],
 });
 
 const jost = Jost({
@@ -35,7 +41,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${bodoni.variable} ${jost.variable} ${specialElite.variable} h-full antialiased`}
+      className={`${fraunces.variable} ${jost.variable} ${specialElite.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-cream text-ink font-body">{children}</body>
     </html>
