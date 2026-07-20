@@ -16,13 +16,17 @@ export default async function StructuralHub() {
       <EyebrowLabel>Pillar 01</EyebrowLabel>
       <h1 className="mt-3 font-display text-[28px] font-semibold text-ink">Structural Analysis</h1>
       <p className="mt-2 max-w-[640px] text-[13.5px] text-ink-soft">
-        SEO Analysis, AEO/GEO Analysis, Page Vitals, and Content &amp; Accessibility are rule-based
-        checks that run per connected page —{" "}
-        <Link href="/dashboard" className="underline">
-          pick a page
+        SEO &amp; AI Search, Page Vitals, and Content &amp; Accessibility are rule-based checks
+        that run together per connected page — see{" "}
+        <Link href="/dashboard/structural/seo" className="underline">
+          SEO &amp; AI Search
         </Link>{" "}
-        to see them. Design &amp; Content Audit below is a separate, Claude-powered visual critique
-        that runs against any URL directly.
+        or{" "}
+        <Link href="/dashboard/structural/vitals" className="underline">
+          Page Vitals
+        </Link>{" "}
+        directly, or the full combined report below. Design &amp; Content Audit is a separate,
+        Claude-powered visual critique that runs against any URL directly.
       </p>
 
       <section className="mt-10">
@@ -55,9 +59,9 @@ export default async function StructuralHub() {
       </section>
 
       <section className="mt-14">
-        <h2 className="font-display text-[18px] font-semibold text-ink">SEO / AEO-GEO / Page Vitals / Content & Accessibility</h2>
+        <h2 className="font-display text-[18px] font-semibold text-ink">Full Diagnostic (all categories)</h2>
         <p className="mt-1.5 text-[12.5px] text-ink-soft">
-          These run together as one diagnostic pass per connected page.
+          SEO &amp; AI Search, Page Vitals, and Content &amp; Accessibility together in one pass.
         </p>
         {pages.length === 0 ? (
           <Card hover={false} className="mt-4 border-dashed p-8 text-center text-[13px] text-ink-soft">
