@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createRun, completeRun, failRun, setRunStimulus } from "@/lib/db/runs";
-import { captureStimulus } from "@/lib/analysis/screenshot";
+import { capturePageScreenshot } from "@/lib/analysis/screenshot";
 import { runDesignAudit } from "@/lib/ai/design-audit";
 
 export const runtime = "nodejs";
@@ -16,7 +16,7 @@ export async function POST(request: Request) {
 
   const run = await createRun({ pageId: null, pillar: 1, kind: "design_audit", targetUrl: normalized });
   try {
-    const { png, width, height } = await captureStimulus(normalized);
+    const { png, width, height } = await capturePageScreenshot(normalized);
     await setRunStimulus(run.id, png, width, height, "image/png");
     const base64 = png.toString("base64");
     const { findings, summary } = await runDesignAudit({ base64, mediaType: "image/png" });

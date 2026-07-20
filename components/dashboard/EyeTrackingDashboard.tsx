@@ -53,6 +53,8 @@ export function EyeTrackingDashboard({
   const [data, setData] = useState<EventsResponse>(initial);
   const [showEmbed, setShowEmbed] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [capturing, setCapturing] = useState(false);
+  const [captureError, setCaptureError] = useState<string | null>(null);
   const [clearing, setClearing] = useState(false);
   const [confirmClear, setConfirmClear] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -79,12 +81,31 @@ export function EyeTrackingDashboard({
       const fd = new FormData();
       fd.append("apiKey", site.api_key);
       fd.append("pageKey", page.page_key);
+      fd.append("deviceType", device);
       fd.append("image", file, "screenshot.jpg");
       await fetch("/api/eye-screenshot", { method: "POST", body: fd });
       router.refresh();
     } finally {
       setUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  }
+
+  async function handleCapture() {
+    setCapturing(true);
+    setCaptureError(null);
+    try {
+      const res = await fetch(`/api/eye-pages/${page.id}/capture-screenshot`, { method: "POST" });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        setCaptureError(body.error ?? "Couldn't capture a screenshot.");
+        return;
+      }
+      // The server always captures at a desktop viewport, so surface it.
+      setDevice("desktop");
+      router.refresh();
+    } finally {
+      setCapturing(false);
     }
   }
 
@@ -118,6 +139,14 @@ export function EyeTrackingDashboard({
           </a>
         </div>
         <div className="flex shrink-0 flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={handleCapture}
+            disabled={capturing}
+            className="border-2 border-ink bg-paper px-3 py-2 font-mono text-[10.5px] uppercase tracking-wide text-ink-soft hover:text-ink"
+          >
+            {capturing ? "Capturing…" : "Capture screenshot"}
+          </button>
           <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleUpload} />
           <button
             type="button"
@@ -148,6 +177,8 @@ export function EyeTrackingDashboard({
           </button>
         </div>
       </div>
+
+      {captureError && <p className="mt-2 font-mono text-[11px] text-brick">{captureError}</p>}
 
       {showEmbed && (
         <div className="mt-4">

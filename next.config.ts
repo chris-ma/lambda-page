@@ -29,6 +29,11 @@ const nextConfig: NextConfig = {
     "/api/analyze/competitive-set": playwrightTrace,
     "/api/analyze/design-audit": playwrightTrace,
     "/api/analyze/content-fit": playwrightTrace,
+    "/api/eye-projects": playwrightTrace,
+    // Dynamic segment brackets must be escaped for outputFileTracingIncludes'
+    // picomatch route-glob keys — an unescaped [pageId] is a character class,
+    // not a literal, and silently fails to match this route at all.
+    "/api/eye-pages/\\[pageId\\]/capture-screenshot": playwrightTrace,
   },
   async headers() {
     return [
