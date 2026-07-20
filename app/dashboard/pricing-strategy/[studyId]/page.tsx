@@ -3,40 +3,53 @@ import {
   getStudy,
   getStatements,
   getOpenQuestions,
+  getPricePoints,
   listSessions,
   getPriceQuads,
+  getPriceResponses,
   getStatementResponses,
   getOpenResponses,
 } from "@/lib/db/assumption";
 import { computeVanWestendorp, MIN_PRICING_RESPONSES } from "@/lib/pricing/van-westendorp";
+import { computeGaborGranger } from "@/lib/pricing/gabor-granger";
 import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
 import { Card } from "@/components/ui/Card";
 import { Tag } from "@/components/ui/Tag";
 import { ShareLink } from "@/components/dashboard/ShareLink";
 import { VanWestendorpChart } from "@/components/charts/VanWestendorpChart";
+import { GaborGrangerChart } from "@/components/charts/GaborGrangerChart";
 
 export const dynamic = "force-dynamic";
 
-export default async function AssumptionStudyResults({ params }: { params: Promise<{ studyId: string }> }) {
+export default async function PricingStudyResults({ params }: { params: Promise<{ studyId: string }> }) {
   const { studyId } = await params;
-  const [study, statements, openQuestions, sessions, priceQuads, statementResponses, openResponses] = await Promise.all([
-    getStudy(studyId),
-    getStatements(studyId),
-    getOpenQuestions(studyId),
-    listSessions(studyId),
-    getPriceQuads(studyId),
-    getStatementResponses(studyId),
-    getOpenResponses(studyId),
-  ]);
+  const [study, statements, openQuestions, pricePoints, sessions, priceQuads, priceResponses, statementResponses, openResponses] =
+    await Promise.all([
+      getStudy(studyId),
+      getStatements(studyId),
+      getOpenQuestions(studyId),
+      getPricePoints(studyId),
+      listSessions(studyId),
+      getPriceQuads(studyId),
+      getPriceResponses(studyId),
+      getStatementResponses(studyId),
+      getOpenResponses(studyId),
+    ]);
 
-  const vanWestendorp = study.include_pricing ? computeVanWestendorp(priceQuads) : null;
+  const vanWestendorp = computeVanWestendorp(priceQuads);
+  const gaborGranger = study.include_gabor_granger
+    ? computeGaborGranger(
+        pricePoints.map((p) => ({ id: p.id, price: Number(p.price) })),
+        priceResponses,
+      )
+    : null;
 
   return (
     <div>
-      <Link href="/dashboard/pre-build/assumption-interviews" className="font-mono text-[11px] text-ink-soft">
-        ← Assumption Interviews
+      <Link href="/dashboard/pricing-strategy" className="font-mono text-[11px] text-ink-soft">
+        ← Pricing Strategy
       </Link>
-      <EyebrowLabel className="mt-3">Pillar 00 — Pre-Build Validation</EyebrowLabel>
+      <EyebrowLabel className="mt-3">Pillar 03 — User Testing</EyebrowLabel>
       <h1 className="mt-2 font-display text-[26px] font-semibold text-ink">{study.name}</h1>
       {study.context && <p className="mt-2 max-w-[620px] text-[13.5px] text-ink-soft">&ldquo;{study.context}&rdquo;</p>}
 
@@ -48,20 +61,42 @@ export default async function AssumptionStudyResults({ params }: { params: Promi
         {sessions.length} response{sessions.length === 1 ? "" : "s"}
       </div>
 
-      {study.include_pricing && (
+      <section className="mt-12">
+        <h2 className="font-display text-[18px] font-semibold text-ink">Pricing tolerance</h2>
+        <p className="mt-1.5 text-[12.5px] text-ink-soft">
+          Van Westendorp Price Sensitivity Meter — computed directly from raw price responses, no
+          judgment call.
+        </p>
+        {vanWestendorp ? (
+          <div className="mt-5">
+            <VanWestendorpChart result={vanWestendorp} />
+          </div>
+        ) : (
+          <Card hover={false} className="mt-4 border-dashed p-8 text-center text-[13px] text-ink-soft">
+            Need at least {MIN_PRICING_RESPONSES} price responses to compute price points — {priceQuads.length} so far.
+          </Card>
+        )}
+      </section>
+
+      {study.include_gabor_granger && (
         <section className="mt-12">
-          <h2 className="font-display text-[18px] font-semibold text-ink">Pricing tolerance</h2>
+          <h2 className="font-display text-[18px] font-semibold text-ink">Demand at specific prices</h2>
           <p className="mt-1.5 text-[12.5px] text-ink-soft">
-            Van Westendorp Price Sensitivity Meter — computed directly from raw price responses, no
-            judgment call.
+            Gabor-Granger — % of respondents who&rsquo;d buy at each price, and the price that
+            maximizes the revenue index (price × purchase likelihood).
           </p>
-          {vanWestendorp ? (
+          {gaborGranger && gaborGranger.points.some((p) => p.n > 0) ? (
             <div className="mt-5">
-              <VanWestendorpChart result={vanWestendorp} />
+              <GaborGrangerChart result={gaborGranger} />
+              {gaborGranger.optimalPrice !== null && (
+                <p className="mt-4 font-mono text-[11px] text-terracotta-deep">
+                  Revenue-maximizing price: ${gaborGranger.optimalPrice}
+                </p>
+              )}
             </div>
           ) : (
             <Card hover={false} className="mt-4 border-dashed p-8 text-center text-[13px] text-ink-soft">
-              Need at least {MIN_PRICING_RESPONSES} price responses to compute price points — {priceQuads.length} so far.
+              No price-point responses yet.
             </Card>
           )}
         </section>
@@ -69,7 +104,7 @@ export default async function AssumptionStudyResults({ params }: { params: Promi
 
       {statements.length > 0 && (
         <section className="mt-12">
-          <h2 className="font-display text-[18px] font-semibold text-ink">Assumptions</h2>
+          <h2 className="font-display text-[18px] font-semibold text-ink">Other pricing assumptions</h2>
           <div className="mt-4 space-y-5">
             {statements.map((st) => {
               const responses = statementResponses.filter((r) => r.statement_id === st.id);

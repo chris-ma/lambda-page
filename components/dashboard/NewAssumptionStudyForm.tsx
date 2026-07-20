@@ -9,11 +9,13 @@ function EditableList({
   setItems,
   placeholder,
   addLabel,
+  numeric,
 }: {
   items: string[];
   setItems: (fn: (items: string[]) => string[]) => void;
   placeholder: (i: number) => string;
   addLabel: string;
+  numeric?: boolean;
 }) {
   return (
     <div>
@@ -21,6 +23,9 @@ function EditableList({
         {items.map((v, i) => (
           <div key={i} className="flex gap-2">
             <input
+              type={numeric ? "number" : "text"}
+              min={numeric ? 0 : undefined}
+              step={numeric ? "0.01" : undefined}
               value={v}
               onChange={(e) => setItems((xs) => xs.map((x, idx) => (idx === i ? e.target.value : x)))}
               placeholder={placeholder(i)}
@@ -53,9 +58,10 @@ function EditableList({
 export function NewAssumptionStudyForm() {
   const [name, setName] = useState("");
   const [context, setContext] = useState("");
-  const [includePricing, setIncludePricing] = useState(true);
   const [priceProductLabel, setPriceProductLabel] = useState("");
-  const [statements, setStatements] = useState<string[]>(["", ""]);
+  const [includeGaborGranger, setIncludeGaborGranger] = useState(false);
+  const [pricePoints, setPricePoints] = useState<string[]>(["", "", ""]);
+  const [statements, setStatements] = useState<string[]>([""]);
   const [openQuestions, setOpenQuestions] = useState<string[]>([""]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -65,8 +71,9 @@ export function NewAssumptionStudyForm() {
     e.preventDefault();
     const cleanStatements = statements.map((s) => s.trim()).filter(Boolean);
     const cleanOpenQuestions = openQuestions.map((s) => s.trim()).filter(Boolean);
-    if (cleanStatements.length === 0 && !includePricing) {
-      setError("Add at least one assumption to test, or enable the pricing question.");
+    const cleanPricePoints = pricePoints.map((p) => Number(p)).filter((p) => Number.isFinite(p) && p >= 0);
+    if (includeGaborGranger && cleanPricePoints.length < 2) {
+      setError("Add at least two candidate price points, or turn off price-point testing.");
       return;
     }
     setLoading(true);
@@ -77,8 +84,9 @@ export function NewAssumptionStudyForm() {
       body: JSON.stringify({
         name,
         context,
-        includePricing,
         priceProductLabel: priceProductLabel || "this",
+        includeGaborGranger,
+        pricePoints: cleanPricePoints,
         statements: cleanStatements,
         openQuestions: cleanOpenQuestions,
       }),
@@ -90,7 +98,7 @@ export function NewAssumptionStudyForm() {
       return;
     }
     const { studyId } = await res.json();
-    router.push(`/dashboard/pre-build/assumption-interviews/${studyId}`);
+    router.push(`/dashboard/pricing-strategy/${studyId}`);
   }
 
   return (
@@ -99,7 +107,7 @@ export function NewAssumptionStudyForm() {
       <input
         value={name}
         onChange={(e) => setName(e.target.value)}
-        placeholder="e.g. SMB pricing &amp; ICP check — Q3"
+        placeholder="e.g. SMB pricing check — Q3"
         className="mt-2 w-full border-2 border-ink bg-paper px-4 py-3 font-body text-[14px] text-ink focus:outline-none focus:ring-2 focus:ring-teal-deep"
         required
       />
@@ -117,36 +125,54 @@ export function NewAssumptionStudyForm() {
         className="mt-2 w-full border-2 border-ink bg-paper px-4 py-3 font-body text-[14px] text-ink focus:outline-none focus:ring-2 focus:ring-teal-deep"
       />
 
-      <label className="mt-6 flex items-center gap-2 font-mono text-[11px] uppercase tracking-wide text-ink-soft">
-        <input type="checkbox" checked={includePricing} onChange={(e) => setIncludePricing(e.target.checked)} />
-        Include pricing tolerance question (Van Westendorp)
+      <label className="mt-6 block font-mono text-[10.5px] tracking-wide text-ink-soft uppercase">
+        What to call it in the price questions
       </label>
-      {includePricing && (
+      <p className="mt-1 text-[12px] text-ink-soft">
+        Every study runs a Van Westendorp price-sensitivity block — four open price questions,
+        always on.
+      </p>
+      <input
+        value={priceProductLabel}
+        onChange={(e) => setPriceProductLabel(e.target.value)}
+        placeholder="e.g. this product, a monthly subscription to Lambda Page"
+        className="mt-2 w-full border-2 border-ink bg-paper px-4 py-3 font-body text-[14px] text-ink focus:outline-none focus:ring-2 focus:ring-teal-deep"
+      />
+
+      <label className="mt-6 flex items-center gap-2 font-mono text-[11px] uppercase tracking-wide text-ink-soft">
+        <input type="checkbox" checked={includeGaborGranger} onChange={(e) => setIncludeGaborGranger(e.target.checked)} />
+        Also test specific candidate prices (Gabor-Granger)
+      </label>
+      {includeGaborGranger && (
         <>
-          <label className="mt-3 block font-mono text-[10.5px] tracking-wide text-ink-soft uppercase">
-            What to call it in the price questions
-          </label>
-          <input
-            value={priceProductLabel}
-            onChange={(e) => setPriceProductLabel(e.target.value)}
-            placeholder="e.g. this product, a monthly subscription to Lambda Page"
-            className="mt-2 w-full border-2 border-ink bg-paper px-4 py-3 font-body text-[14px] text-ink focus:outline-none focus:ring-2 focus:ring-teal-deep"
-          />
+          <p className="mt-1 text-[12px] text-ink-soft">
+            Respondents rate purchase likelihood at each price — produces a real demand curve and
+            a revenue-maximizing price.
+          </p>
+          <div className="mt-2">
+            <EditableList
+              items={pricePoints}
+              setItems={setPricePoints}
+              placeholder={(i) => `Price ${i + 1}, e.g. ${[9, 19, 29, 49][i] ?? 19}`}
+              addLabel="+ Add price point"
+              numeric
+            />
+          </div>
         </>
       )}
 
       <label className="mt-6 block font-mono text-[10.5px] tracking-wide text-ink-soft uppercase">
-        Assumptions to validate
+        Other pricing assumptions to validate (optional)
       </label>
       <p className="mt-1 text-[12px] text-ink-soft">
-        Statements about your audience, problem, or willingness to pay — the interviewee marks each
-        confirmed, contradicted, or unsure.
+        Statements about budget, purchasing process, or what they compare you to — the interviewee
+        marks each confirmed, contradicted, or unsure.
       </p>
       <div className="mt-2">
         <EditableList
           items={statements}
           setItems={setStatements}
-          placeholder={() => `e.g. "Marketing managers at 50-200 person B2B companies own this decision"`}
+          placeholder={() => `e.g. "They'd need budget sign-off above $50/month"`}
           addLabel="+ Add assumption"
         />
       </div>
@@ -158,7 +184,7 @@ export function NewAssumptionStudyForm() {
         <EditableList
           items={openQuestions}
           setItems={setOpenQuestions}
-          placeholder={() => "e.g. What do you currently use to solve this?"}
+          placeholder={() => "e.g. What do you currently pay for a similar tool?"}
           addLabel="+ Add question"
         />
       </div>

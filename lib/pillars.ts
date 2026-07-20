@@ -29,11 +29,6 @@ export const PILLARS_NAV: PillarNavItem[] = [
         description: "Upload a prototype screenshot for pinned AI critique.",
         href: "/dashboard/pre-build/wireframe/new",
       },
-      {
-        label: "Assumption Interviews",
-        description: "Pricing tolerance (Van Westendorp) and assumption validation — a real interview link, real panel.",
-        href: "/dashboard/pre-build/assumption-interviews",
-      },
     ],
   },
   {
@@ -83,6 +78,7 @@ export const PILLARS_NAV: PillarNavItem[] = [
       { label: "5-Second Test", description: "First-impression recall — screenshot in, questions in, five seconds, then answers.", href: "/dashboard/five-second" },
       { label: "Usability Testing", description: "A task, a unique participant link, and a real activity log of what they did.", href: "/dashboard/usability-testing" },
       { label: "Card Sorting & Tree Testing", description: "How people group your content, and whether they can find it in your nav.", href: "/dashboard/card-sorting" },
+      { label: "Pricing Strategy", description: "Van Westendorp price sensitivity, Gabor-Granger demand curves, and pricing assumptions — a real interview link, real panel.", href: "/dashboard/pricing-strategy" },
     ],
   },
 ];

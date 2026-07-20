@@ -67,11 +67,28 @@ export type Database = {
         ];
       };
       assumption_studies: {
-        Row: { id: string; project_id: string; name: string; context: string | null; include_pricing: boolean; price_product_label: string | null; created_at: string };
-        Insert: { id?: string; project_id: string; name: string; context?: string | null; include_pricing?: boolean; price_product_label?: string | null; created_at?: string };
-        Update: { id?: string; project_id?: string; name?: string; context?: string | null; include_pricing?: boolean; price_product_label?: string | null; created_at?: string };
+        Row: { id: string; project_id: string; name: string; context: string | null; include_pricing: boolean; price_product_label: string | null; include_gabor_granger: boolean; created_at: string };
+        Insert: { id?: string; project_id: string; name: string; context?: string | null; include_pricing?: boolean; price_product_label?: string | null; include_gabor_granger?: boolean; created_at?: string };
+        Update: { id?: string; project_id?: string; name?: string; context?: string | null; include_pricing?: boolean; price_product_label?: string | null; include_gabor_granger?: boolean; created_at?: string };
         Relationships: [
           { foreignKeyName: "assumption_studies_project_id_fkey"; columns: ["project_id"]; isOneToOne: false; referencedRelation: "projects"; referencedColumns: ["id"] },
+        ];
+      };
+      assumption_price_points: {
+        Row: { id: string; study_id: string; price: number; position: number };
+        Insert: { id?: string; study_id: string; price: number; position?: number };
+        Update: { id?: string; study_id?: string; price?: number; position?: number };
+        Relationships: [
+          { foreignKeyName: "assumption_price_points_study_id_fkey"; columns: ["study_id"]; isOneToOne: false; referencedRelation: "assumption_studies"; referencedColumns: ["id"] },
+        ];
+      };
+      assumption_price_responses: {
+        Row: { id: string; session_id: string; price_point_id: string; likelihood: string };
+        Insert: { id?: string; session_id: string; price_point_id: string; likelihood: string };
+        Update: { id?: string; session_id?: string; price_point_id?: string; likelihood?: string };
+        Relationships: [
+          { foreignKeyName: "assumption_price_responses_session_id_fkey"; columns: ["session_id"]; isOneToOne: false; referencedRelation: "assumption_sessions"; referencedColumns: ["id"] },
+          { foreignKeyName: "assumption_price_responses_price_point_id_fkey"; columns: ["price_point_id"]; isOneToOne: false; referencedRelation: "assumption_price_points"; referencedColumns: ["id"] },
         ];
       };
       assumption_statements: {

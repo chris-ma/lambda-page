@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { submitSession, type Verdict } from "@/lib/db/assumption";
 import type { PriceQuad } from "@/lib/pricing/van-westendorp";
+import { LIKELIHOOD_ORDER, type Likelihood } from "@/lib/pricing/gabor-granger";
 
 const VALID_VERDICTS: Verdict[] = ["confirmed", "contradicted", "unsure"];
 
@@ -16,6 +17,15 @@ export async function POST(request: Request, { params }: { params: Promise<{ stu
       price = { tooCheap: nums[0], bargain: nums[1], expensive: nums[2], tooExpensive: nums[3] };
     }
   }
+
+  const pricePointAnswers = Array.isArray(body?.pricePointAnswers)
+    ? body.pricePointAnswers
+        .map((p: { pricePointId?: string; likelihood?: string }) => ({
+          pricePointId: String(p.pricePointId ?? ""),
+          likelihood: p.likelihood as Likelihood,
+        }))
+        .filter((p: { pricePointId: string; likelihood: Likelihood }) => p.pricePointId && LIKELIHOOD_ORDER.includes(p.likelihood))
+    : [];
 
   const statementVerdicts = Array.isArray(body?.statementVerdicts)
     ? body.statementVerdicts
@@ -33,6 +43,6 @@ export async function POST(request: Request, { params }: { params: Promise<{ stu
         .filter((o: { questionId: string }) => o.questionId)
     : [];
 
-  await submitSession(studyId, { price, statementVerdicts, openAnswers });
+  await submitSession(studyId, { price, pricePointAnswers, statementVerdicts, openAnswers });
   return NextResponse.json({ ok: true }, { status: 201 });
 }

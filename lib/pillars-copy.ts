@@ -21,6 +21,6 @@ export const PILLAR_COPY: Record<
   3: {
     tagline: "Behavioral data shows where; this shows why",
     why: "A funnel chart can tell you that 40% of visitors drop off at step three. It can't tell you whether that's because the copy confused them, the layout hid the next step, or the price surprised them. Answering \"why\" requires watching or asking real people directly — attention data, task-based sessions, structured comprehension tests — which is a fundamentally different (and slower, more expensive) kind of measurement than an analytics pipeline.",
-    what: "User Testing is the qualitative counterpart to Pillar 02: eye tracking for attention sequence, five-second comprehension tests for first-impression recall, task-based usability testing with a real per-participant activity log, and card sorting plus tree testing for how people categorize your content and whether they can actually find it in a proposed navigation.",
+    what: "User Testing is the qualitative counterpart to Pillar 02: eye tracking for attention sequence, five-second comprehension tests for first-impression recall, task-based usability testing with a real per-participant activity log, card sorting plus tree testing for how people categorize your content, and pricing strategy — Van Westendorp price sensitivity and Gabor-Granger demand curves from a real respondent panel.",
   },
 };

@@ -3,10 +3,12 @@
 import { useState } from "react";
 import { LambdaMark } from "@/components/ui/LambdaMark";
 import { Button } from "@/components/ui/Button";
+import { LIKELIHOOD_LABEL, LIKELIHOOD_ORDER, type Likelihood } from "@/lib/pricing/gabor-granger";
 import { cn } from "@/lib/utils";
 
 type Statement = { id: string; statement: string };
 type OpenQuestion = { id: string; prompt: string };
+type PricePoint = { id: string; price: number };
 type Verdict = "confirmed" | "contradicted" | "unsure";
 type Phase = "intro" | "form" | "submitted";
 
@@ -14,16 +16,16 @@ export function AssumptionInterviewRunner({
   studyId,
   name,
   context,
-  includePricing,
   priceProductLabel,
+  pricePoints,
   statements,
   openQuestions,
 }: {
   studyId: string;
   name: string;
   context: string;
-  includePricing: boolean;
   priceProductLabel: string;
+  pricePoints: PricePoint[];
   statements: Statement[];
   openQuestions: OpenQuestion[];
 }) {
@@ -32,6 +34,7 @@ export function AssumptionInterviewRunner({
   const [bargain, setBargain] = useState("");
   const [expensive, setExpensive] = useState("");
   const [tooExpensive, setTooExpensive] = useState("");
+  const [priceAnswers, setPriceAnswers] = useState<Record<string, Likelihood | undefined>>({});
   const [verdicts, setVerdicts] = useState<Record<string, Verdict | undefined>>({});
   const [comments, setComments] = useState<Record<string, string>>({});
   const [openAnswers, setOpenAnswers] = useState<Record<string, string>>({});
@@ -39,21 +42,23 @@ export function AssumptionInterviewRunner({
   const [error, setError] = useState<string | null>(null);
 
   const unansweredStatements = statements.filter((s) => !verdicts[s.id]);
+  const unansweredPricePoints = pricePoints.filter((p) => !priceAnswers[p.id]);
 
   async function onSubmit() {
     if (unansweredStatements.length > 0) {
       setError("Give a verdict for every assumption before submitting.");
       return;
     }
-    let price = null;
-    if (includePricing) {
-      const nums = [tooCheap, bargain, expensive, tooExpensive].map(Number);
-      if (nums.some((n) => !Number.isFinite(n) || n < 0) || [tooCheap, bargain, expensive, tooExpensive].some((v) => v.trim() === "")) {
-        setError("Fill in all four price questions.");
-        return;
-      }
-      price = { tooCheap: nums[0], bargain: nums[1], expensive: nums[2], tooExpensive: nums[3] };
+    if (unansweredPricePoints.length > 0) {
+      setError("Rate purchase likelihood at every price point before submitting.");
+      return;
     }
+    const nums = [tooCheap, bargain, expensive, tooExpensive].map(Number);
+    if (nums.some((n) => !Number.isFinite(n) || n < 0) || [tooCheap, bargain, expensive, tooExpensive].some((v) => v.trim() === "")) {
+      setError("Fill in all four price questions.");
+      return;
+    }
+    const price = { tooCheap: nums[0], bargain: nums[1], expensive: nums[2], tooExpensive: nums[3] };
     setLoading(true);
     setError(null);
     await fetch(`/api/assumption-studies/${studyId}/respond`, {
@@ -61,6 +66,7 @@ export function AssumptionInterviewRunner({
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         price,
+        pricePointAnswers: pricePoints.map((p) => ({ pricePointId: p.id, likelihood: priceAnswers[p.id] })),
         statementVerdicts: statements.map((s) => ({ statementId: s.id, verdict: verdicts[s.id], comment: comments[s.id] })),
         openAnswers: openQuestions.map((q) => ({ questionId: q.id, response: openAnswers[q.id] ?? "" })),
       }),
@@ -85,30 +91,59 @@ export function AssumptionInterviewRunner({
     return (
       <div className="min-h-screen bg-cream px-4 py-10 sm:px-8">
         <div className="mx-auto max-w-[640px]">
-          {includePricing && (
-            <section>
-              <h2 className="font-display text-[18px] font-semibold text-ink">Pricing</h2>
+          <section>
+            <h2 className="font-display text-[18px] font-semibold text-ink">Pricing</h2>
+            <div className="mt-4 space-y-5">
+              <PriceQuestion
+                label={`At what price would ${priceProductLabel} be so expensive you would not consider it?`}
+                value={tooExpensive}
+                onChange={setTooExpensive}
+              />
+              <PriceQuestion
+                label={`At what price would ${priceProductLabel} start to seem expensive, but you'd still consider it?`}
+                value={expensive}
+                onChange={setExpensive}
+              />
+              <PriceQuestion
+                label={`At what price would ${priceProductLabel} be a bargain — a great buy for the money?`}
+                value={bargain}
+                onChange={setBargain}
+              />
+              <PriceQuestion
+                label={`At what price would ${priceProductLabel} be priced so low you'd question the quality?`}
+                value={tooCheap}
+                onChange={setTooCheap}
+              />
+            </div>
+          </section>
+
+          {pricePoints.length > 0 && (
+            <section className="mt-10">
+              <h2 className="font-display text-[18px] font-semibold text-ink">At these specific prices</h2>
+              <p className="mt-1.5 text-[12.5px] text-ink-soft">
+                For each price, how likely would you be to buy {priceProductLabel}?
+              </p>
               <div className="mt-4 space-y-5">
-                <PriceQuestion
-                  label={`At what price would ${priceProductLabel} be so expensive you would not consider it?`}
-                  value={tooExpensive}
-                  onChange={setTooExpensive}
-                />
-                <PriceQuestion
-                  label={`At what price would ${priceProductLabel} start to seem expensive, but you'd still consider it?`}
-                  value={expensive}
-                  onChange={setExpensive}
-                />
-                <PriceQuestion
-                  label={`At what price would ${priceProductLabel} be a bargain — a great buy for the money?`}
-                  value={bargain}
-                  onChange={setBargain}
-                />
-                <PriceQuestion
-                  label={`At what price would ${priceProductLabel} be priced so low you'd question the quality?`}
-                  value={tooCheap}
-                  onChange={setTooCheap}
-                />
+                {pricePoints.map((p) => (
+                  <div key={p.id} className="border-2 border-ink bg-paper p-4">
+                    <p className="font-mono text-[15px] text-ink">${p.price}</p>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {LIKELIHOOD_ORDER.map((l) => (
+                        <button
+                          key={l}
+                          type="button"
+                          onClick={() => setPriceAnswers((prev) => ({ ...prev, [p.id]: l }))}
+                          className={cn(
+                            "border-2 border-ink px-3 py-1.5 font-mono text-[10px] uppercase tracking-wide",
+                            priceAnswers[p.id] === l ? "bg-terracotta text-ink" : "bg-cream text-ink-soft",
+                          )}
+                        >
+                          {LIKELIHOOD_LABEL[l]}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ))}
               </div>
             </section>
           )}
@@ -184,10 +219,10 @@ export function AssumptionInterviewRunner({
     <div className="flex min-h-screen items-center justify-center bg-cream px-6 py-16 text-center">
       <div className="w-full max-w-[480px]">
         <LambdaMark size={44} className="mx-auto" />
-        <div className="texture mt-8 border-2 border-ink bg-paper p-7 shadow-depth-md">
+        <div className="mt-8 border-2 border-ink bg-paper p-7">
           <p className="font-display text-[20px] font-semibold text-ink">{name}</p>
           <p className="mt-3 text-[14px] leading-relaxed text-ink-soft">
-            {context || "A few quick questions about a concept we're validating."}
+            {context || "A few quick questions about pricing for a product we're validating."}
           </p>
         </div>
         <div className="mt-8">

@@ -7,25 +7,22 @@ import { Tag } from "@/components/ui/Tag";
 
 export const dynamic = "force-dynamic";
 
-export default async function AssumptionInterviewsHub() {
+export default async function PricingStrategyHub() {
   const studies = await listStudies();
 
   return (
     <div>
-      <Link href="/dashboard/pre-build" className="font-mono text-[11px] text-ink-soft">
-        ← Pre-Build
-      </Link>
-      <EyebrowLabel className="mt-3">Pillar 00 — Pre-Build Validation</EyebrowLabel>
+      <EyebrowLabel>Pillar 03 — User Testing</EyebrowLabel>
       <div className="mt-2 flex flex-wrap items-center justify-between gap-4">
-        <h1 className="font-display text-[28px] font-semibold text-ink">Assumption Interviews</h1>
-        <Button href="/dashboard/pre-build/assumption-interviews/new">New study</Button>
+        <h1 className="font-display text-[28px] font-semibold text-ink">Pricing Strategy</h1>
+        <Button href="/dashboard/pricing-strategy/new">New study</Button>
       </div>
       <p className="mt-2 max-w-[640px] text-[13.5px] text-ink-soft">
-        Pricing tolerance and segment validity — a real shareable link to a real panel, same
-        &ldquo;bring your own respondents&rdquo; model as Message &amp; Concept Testing, not simulated
-        interviewees. Define assumptions to confirm or contradict, and optionally run a Van
-        Westendorp pricing question — the price points it computes are measured from raw responses,
-        not a judgment call.
+        A real shareable interview link to a real panel — same &ldquo;bring your own
+        respondents&rdquo; model as Message &amp; Concept Testing, not simulated interviewees.
+        Every study runs a Van Westendorp price-sensitivity block, and can also test specific
+        candidate prices (Gabor-Granger) and pricing-related assumptions — all computed directly
+        from raw responses, never a judgment call.
       </p>
 
       {studies.length === 0 ? (
@@ -38,11 +35,11 @@ export default async function AssumptionInterviewsHub() {
       ) : (
         <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {studies.map((s) => (
-            <Link key={s.id} href={`/dashboard/pre-build/assumption-interviews/${s.id}`}>
+            <Link key={s.id} href={`/dashboard/pricing-strategy/${s.id}`}>
               <Card className="h-full p-5">
                 <div className="flex items-start justify-between gap-2">
                   <span className="font-display text-[15px] font-semibold text-ink">{s.name}</span>
-                  {s.include_pricing && <Tag status="INFO" label="Pricing" size="sm" />}
+                  {s.include_gabor_granger && <Tag status="INFO" label="Gabor-Granger" size="sm" />}
                 </div>
                 <p className="mt-2 font-mono text-[10px] text-ink-soft">{new Date(s.created_at).toLocaleString()}</p>
               </Card>
