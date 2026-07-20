@@ -200,9 +200,9 @@ export type Database = {
         ];
       };
       competitive_sets: {
-        Row: { created_at: string; error: string | null; id: string; name: string; project_id: string; status: string; synthesis: string | null; buying_drivers: Json | null };
-        Insert: { created_at?: string; error?: string | null; id?: string; name: string; project_id: string; status?: string; synthesis?: string | null; buying_drivers?: Json | null };
-        Update: { created_at?: string; error?: string | null; id?: string; name?: string; project_id?: string; status?: string; synthesis?: string | null; buying_drivers?: Json | null };
+        Row: { created_at: string; error: string | null; id: string; name: string; project_id: string; status: string; synthesis: string | null; buying_drivers: Json | null; market_context: Json | null; competitor_detail: Json | null };
+        Insert: { created_at?: string; error?: string | null; id?: string; name: string; project_id: string; status?: string; synthesis?: string | null; buying_drivers?: Json | null; market_context?: Json | null; competitor_detail?: Json | null };
+        Update: { created_at?: string; error?: string | null; id?: string; name?: string; project_id?: string; status?: string; synthesis?: string | null; buying_drivers?: Json | null; market_context?: Json | null; competitor_detail?: Json | null };
         Relationships: [
           { foreignKeyName: "competitive_sets_project_id_fkey"; columns: ["project_id"]; isOneToOne: false; referencedRelation: "projects"; referencedColumns: ["id"] },
         ];

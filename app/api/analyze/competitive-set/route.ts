@@ -2,7 +2,15 @@ import { NextResponse } from "next/server";
 import { createCompetitiveSet, completeCompetitiveSet, failCompetitiveSet } from "@/lib/db/competitive-sets";
 import { createRun, completeRun, failRun } from "@/lib/db/runs";
 import { runCompetitiveScan } from "@/lib/analysis/competitive";
-import { synthesizeCompetitiveSet, scoreBuyingDrivers, type BuyingDriverResult } from "@/lib/ai/competitive-synthesis";
+import {
+  synthesizeCompetitiveSet,
+  scoreBuyingDrivers,
+  analyzeMarketContext,
+  analyzeCompetitorDetail,
+  type BuyingDriverResult,
+  type MarketContextResult,
+  type CompetitorDetailResult,
+} from "@/lib/ai/competitive-synthesis";
 import type { FindingInput } from "@/lib/db/runs";
 
 export const runtime = "nodejs";
@@ -49,12 +57,14 @@ export async function POST(request: Request) {
     // missing key, transient error) must not discard per-competitor scan
     // results that already succeeded. allSettled + a visible fallback
     // message beats losing the whole set to one flaky call.
-    const [synthesisResult, buyingDriversResult] = await Promise.allSettled([
+    const [synthesisResult, buyingDriversResult, marketContextResult, competitorDetailResult] = await Promise.allSettled([
       synthesizeCompetitiveSet(perSite),
       // The buying-driver radar/opportunity read needs at least two
       // competitors to be a comparison; skip it (not an error) for a
       // single-URL scan.
       perSite.length >= 2 ? scoreBuyingDrivers(perSite) : Promise.resolve(null as BuyingDriverResult | null),
+      analyzeMarketContext(perSite),
+      analyzeCompetitorDetail(perSite),
     ]);
 
     const synthesis =
@@ -62,8 +72,10 @@ export async function POST(request: Request) {
         ? synthesisResult.value
         : `Competitive synthesis unavailable: ${synthesisResult.reason instanceof Error ? synthesisResult.reason.message : String(synthesisResult.reason)}. The per-competitor scans below still completed.`;
     const buyingDrivers = buyingDriversResult.status === "fulfilled" ? buyingDriversResult.value : null;
+    const marketContext: MarketContextResult | null = marketContextResult.status === "fulfilled" ? marketContextResult.value : null;
+    const competitorDetail: CompetitorDetailResult | null = competitorDetailResult.status === "fulfilled" ? competitorDetailResult.value : null;
 
-    await completeCompetitiveSet(set.id, synthesis, buyingDrivers);
+    await completeCompetitiveSet(set.id, synthesis, buyingDrivers, marketContext, competitorDetail);
     return NextResponse.json({ setId: set.id }, { status: 201 });
   } catch (err) {
     await failCompetitiveSet(set.id, err instanceof Error ? err.message : String(err));

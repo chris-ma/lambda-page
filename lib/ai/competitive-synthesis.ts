@@ -149,3 +149,151 @@ export async function scoreBuyingDrivers(
     prompt: `Score buying drivers for ${perSite.length} competitor page(s):\n\n${prompt}`,
   });
 }
+
+// ---- Market context (once per scan) ---------------------------------------
+
+export type MarketContextResult = {
+  industryOverview: string;
+  problemsSolved: string[];
+  marketSegment: string;
+};
+
+const marketContextSchema = z.object({
+  industryOverview: z
+    .string()
+    .describe(
+      "2-4 sentences on the size/shape of this industry and what's driving demand right now. A judgment call inferred from the scanned pages, not a cited market-research figure.",
+    ),
+  problemsSolved: z
+    .array(z.string())
+    .describe(
+      "3-6 short phrases naming the concrete problems this category of product solves for buyers, inferred from how the pages themselves frame the pain they address.",
+    ),
+  marketSegment: z
+    .string()
+    .describe(
+      "1-2 sentences on who the target buyer is (company size, role, vertical) and where this set of competitors sits — budget/value/premium tier, SMB vs. enterprise, etc.",
+    ),
+});
+
+const MARKET_CONTEXT_SYSTEM = `You are a market analyst summarizing the industry a set of competitor landing pages belongs to, using only the automated findings and page-content excerpts provided — no external data, no browsing, no prior knowledge beyond what's in the excerpts.
+
+Describe the industry's scale/momentum, the concrete problems this category of product solves, and the market segment (buyer profile and price/value tier) these competitors are collectively targeting. This is directional scene-setting for a positioning conversation — be honest that it's inferred from a handful of landing pages, not verified market research, and keep every claim traceable to something in the excerpts.`;
+
+export async function analyzeMarketContext(
+  perSite: { url: string; findings: FindingInput[]; summary: Record<string, unknown> }[],
+): Promise<MarketContextResult> {
+  const prompt = perSite
+    .map((site) => {
+      const excerpt = typeof site.summary.bodyTextSample === "string" ? site.summary.bodyTextSample : "";
+      return `### ${site.url}\n\n${excerpt}`;
+    })
+    .join("\n\n---\n\n");
+
+  return judge({
+    system: MARKET_CONTEXT_SYSTEM,
+    schema: marketContextSchema,
+    prompt: `Page content excerpts for ${perSite.length} competitor page(s) in this market:\n\n${prompt}`,
+  });
+}
+
+// ---- Per-competitor detail: pricing/value, product, promotional ----------
+
+const scoreField0to10 = (label: string) => z.number().min(0).max(10).describe(`${label}, 0-10. Score conservatively when the page gives thin evidence.`);
+
+export type CompetitorDetail = {
+  url: string;
+  pricing: {
+    priceLevel: number;
+    priceEvidence: string;
+    perceivedValue: number;
+    estimatedMarketSharePct: number;
+  };
+  product: {
+    perks: string[];
+    flaws: string[];
+    synergies: string[];
+    productQuality: number;
+    stickiness: number;
+  };
+  promotional: {
+    channelsNote: string;
+    partnerships: string[];
+  };
+};
+
+export type CompetitorDetailResult = { competitors: CompetitorDetail[] };
+
+const competitorDetailSchema = z.object({
+  competitors: z
+    .array(
+      z.object({
+        url: z.string().describe("The exact URL as given in the input, unchanged."),
+        pricing: z.object({
+          priceLevel: z
+            .number()
+            .min(1)
+            .max(10)
+            .describe("Where this competitor sits on a low-to-premium price scale relative to the rest of the set, 1 = cheapest, 10 = most premium."),
+          priceEvidence: z
+            .string()
+            .describe("What on the page actually supports this placement — a cited number, a plan name, or 'no price shown, inferred from positioning' if none."),
+          perceivedValue: scoreField0to10("Perceived value for the price — how much the page makes the offering feel worth what it costs"),
+          estimatedMarketSharePct: z
+            .number()
+            .min(0)
+            .max(100)
+            .describe(
+              "AI's rough estimate of this competitor's relative share of attention/traffic within just this scanned set (not real market data) — used only to size a bubble on a chart, should roughly sum to ~100 across the set.",
+            ),
+        }),
+        product: z.object({
+          perks: z.array(z.string()).describe("3-6 short phrases: concrete strengths of the product/service as presented on the page."),
+          flaws: z
+            .array(z.string())
+            .describe("2-5 short phrases: gaps, weaknesses, or missing capabilities apparent from the page (or its silence on a topic competitors cover)."),
+          synergies: z.array(z.string()).describe("0-4 short phrases: integrations, ecosystem fit, or bundling with other tools/platforms mentioned on the page."),
+          productQuality: scoreField0to10("Apparent product/service quality as conveyed by the page's claims, detail, and polish"),
+          stickiness: scoreField0to10(
+            "How likely customers are to stay once onboarded — switching costs, lock-in, habit formation, data/workflow embedding implied by the page",
+          ),
+        }),
+        promotional: z.object({
+          channelsNote: z
+            .string()
+            .describe(
+              "1-2 sentences on how this competitor appears to promote itself — content marketing, paid-ads language, community, referral/affiliate mentions, etc. Cross-reference the measured social-platform links given for this URL rather than guessing new ones.",
+            ),
+          partnerships: z.array(z.string()).describe("0-5 named partners, integrations, or co-marketing mentions found on the page. Empty array if none evident."),
+        }),
+      }),
+    )
+    .describe("One entry per competitor URL provided, same order."),
+});
+
+const COMPETITOR_DETAIL_SYSTEM = `You are analyzing individual competitor landing pages on three fronts, using only the automated findings, page-content excerpts, and measured social-platform links provided for each — no external data, no browsing, no prior knowledge of these companies.
+
+1. Pricing & value: where they sit on a low-to-premium price scale relative to the rest of the set, what evidence (if any) supports that, and how much value the page makes the price feel worth. Also give a rough relative "share of attention" estimate across the set to size a chart bubble — this is explicitly not real market-share data.
+2. Product/service: concrete perks and flaws as presented on the page, any synergies/integrations mentioned, and quality/stickiness scores.
+3. Promotional: how the competitor appears to promote itself, grounded first in the measured social-platform links given for that URL, plus any partnership or co-marketing mentions in the page copy.
+
+Every field here is a directional judgment call built on a single scraped page, not verified competitive intelligence — keep rationale tied to specific evidence and don't overstate confidence, especially on market share.`;
+
+export async function analyzeCompetitorDetail(
+  perSite: { url: string; findings: FindingInput[]; summary: Record<string, unknown> }[],
+): Promise<CompetitorDetailResult> {
+  const prompt = perSite
+    .map((site) => {
+      const lines = site.findings.map((f) => `- ${f.attribute}: ${f.status}${f.value ? ` (${f.value})` : ""}${f.detail ? ` — ${f.detail}` : ""}`);
+      const excerpt = typeof site.summary.bodyTextSample === "string" ? site.summary.bodyTextSample : "";
+      const social = Array.isArray(site.summary.socialPlatforms) ? site.summary.socialPlatforms.join(", ") : "none detected";
+      return `### ${site.url}\n\nAutomated findings:\n${lines.join("\n")}\n\nMeasured social platform links: ${social}\n\nPage content excerpt:\n${excerpt}`;
+    })
+    .join("\n\n---\n\n");
+
+  return judge({
+    system: COMPETITOR_DETAIL_SYSTEM,
+    schema: competitorDetailSchema,
+    prompt: `Analyze pricing/value, product, and promotional dimensions for ${perSite.length} competitor page(s):\n\n${prompt}`,
+  });
+}

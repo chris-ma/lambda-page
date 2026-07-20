@@ -1,7 +1,7 @@
 import { query, queryOne } from "./client";
 import { DEFAULT_PROJECT_ID } from "@/lib/config";
 import type { Database } from "@/lib/database.types";
-import type { BuyingDriverResult } from "@/lib/ai/competitive-synthesis";
+import type { BuyingDriverResult, MarketContextResult, CompetitorDetailResult } from "@/lib/ai/competitive-synthesis";
 
 type CompetitiveSet = Database["public"]["Tables"]["competitive_sets"]["Row"];
 
@@ -14,12 +14,23 @@ export async function createCompetitiveSet(name: string): Promise<CompetitiveSet
   return set;
 }
 
-export async function completeCompetitiveSet(id: string, synthesis: string, buyingDrivers: BuyingDriverResult | null) {
-  await query(`update competitive_sets set status = 'complete', synthesis = $2, buying_drivers = $3 where id = $1`, [
-    id,
-    synthesis,
-    buyingDrivers ? JSON.stringify(buyingDrivers) : null,
-  ]);
+export async function completeCompetitiveSet(
+  id: string,
+  synthesis: string,
+  buyingDrivers: BuyingDriverResult | null,
+  marketContext: MarketContextResult | null,
+  competitorDetail: CompetitorDetailResult | null,
+) {
+  await query(
+    `update competitive_sets set status = 'complete', synthesis = $2, buying_drivers = $3, market_context = $4, competitor_detail = $5 where id = $1`,
+    [
+      id,
+      synthesis,
+      buyingDrivers ? JSON.stringify(buyingDrivers) : null,
+      marketContext ? JSON.stringify(marketContext) : null,
+      competitorDetail ? JSON.stringify(competitorDetail) : null,
+    ],
+  );
 }
 
 export async function failCompetitiveSet(id: string, message: string) {
