@@ -14,6 +14,13 @@
   --color-teal: #4e8580;
   --color-teal-deep: #396460;
   --color-brick: #bd5a3f;
+  /* The single highlight color — every decorative accent across the
+     marketing site and shared UI resolves to this one hue now, rather than
+     cycling through the four status-system colors above (which stay put,
+     unused decoratively, since PASS/FLAGGED/FAILING/INFO in the dashboard
+     still needs them unambiguous). */
+  --color-terracotta: #c2603c;
+  --color-terracotta-deep: #a44a2f;
 
   --font-display: var(--font-display-raw), Georgia, serif;
   --font-body: Georgia, Cambria, "Times New Roman", Times, serif;

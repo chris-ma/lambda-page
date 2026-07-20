@@ -56,7 +56,7 @@ export default function PillarsPage() {
                 <a
                   key={p.id}
                   href={`#${p.slug}`}
-                  className="border-2 border-ink bg-paper px-4 py-2 font-mono text-[11px] tracking-wide text-ink uppercase hover:bg-mustard"
+                  className="border-2 border-ink bg-paper px-4 py-2 font-mono text-[11px] tracking-wide text-ink uppercase hover:bg-terracotta"
                 >
                   {String(p.id).padStart(2, "0")} — {p.label}
                 </a>
@@ -65,83 +65,78 @@ export default function PillarsPage() {
           </Reveal>
         </section>
 
-        {PILLARS_NAV.map((p, i) => {
+        {PILLARS_NAV.map((p) => {
           const copy = PILLAR_COPY[p.id];
           const accent = PILLAR_COLOR[p.id];
           return (
-            <section
-              key={p.id}
-              id={p.slug}
-              className={`scroll-mt-[76px] border-b-2 border-ink px-6 py-24 ${i % 2 === 0 ? "bg-paper" : "bg-cream"}`}
-            >
-              <div className="mx-auto max-w-[980px]">
+            <section key={p.id} id={p.slug} className="scroll-mt-[76px] border-b border-line bg-paper px-6 py-20">
+              <div className="mx-auto grid max-w-[1100px] gap-10 lg:grid-cols-[260px_1fr]">
                 <Reveal>
-                  <div className="flex flex-wrap items-center gap-4">
-                    <span className={cn("flex h-14 w-14 shrink-0 items-center justify-center border-2 border-ink", accent.chip)}>
+                  <aside className="lg:sticky lg:top-[120px] lg:self-start">
+                    <span className={cn("flex h-14 w-14 items-center justify-center border-2 border-ink", accent.chip)}>
                       <PillarIcon pillar={p.id} size={28} />
                     </span>
-                    <div>
-                      <span className={cn("font-mono text-[11px] tracking-wide font-semibold", accent.text)}>
-                        PILLAR {String(p.id).padStart(2, "0")}
-                      </span>
-                      <div className="flex items-center gap-2.5">
-                        <h2 className="font-display text-[28px] font-semibold text-ink">{PILLAR_TITLE[p.id]}</h2>
-                        {p.comingSoon && <Tag status="INFO" label="Coming soon" size="sm" />}
+                    <div className={cn("mt-4 font-mono text-[11px] font-semibold tracking-[0.14em] uppercase", accent.text)}>
+                      Pillar {String(p.id).padStart(2, "0")}
+                    </div>
+                    <h2 className="mt-2 font-display text-[26px] leading-[1.15] text-ink">{PILLAR_TITLE[p.id]}</h2>
+                    {p.comingSoon && (
+                      <div className="mt-3">
+                        <Tag status="INFO" label="Coming soon" size="sm" />
                       </div>
-                    </div>
+                    )}
+                    <p className="mt-3 font-display text-[15px] italic text-ink-soft">{copy.tagline}</p>
+                  </aside>
+                </Reveal>
+
+                <div className="space-y-10">
+                  <div className="grid gap-8 sm:grid-cols-2">
+                    <Reveal delay={100}>
+                      <div>
+                        <EyebrowLabel>Why this pillar exists</EyebrowLabel>
+                        <p className="mt-3 text-[14px] leading-relaxed text-ink-soft">{copy.why}</p>
+                      </div>
+                    </Reveal>
+                    <Reveal delay={140}>
+                      <div>
+                        <EyebrowLabel>What it does</EyebrowLabel>
+                        <p className="mt-3 text-[14px] leading-relaxed text-ink-soft">{copy.what}</p>
+                      </div>
+                    </Reveal>
                   </div>
-                </Reveal>
 
-                <Reveal delay={60}>
-                  <p className="mt-5 max-w-[720px] font-display text-[19px] italic text-ink">{copy.tagline}</p>
-                </Reveal>
-
-                <div className="mt-10 grid gap-8 lg:grid-cols-2">
-                  <Reveal delay={100}>
-                    <div>
-                      <EyebrowLabel>Why this pillar exists</EyebrowLabel>
-                      <p className="mt-3 text-[14px] leading-relaxed text-ink-soft">{copy.why}</p>
-                    </div>
-                  </Reveal>
-                  <Reveal delay={140}>
-                    <div>
-                      <EyebrowLabel>What it does</EyebrowLabel>
-                      <p className="mt-3 text-[14px] leading-relaxed text-ink-soft">{copy.what}</p>
+                  <Reveal delay={180}>
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      {p.subTools.map((tool) => (
+                        <Card key={tool.label} hover={false} className="flex h-full flex-col p-5">
+                          <div className="flex items-start justify-between gap-3">
+                            <h3 className="font-display text-[15px] font-semibold text-ink">{tool.label}</h3>
+                            {!tool.href && (
+                              <span className="shrink-0 font-mono text-[8.5px] tracking-wide text-ink-soft uppercase">
+                                not built yet
+                              </span>
+                            )}
+                          </div>
+                          <p className="mt-2 flex-1 text-[12.5px] leading-relaxed text-ink-soft">{tool.description}</p>
+                          {tool.href && (
+                            <Link
+                              href={tool.href}
+                              className={cn("mt-3 inline-flex items-center gap-1 font-mono text-[11px] hover:underline", accent.text)}
+                            >
+                              Open tool →
+                            </Link>
+                          )}
+                        </Card>
+                      ))}
                     </div>
                   </Reveal>
                 </div>
-
-                <Reveal delay={180}>
-                  <div className="mt-10 grid gap-4 sm:grid-cols-2">
-                    {p.subTools.map((tool) => (
-                      <Card key={tool.label} hover={false} className="flex h-full flex-col p-5">
-                        <div className="flex items-start justify-between gap-3">
-                          <h3 className="font-display text-[15px] font-semibold text-ink">{tool.label}</h3>
-                          {!tool.href && (
-                            <span className="shrink-0 font-mono text-[8.5px] tracking-wide text-ink-soft uppercase">
-                              not built yet
-                            </span>
-                          )}
-                        </div>
-                        <p className="mt-2 flex-1 text-[12.5px] leading-relaxed text-ink-soft">{tool.description}</p>
-                        {tool.href && (
-                          <Link
-                            href={tool.href}
-                            className={cn("mt-3 inline-flex items-center gap-1 font-mono text-[11px] hover:underline", accent.text)}
-                          >
-                            Open tool →
-                          </Link>
-                        )}
-                      </Card>
-                    ))}
-                  </div>
-                </Reveal>
               </div>
             </section>
           );
         })}
 
-        <section className="bg-mustard px-6 py-24 text-center">
+        <section className="bg-terracotta px-6 py-24 text-center">
           <Reveal>
             <h2 className="mx-auto max-w-[420px] font-display text-[32px] font-semibold text-ink">
               See where your page breaks
@@ -154,7 +149,9 @@ export default function PillarsPage() {
           </Reveal>
           <Reveal delay={120}>
             <div className="mt-8">
-              <Button href="/dashboard">Run a free diagnostic</Button>
+              <Button href="/dashboard" variant="ink">
+                Run a free diagnostic
+              </Button>
             </div>
           </Reveal>
         </section>

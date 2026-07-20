@@ -65,7 +65,7 @@ export function Nav() {
 
         {/* Reading-progress bar */}
         <div className="relative mx-10 hidden h-[2px] max-w-[260px] flex-1 bg-line lg:block">
-          <div className="absolute inset-y-0 left-0 bg-ink transition-[width] duration-100" style={{ width: `${progress}%` }} />
+          <div className="absolute inset-y-0 left-0 bg-terracotta transition-[width] duration-100" style={{ width: `${progress}%` }} />
         </div>
 
         {/* Desktop nav */}
@@ -132,7 +132,7 @@ export function Nav() {
             <div className="mb-4 flex items-center justify-between font-mono text-[10px] tracking-wide text-ink-soft uppercase">
               <span>
                 {active.label} — Sub-Tools
-                {active.comingSoon && <span className="ml-2 text-brick">Coming with User Testing</span>}
+                {active.comingSoon && <span className="ml-2 text-terracotta-deep">Coming with User Testing</span>}
               </span>
               <Link href={`/pillars#${active.slug}`} onClick={() => setOpen(null)} className={cn("text-ink", PILLAR_COLOR[active.id].hoverPlain)}>
                 Why this pillar exists →
@@ -168,7 +168,7 @@ export function Nav() {
               <div key={p.id} className="border-b border-ink/15 py-4 first:pt-0">
                 <div className="flex items-baseline gap-2">
                   <span className="font-display text-[16px] font-semibold text-ink">{p.label}</span>
-                  {p.comingSoon && <span className="font-mono text-[9px] text-brick uppercase">soon</span>}
+                  {p.comingSoon && <span className="font-mono text-[9px] text-terracotta-deep uppercase">soon</span>}
                 </div>
                 <ul className="mt-2 space-y-1.5">
                   {p.subTools.map((tool) => (

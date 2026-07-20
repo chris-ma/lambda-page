@@ -4,7 +4,7 @@ import { Reveal } from "@/components/ui/Reveal";
 
 export function ClosingCta() {
   return (
-    <section className="border-b-2 border-ink bg-mustard px-6 py-24 text-center">
+    <section className="border-b-2 border-ink bg-terracotta px-6 py-24 text-center">
       <Reveal>
         <LambdaMark size={64} className="mx-auto" />
       </Reveal>
@@ -26,7 +26,9 @@ export function ClosingCta() {
       </Reveal>
       <Reveal delay={200}>
         <div className="mt-8">
-          <Button href="/dashboard/structural/design-audit/new">Run a free diagnostic</Button>
+          <Button href="/dashboard/structural/design-audit/new" variant="ink">
+            Run a free diagnostic
+          </Button>
         </div>
       </Reveal>
     </section>

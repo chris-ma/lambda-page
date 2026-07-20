@@ -16,7 +16,7 @@ export function WhatItIs() {
         <Reveal delay={110}>
           <p className="mt-10 font-display text-[26px] leading-[1.32] font-medium text-ink italic sm:text-[32px]">
             Lambda Page treats a landing page as what it actually is —{" "}
-            <span className="text-brick font-semibold not-italic">a function.</span>{" "}
+            <span className="text-terracotta-deep font-semibold not-italic">a function.</span>{" "}
             Traffic goes in, a conversion either comes out or it doesn&rsquo;t.
           </p>
         </Reveal>

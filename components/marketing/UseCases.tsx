@@ -31,7 +31,7 @@ export function UseCases() {
       </Reveal>
       <Reveal delay={60}>
         <h2 className="mx-auto mt-4 max-w-[760px] font-display text-[30px] leading-[1.15] font-semibold text-ink sm:text-[38px]">
-          Built for anyone who ships pages and has to <em className="text-pink-deep font-normal italic">answer for how they perform</em>
+          Built for anyone who ships pages and has to <em className="text-terracotta-deep font-normal italic">answer for how they perform</em>
         </h2>
       </Reveal>
 

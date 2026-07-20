@@ -1,51 +1,33 @@
 export type PillarId = 0 | 1 | 2 | 3;
 
 /**
- * One signature accent color per pillar, marketing surfaces only (homepage,
- * /pillars, nav). Deliberately not reused in the dashboard, where these same
- * hues already carry a fixed, stricter meaning as the PASS/FLAGGED/FAILING/
- * INFO status system — reusing them there for pillar identity would make a
- * teal icon next to a teal PASS tag ambiguous. `bg` is the base tone (safe
- * for an ink icon/label on top, same combo already proven on the mustard λ
- * badge); `text`/`border` are the deeper variant, for labels and rules on
- * paper/cream.
+ * A single highlight color — terracotta — used everywhere a pillar needs an
+ * accent, on marketing surfaces only (homepage, /pillars, nav). Previously
+ * cycled through four different hues per pillar; collapsed to one shared
+ * terracotta so every accent moment across the site reads as the same
+ * highlight. Kept as a per-pillar Record (all four entries identical) so
+ * every consumer that already reads PILLAR_COLOR[p.id] picks this up with
+ * no call-site changes. Deliberately not reused in the dashboard, where
+ * mustard/teal/brick/pink still carry their own fixed meaning as the
+ * PASS/FLAGGED/FAILING/INFO status system.
  */
+const TERRACOTTA_ACCENT = {
+  chip: "bg-terracotta",
+  text: "text-terracotta-deep",
+  border: "border-terracotta-deep",
+  bar: "bg-terracotta-deep",
+  hoverText: "group-hover:text-terracotta-deep",
+  hoverPlain: "hover:text-terracotta-deep",
+};
+
 export const PILLAR_COLOR: Record<
   PillarId,
   { chip: string; text: string; border: string; bar: string; hoverText: string; hoverPlain: string }
 > = {
-  0: {
-    chip: "bg-mustard",
-    text: "text-mustard-deep",
-    border: "border-mustard-deep",
-    bar: "bg-mustard-deep",
-    hoverText: "group-hover:text-mustard-deep",
-    hoverPlain: "hover:text-mustard-deep",
-  },
-  1: {
-    chip: "bg-teal",
-    text: "text-teal-deep",
-    border: "border-teal-deep",
-    bar: "bg-teal-deep",
-    hoverText: "group-hover:text-teal-deep",
-    hoverPlain: "hover:text-teal-deep",
-  },
-  2: {
-    chip: "bg-brick",
-    text: "text-brick",
-    border: "border-brick",
-    bar: "bg-brick",
-    hoverText: "group-hover:text-brick",
-    hoverPlain: "hover:text-brick",
-  },
-  3: {
-    chip: "bg-pink",
-    text: "text-pink-deep",
-    border: "border-pink-deep",
-    bar: "bg-pink-deep",
-    hoverText: "group-hover:text-pink-deep",
-    hoverPlain: "hover:text-pink-deep",
-  },
+  0: TERRACOTTA_ACCENT,
+  1: TERRACOTTA_ACCENT,
+  2: TERRACOTTA_ACCENT,
+  3: TERRACOTTA_ACCENT,
 };
 
 export function PillarIcon({ pillar, size = 26 }: { pillar: PillarId; size?: number }) {

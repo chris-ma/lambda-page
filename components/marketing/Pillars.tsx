@@ -22,7 +22,7 @@ export function Pillars() {
         </Reveal>
         <Reveal delay={60}>
           <h2 className="mx-auto mt-4 max-w-[620px] font-display text-[32px] leading-[1.1] font-semibold text-ink sm:text-[42px]">
-            How Lambda Page <em className="text-mustard-deep font-normal italic">measures</em> a page
+            How Lambda Page <em className="text-terracotta-deep font-normal italic">measures</em> a page
           </h2>
         </Reveal>
 
@@ -43,7 +43,7 @@ export function Pillars() {
                     <h3 className="mt-3 font-display text-[19px] font-semibold text-ink">
                       {p.label === "Pre-Build" ? "Pre-Build Validation" : p.label === "Structural" ? "Structural Analysis" : p.label === "Behavioral" ? "Behavioral Analysis" : "User Testing"}
                       {p.comingSoon && (
-                        <span className="ml-2 align-middle font-mono text-[9px] text-brick uppercase">Coming soon</span>
+                        <span className="ml-2 align-middle font-mono text-[9px] text-terracotta-deep uppercase">Coming soon</span>
                       )}
                     </h3>
                     <p className="mt-3 max-w-none text-[13px] leading-relaxed text-ink-soft">

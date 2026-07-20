@@ -21,7 +21,7 @@ export function Hero() {
 
         <div className="mt-14 max-w-[720px]">
           <Reveal delay={60}>
-            <div className="flex items-center gap-2 font-mono text-[11px] font-semibold tracking-[0.14em] text-brick uppercase">
+            <div className="flex items-center gap-2 font-mono text-[11px] font-semibold tracking-[0.14em] text-terracotta-deep uppercase">
               <span aria-hidden="true">^</span>
               Landing Page Function
             </div>
@@ -29,8 +29,8 @@ export function Hero() {
 
           <Reveal delay={120}>
             <h1 className="mt-5 font-display text-[42px] leading-[1.08] font-semibold text-ink sm:text-[52px] md:text-[62px]">
-              The function between <em className="font-normal text-brick italic">traffic</em> and{" "}
-              <em className="font-normal text-brick italic">conversion</em>, made visible.
+              The function between <em className="font-normal text-terracotta-deep italic">traffic</em> and{" "}
+              <em className="font-normal text-terracotta-deep italic">conversion</em>, made visible.
             </h1>
           </Reveal>
 

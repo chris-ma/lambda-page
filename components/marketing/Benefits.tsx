@@ -38,7 +38,7 @@ export function Benefits() {
         <Reveal delay={60}>
           <h2 className="mt-4 max-w-[560px] text-center font-display text-[30px] leading-[1.12] font-semibold text-ink sm:text-[38px] md:text-left">
             Not more data. The number that{" "}
-            <em className="text-teal-deep font-normal italic">actually explains</em>{" "}
+            <em className="text-terracotta-deep font-normal italic">actually explains</em>{" "}
             what&rsquo;s wrong.
           </h2>
         </Reveal>
