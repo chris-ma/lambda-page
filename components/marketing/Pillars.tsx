@@ -21,8 +21,8 @@ export function Pillars() {
           <EyebrowLabel className="justify-center">Four Pillars</EyebrowLabel>
         </Reveal>
         <Reveal delay={60}>
-          <h2 className="mx-auto mt-4 font-display text-[34px] font-semibold text-ink">
-            How Lambda Page measures a page
+          <h2 className="mx-auto mt-4 max-w-[620px] font-display text-[32px] leading-[1.1] font-semibold text-ink sm:text-[42px]">
+            How Lambda Page <em className="text-mustard-deep font-normal italic">measures</em> a page
           </h2>
         </Reveal>
 

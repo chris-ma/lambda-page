@@ -36,12 +36,19 @@ export function Nav() {
   const active = PILLARS_NAV.find((p) => p.id === open);
 
   return (
-    <div ref={ref} className="sticky top-0 z-50 border-b-2 border-ink bg-paper">
-      <nav className="mx-auto flex h-[76px] max-w-[1200px] items-center justify-between px-6">
-        <Link href="/" className="flex items-center gap-3" onClick={() => setMobileOpen(false)}>
-          <LambdaMark size={34} />
-          <span className="font-mono text-[11px] tracking-wide text-ink">LAMBDA PAGE</span>
+    <>
+      <div className="hidden items-center justify-between border-b border-ink/12 bg-cream px-6 py-2 font-mono text-[10px] tracking-[0.14em] text-ink-soft uppercase sm:flex">
+        <span>Landing Page Diagnostics — Est. 2026</span>
+        <Link href="/login" className="hover:text-ink">
+          Log in
         </Link>
+      </div>
+      <div ref={ref} className="sticky top-0 z-50 border-b-2 border-ink bg-paper">
+        <nav className="mx-auto flex h-[80px] max-w-[1200px] items-center justify-between px-6">
+          <Link href="/" className="flex items-center gap-3" onClick={() => setMobileOpen(false)}>
+            <LambdaMark size={38} />
+            <span className="font-display text-[19px] font-semibold tracking-tight text-ink">Lambda Page</span>
+          </Link>
 
         {/* Desktop nav */}
         <div className="hidden items-center gap-7 md:flex">
@@ -171,6 +178,7 @@ export function Nav() {
           </div>
         </div>
       )}
-    </div>
+      </div>
+    </>
   );
 }

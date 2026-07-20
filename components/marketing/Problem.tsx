@@ -28,12 +28,13 @@ export function Problem() {
           <EyebrowLabel className="justify-center">The Problem</EyebrowLabel>
         </Reveal>
         <Reveal delay={60}>
-          <h2 className="mx-auto mt-4 max-w-[780px] font-display text-[38px] leading-tight font-semibold text-ink">
-            Most teams find out a page is broken after it&rsquo;s already cost them money
+          <h2 className="mx-auto mt-4 max-w-[760px] font-display text-[32px] leading-[1.1] font-semibold text-ink sm:text-[42px]">
+            Most teams find out a page is broken after it&rsquo;s{" "}
+            <em className="text-brick font-normal italic">already cost them money</em>
           </h2>
         </Reveal>
         <Reveal delay={120}>
-          <p className="mx-auto mt-6 max-w-[680px] text-[15.5px] leading-relaxed text-ink-soft">
+          <p className="mx-auto mt-8 max-w-[640px] text-left text-[15.5px] leading-relaxed text-ink-soft first-letter:float-left first-letter:mr-2 first-letter:font-display first-letter:text-[64px] first-letter:leading-[0.82] first-letter:font-semibold first-letter:text-brick">
             A landing page usually gets one round of design review, one skim for typos, and then
             it ships. Nobody checks whether the contrast ratio actually passes, whether the form
             has a field that&rsquo;s quietly killing completions, or whether eleven autoplay

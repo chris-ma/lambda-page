@@ -33,7 +33,7 @@ export function HowItWorks() {
         <EyebrowLabel className="justify-center">How It Works</EyebrowLabel>
       </Reveal>
       <Reveal delay={60}>
-        <h2 className="mx-auto mt-4 font-display text-[34px] font-semibold text-ink">
+        <h2 className="mx-auto mt-4 font-display text-[32px] font-semibold text-ink italic sm:text-[42px]">
           Four steps, in order
         </h2>
       </Reveal>
@@ -42,7 +42,7 @@ export function HowItWorks() {
         {STEPS.map((s, i) => (
           <Reveal key={s.n} delay={120 + i * 60}>
             <div className={cn("border-t-4 pt-5", PILLAR_COLOR[i as 0 | 1 | 2 | 3].border)}>
-              <div className={cn("font-display text-[28px] font-bold", PILLAR_COLOR[i as 0 | 1 | 2 | 3].text)}>{s.n}</div>
+              <div className={cn("font-display text-[40px] font-bold", PILLAR_COLOR[i as 0 | 1 | 2 | 3].text)}>{s.n}</div>
               <h3 className="mt-4 font-display text-[17px] font-semibold text-ink">{s.title}</h3>
               <p className="mt-2.5 max-w-none text-[13px] leading-relaxed text-ink-soft">{s.body}</p>
             </div>

@@ -3,23 +3,33 @@ import { Reveal } from "@/components/ui/Reveal";
 
 export function WhatItIs() {
   return (
-    <section className="border-b-2 border-ink bg-paper px-6 py-24 text-center">
-      <div className="mx-auto max-w-[780px]">
+    <section className="border-b-2 border-ink bg-paper px-6 py-28 text-center">
+      <div className="mx-auto max-w-[840px]">
         <Reveal>
-          <EyebrowLabel className="justify-center">What Lambda Page Does</EyebrowLabel>
+          <EyebrowLabel className="justify-center">One System, Four Checkpoints</EyebrowLabel>
         </Reveal>
+
         <Reveal delay={60}>
-          <h2 className="mx-auto mt-4 font-display text-[34px] font-semibold text-ink">
-            One system, four checkpoints, no guessing
-          </h2>
+          <div className="mx-auto mt-10 h-px w-full bg-ink/15" />
         </Reveal>
-        <Reveal delay={120}>
-          <p className="mx-auto mt-6 max-w-[700px] text-[15.5px] leading-relaxed text-ink-soft">
-            Lambda Page treats a landing page as what it actually is — a function. Traffic goes
-            in, a conversion either comes out or it doesn&rsquo;t, and everything in between is
-            measurable. Instead of one audit at launch, Lambda Page checks the page at every
-            stage it exists in: before it&rsquo;s built, before it ships, once it&rsquo;s live,
-            and whenever you need to know why a real person didn&rsquo;t convert.
+
+        <Reveal delay={110}>
+          <p className="mt-10 font-display text-[26px] leading-[1.32] font-medium text-ink italic sm:text-[32px]">
+            Lambda Page treats a landing page as what it actually is —{" "}
+            <span className="text-brick font-semibold not-italic">a function.</span>{" "}
+            Traffic goes in, a conversion either comes out or it doesn&rsquo;t.
+          </p>
+        </Reveal>
+
+        <Reveal delay={160}>
+          <div className="mx-auto mt-10 h-px w-full bg-ink/15" />
+        </Reveal>
+
+        <Reveal delay={210}>
+          <p className="mx-auto mt-8 max-w-[600px] text-[14.5px] leading-relaxed text-ink-soft">
+            Instead of one audit at launch, Lambda Page checks the page at every stage it exists
+            in: before it&rsquo;s built, before it ships, once it&rsquo;s live, and whenever you
+            need to know why a real person didn&rsquo;t convert.
           </p>
         </Reveal>
       </div>

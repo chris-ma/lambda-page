@@ -30,8 +30,8 @@ export function UseCases() {
         <EyebrowLabel className="justify-center">Who Uses Lambda Page</EyebrowLabel>
       </Reveal>
       <Reveal delay={60}>
-        <h2 className="mx-auto mt-4 max-w-[780px] font-display text-[34px] font-semibold text-ink">
-          Built for anyone who ships pages and has to answer for how they perform
+        <h2 className="mx-auto mt-4 max-w-[760px] font-display text-[30px] leading-[1.15] font-semibold text-ink sm:text-[38px]">
+          Built for anyone who ships pages and has to <em className="text-pink-deep font-normal italic">answer for how they perform</em>
         </h2>
       </Reveal>
 

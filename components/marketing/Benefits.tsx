@@ -1,6 +1,5 @@
 import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
 import { Reveal } from "@/components/ui/Reveal";
-import { StatusIcon } from "@/components/icons/StatusIcon";
 import { FunnelChart } from "@/components/charts/FunnelChart";
 
 const BENEFITS = [
@@ -37,8 +36,8 @@ export function Benefits() {
           <EyebrowLabel className="justify-center md:justify-start">What You Get</EyebrowLabel>
         </Reveal>
         <Reveal delay={60}>
-          <h2 className="mt-4 max-w-[560px] text-center font-display text-[34px] font-semibold text-ink md:text-left">
-            Not more data. The number that actually explains what&rsquo;s wrong.
+          <h2 className="mt-4 max-w-[560px] text-center font-display text-[30px] leading-[1.12] font-semibold text-ink sm:text-[38px] md:text-left">
+            Not more data. The number that <em className="text-teal-deep font-normal italic">actually explains</em> what&rsquo;s wrong.
           </h2>
         </Reveal>
 
@@ -47,7 +46,7 @@ export function Benefits() {
             {BENEFITS.map((b, i) => (
               <Reveal key={b.title} delay={120 + i * 60}>
                 <div className="flex gap-4">
-                  <StatusIcon status="PASS" size={22} />
+                  <span className="font-mono text-[11px] font-semibold text-ink-soft">{String(i + 1).padStart(2, "0")}</span>
                   <div>
                     <h3 className="font-display text-[16px] font-semibold text-ink">{b.title}</h3>
                     <p className="mt-1.5 max-w-none text-[13.5px] leading-relaxed text-ink-soft">{b.body}</p>

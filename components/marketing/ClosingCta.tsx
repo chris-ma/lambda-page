@@ -8,8 +8,14 @@ export function ClosingCta() {
       <Reveal>
         <LambdaMark size={64} className="mx-auto" />
       </Reveal>
+      <Reveal delay={40}>
+        <div className="flex items-center justify-center gap-2 font-mono text-[11px] font-semibold tracking-[0.14em] text-ink/70 uppercase">
+          <span aria-hidden="true">^</span>
+          Fig. 05 — Run The Diagnostic
+        </div>
+      </Reveal>
       <Reveal delay={80}>
-        <h2 className="mx-auto mt-8 max-w-[420px] font-display text-[36px] font-semibold text-ink">
+        <h2 className="mx-auto mt-6 max-w-[460px] font-display text-[38px] leading-[1.08] font-semibold text-ink sm:text-[46px]">
           See where your page breaks
         </h2>
       </Reveal>
