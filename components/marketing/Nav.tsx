@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { LambdaMark } from "@/components/ui/LambdaMark";
 import { Button } from "@/components/ui/Button";
 import { PILLARS_NAV } from "@/lib/pillars";
+import { PILLAR_COLOR } from "@/components/icons/PillarIcon";
 import { cn } from "@/lib/utils";
 
 export function Nav() {
@@ -51,14 +52,15 @@ export function Nav() {
               onClick={() => setOpen(open === p.id ? null : p.id)}
               className={cn(
                 "relative py-2 font-body text-[14px] text-ink transition-colors",
-                open === p.id && "text-brick",
+                open === p.id && PILLAR_COLOR[p.id].text,
               )}
             >
               {p.label}
               {p.comingSoon && <span className="ml-1.5 align-super font-mono text-[8px] text-ink-soft">soon</span>}
               <span
                 className={cn(
-                  "absolute -bottom-0.5 left-0 h-[2px] w-full bg-brick transition-opacity",
+                  "absolute -bottom-0.5 left-0 h-[2px] w-full transition-opacity",
+                  PILLAR_COLOR[p.id].bar,
                   open === p.id ? "opacity-100" : "opacity-0",
                 )}
               />
@@ -107,7 +109,7 @@ export function Nav() {
                 {active.label} — Sub-Tools
                 {active.comingSoon && <span className="ml-2 text-brick">Coming with User Testing</span>}
               </span>
-              <Link href={`/pillars#${active.slug}`} onClick={() => setOpen(null)} className="text-ink hover:text-brick">
+              <Link href={`/pillars#${active.slug}`} onClick={() => setOpen(null)} className={cn("text-ink", PILLAR_COLOR[active.id].hoverPlain)}>
                 Why this pillar exists →
               </Link>
             </div>
@@ -115,7 +117,7 @@ export function Nav() {
               {active.subTools.map((tool) =>
                 tool.href ? (
                   <Link key={tool.label} href={tool.href} onClick={() => setOpen(null)} className="group">
-                    <div className="font-display text-[14px] font-semibold text-ink group-hover:text-brick">{tool.label} →</div>
+                    <div className={cn("font-display text-[14px] font-semibold text-ink", PILLAR_COLOR[active.id].hoverText)}>{tool.label} →</div>
                     <p className="mt-1.5 max-w-none text-[11.5px] leading-snug text-ink-soft">{tool.description}</p>
                   </Link>
                 ) : (

@@ -1,5 +1,7 @@
 import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
 import { Reveal } from "@/components/ui/Reveal";
+import { PILLAR_COLOR } from "@/components/icons/PillarIcon";
+import { cn } from "@/lib/utils";
 
 const STEPS = [
   {
@@ -39,8 +41,8 @@ export function HowItWorks() {
       <div className="mx-auto mt-14 grid max-w-[1180px] gap-8 text-left sm:grid-cols-2 lg:grid-cols-4">
         {STEPS.map((s, i) => (
           <Reveal key={s.n} delay={120 + i * 60}>
-            <div className="border-t-2 border-ink pt-5">
-              <div className="font-display text-[28px] font-bold text-brick">{s.n}</div>
+            <div className={cn("border-t-4 pt-5", PILLAR_COLOR[i as 0 | 1 | 2 | 3].border)}>
+              <div className={cn("font-display text-[28px] font-bold", PILLAR_COLOR[i as 0 | 1 | 2 | 3].text)}>{s.n}</div>
               <h3 className="mt-4 font-display text-[17px] font-semibold text-ink">{s.title}</h3>
               <p className="mt-2.5 max-w-none text-[13px] leading-relaxed text-ink-soft">{s.body}</p>
             </div>

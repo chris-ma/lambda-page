@@ -6,14 +6,17 @@ const STATS = [
   {
     value: "68%",
     description: "of form abandons on a typical signup flow trace back to a single problem field — invisible without field-level tracking.",
+    accent: "text-brick",
   },
   {
     value: "11",
     description: "simultaneous video loads is enough to push mobile load time past the point most visitors ever see the page.",
+    accent: "text-mustard-deep",
   },
   {
     value: "2.09:1",
     description: "a real contrast ratio that looks fine to the eye and fails WCAG AA outright. Most teams never run the math.",
+    accent: "text-teal-deep",
   },
 ];
 
@@ -42,7 +45,7 @@ export function Problem() {
         <div className="mt-14 grid gap-6 text-left sm:grid-cols-3">
           {STATS.map((s, i) => (
             <Reveal key={s.value} delay={180 + i * 60}>
-              <StatCard value={s.value} description={s.description} />
+              <StatCard value={s.value} description={s.description} accent={s.accent} />
             </Reveal>
           ))}
         </div>

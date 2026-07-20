@@ -7,9 +7,10 @@ import { Button } from "@/components/ui/Button";
 import { Tag } from "@/components/ui/Tag";
 import { Reveal } from "@/components/ui/Reveal";
 import { LambdaMark } from "@/components/ui/LambdaMark";
-import { PillarIcon } from "@/components/icons/PillarIcon";
+import { PillarIcon, PILLAR_COLOR } from "@/components/icons/PillarIcon";
 import { PILLARS_NAV } from "@/lib/pillars";
 import { PILLAR_COPY } from "@/lib/pillars-copy";
+import { cn } from "@/lib/utils";
 
 const PILLAR_TITLE: Record<number, string> = {
   0: "Pre-Build Validation",
@@ -66,6 +67,7 @@ export default function PillarsPage() {
 
         {PILLARS_NAV.map((p, i) => {
           const copy = PILLAR_COPY[p.id];
+          const accent = PILLAR_COLOR[p.id];
           return (
             <section
               key={p.id}
@@ -75,11 +77,11 @@ export default function PillarsPage() {
               <div className="mx-auto max-w-[980px]">
                 <Reveal>
                   <div className="flex flex-wrap items-center gap-4">
-                    <span className="flex h-14 w-14 shrink-0 items-center justify-center border-2 border-ink bg-mustard">
+                    <span className={cn("flex h-14 w-14 shrink-0 items-center justify-center border-2 border-ink", accent.chip)}>
                       <PillarIcon pillar={p.id} size={28} />
                     </span>
                     <div>
-                      <span className="font-mono text-[11px] tracking-wide text-ink-soft">
+                      <span className={cn("font-mono text-[11px] tracking-wide font-semibold", accent.text)}>
                         PILLAR {String(p.id).padStart(2, "0")}
                       </span>
                       <div className="flex items-center gap-2.5">
@@ -125,7 +127,7 @@ export default function PillarsPage() {
                         {tool.href && (
                           <Link
                             href={tool.href}
-                            className="mt-3 inline-flex items-center gap-1 font-mono text-[11px] text-teal-deep hover:underline"
+                            className={cn("mt-3 inline-flex items-center gap-1 font-mono text-[11px] hover:underline", accent.text)}
                           >
                             Open tool →
                           </Link>

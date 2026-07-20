@@ -1,6 +1,8 @@
 import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
 import { Reveal } from "@/components/ui/Reveal";
 import { Card } from "@/components/ui/Card";
+import { PILLAR_COLOR } from "@/components/icons/PillarIcon";
+import { cn } from "@/lib/utils";
 
 const CASES = [
   {
@@ -37,7 +39,8 @@ export function UseCases() {
         {CASES.map((c, i) => (
           <Reveal key={c.title} delay={120 + i * 60}>
             <Card hover={false} className="p-6">
-              <h3 className="font-display text-[16px] font-semibold text-ink">{c.title}</h3>
+              <div className={cn("h-[3px] w-9", PILLAR_COLOR[i as 0 | 1 | 2 | 3].bar)} />
+              <h3 className="mt-4 font-display text-[16px] font-semibold text-ink">{c.title}</h3>
               <p className="mt-3 max-w-none text-[13px] leading-relaxed text-ink-soft">{c.body}</p>
             </Card>
           </Reveal>

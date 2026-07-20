@@ -1,6 +1,56 @@
 export type PillarId = 0 | 1 | 2 | 3;
 
+/**
+ * One signature accent color per pillar, marketing surfaces only (homepage,
+ * /pillars, nav). Deliberately not reused in the dashboard, where these same
+ * hues already carry a fixed, stricter meaning as the PASS/FLAGGED/FAILING/
+ * INFO status system — reusing them there for pillar identity would make a
+ * teal icon next to a teal PASS tag ambiguous. `bg` is the base tone (safe
+ * for an ink icon/label on top, same combo already proven on the mustard λ
+ * badge); `text`/`border` are the deeper variant, for labels and rules on
+ * paper/cream.
+ */
+export const PILLAR_COLOR: Record<
+  PillarId,
+  { chip: string; text: string; border: string; bar: string; hoverText: string; hoverPlain: string }
+> = {
+  0: {
+    chip: "bg-mustard",
+    text: "text-mustard-deep",
+    border: "border-mustard-deep",
+    bar: "bg-mustard-deep",
+    hoverText: "group-hover:text-mustard-deep",
+    hoverPlain: "hover:text-mustard-deep",
+  },
+  1: {
+    chip: "bg-teal",
+    text: "text-teal-deep",
+    border: "border-teal-deep",
+    bar: "bg-teal-deep",
+    hoverText: "group-hover:text-teal-deep",
+    hoverPlain: "hover:text-teal-deep",
+  },
+  2: {
+    chip: "bg-brick",
+    text: "text-brick",
+    border: "border-brick",
+    bar: "bg-brick",
+    hoverText: "group-hover:text-brick",
+    hoverPlain: "hover:text-brick",
+  },
+  3: {
+    chip: "bg-pink",
+    text: "text-pink-deep",
+    border: "border-pink-deep",
+    bar: "bg-pink-deep",
+    hoverText: "group-hover:text-pink-deep",
+    hoverPlain: "hover:text-pink-deep",
+  },
+};
+
 export function PillarIcon({ pillar, size = 26 }: { pillar: PillarId; size?: number }) {
+  // Ink stroke always — this icon sits on chips of all four accent colors,
+  // and ink is the one tone that reads clearly against each of them.
   const stroke = "#332A22";
   return (
     <svg width={size} height={size} viewBox="0 0 26 26" aria-hidden="true">

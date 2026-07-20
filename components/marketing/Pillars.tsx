@@ -1,9 +1,10 @@
 import Link from "next/link";
 import { Card } from "@/components/ui/Card";
 import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
-import { PillarIcon } from "@/components/icons/PillarIcon";
+import { PillarIcon, PILLAR_COLOR } from "@/components/icons/PillarIcon";
 import { Reveal } from "@/components/ui/Reveal";
 import { PILLARS_NAV } from "@/lib/pillars";
+import { cn } from "@/lib/utils";
 
 const DESCRIPTIONS: Record<number, string> = {
   0: "Test the concept before a designer touches it. Message and headline variants get checked for comprehension against a real panel, competitor positioning gets mapped automatically, and wireframes get the same scrutiny a finished page would.",
@@ -26,28 +27,34 @@ export function Pillars() {
         </Reveal>
 
         <div className="mt-14 grid gap-6 text-left sm:grid-cols-2 lg:grid-cols-4">
-          {PILLARS_NAV.map((p, i) => (
-            <Reveal key={p.id} delay={120 + i * 60}>
-              <Link href={`/pillars#${p.slug}`} className="group block h-full">
-                <Card className={`flex h-full flex-col p-6 ${p.comingSoon ? "opacity-70" : ""}`}>
-                  <div className="flex items-center justify-between">
-                    <span className="font-mono text-[11px] text-ink-soft">No. {String(p.id).padStart(2, "0")}</span>
-                    <PillarIcon pillar={p.id} />
-                  </div>
-                  <h3 className="mt-4 font-display text-[19px] font-semibold text-ink group-hover:text-brick">
-                    {p.label === "Pre-Build" ? "Pre-Build Validation" : p.label === "Structural" ? "Structural Analysis" : p.label === "Behavioral" ? "Behavioral Analysis" : "User Testing"}
-                    {p.comingSoon && (
-                      <span className="ml-2 align-middle font-mono text-[9px] text-brick uppercase">Coming soon</span>
-                    )}
-                  </h3>
-                  <p className="mt-3 max-w-none text-[13px] leading-relaxed text-ink-soft">
-                    {DESCRIPTIONS[p.id]}
-                  </p>
-                  <span className="mt-4 font-mono text-[10.5px] text-teal-deep">Why it exists, and the tools inside →</span>
-                </Card>
-              </Link>
-            </Reveal>
-          ))}
+          {PILLARS_NAV.map((p, i) => {
+            const accent = PILLAR_COLOR[p.id];
+            return (
+              <Reveal key={p.id} delay={120 + i * 60}>
+                <Link href={`/pillars#${p.slug}`} className="group block h-full">
+                  <Card className={`flex h-full flex-col p-6 ${p.comingSoon ? "opacity-70" : ""}`}>
+                    <div className="flex items-center justify-between">
+                      <span className={cn("font-mono text-[11px] font-semibold", accent.text)}>No. {String(p.id).padStart(2, "0")}</span>
+                      <span className={cn("flex h-10 w-10 items-center justify-center border-2 border-ink", accent.chip)}>
+                        <PillarIcon pillar={p.id} size={22} />
+                      </span>
+                    </div>
+                    <div className={cn("mt-4 h-[3px] w-9", accent.bar)} />
+                    <h3 className="mt-3 font-display text-[19px] font-semibold text-ink">
+                      {p.label === "Pre-Build" ? "Pre-Build Validation" : p.label === "Structural" ? "Structural Analysis" : p.label === "Behavioral" ? "Behavioral Analysis" : "User Testing"}
+                      {p.comingSoon && (
+                        <span className="ml-2 align-middle font-mono text-[9px] text-brick uppercase">Coming soon</span>
+                      )}
+                    </h3>
+                    <p className="mt-3 max-w-none text-[13px] leading-relaxed text-ink-soft">
+                      {DESCRIPTIONS[p.id]}
+                    </p>
+                    <span className={cn("mt-4 font-mono text-[10.5px]", accent.text)}>Why it exists, and the tools inside →</span>
+                  </Card>
+                </Link>
+              </Reveal>
+            );
+          })}
         </div>
       </div>
     </section>
