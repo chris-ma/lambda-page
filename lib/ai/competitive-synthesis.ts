@@ -20,7 +20,35 @@ export const BUYING_DRIVERS = [
 export type BuyingDriverKey = (typeof BUYING_DRIVERS)[number]["key"];
 export type BuyingDriverScores = Record<BuyingDriverKey, number>;
 export type CompetitorDriverScore = { url: string; scores: BuyingDriverScores; rationale: string };
-export type BuyingDriverResult = { competitors: CompetitorDriverScore[] };
+export type BuyingDriverResult = { competitors: CompetitorDriverScore[]; driverImportance: BuyingDriverScores };
+
+export type OpportunityRow = {
+  driver: BuyingDriverKey;
+  label: string;
+  avgScore: number;
+  gap: number;
+  importance: number;
+  opportunityIndex: number;
+};
+
+/**
+ * "Where the money is": ranks the 8 drivers by gap (10 minus how well the
+ * competitive set is already serving that driver, measured from the scores
+ * above) times importance (how much that driver typically decides the
+ * purchase in this category — the one thing the LLM judges here; the gap
+ * itself is arithmetic on data we already have). Highest opportunityIndex
+ * = most underserved driver that also matters most to the purchase
+ * decision, i.e. the gap most worth building for.
+ */
+export function computeOpportunities(result: BuyingDriverResult): OpportunityRow[] {
+  return BUYING_DRIVERS.map((d) => {
+    const scores = result.competitors.map((c) => c.scores[d.key]);
+    const avgScore = scores.length ? scores.reduce((a, b) => a + b, 0) / scores.length : 0;
+    const gap = 10 - avgScore;
+    const importance = result.driverImportance[d.key];
+    return { driver: d.key, label: d.label, avgScore, gap, importance, opportunityIndex: gap * importance };
+  }).sort((a, b) => b.opportunityIndex - a.opportunityIndex);
+}
 
 const driverScoreField = (label: string) =>
   z
@@ -52,11 +80,27 @@ const buyingDriversSchema = z.object({
       }),
     )
     .describe("One entry per competitor URL provided, same order."),
+  driverImportance: z
+    .object({
+      price: driverScoreField("How much price typically decides the purchase in this product category"),
+      featureDepth: driverScoreField("How much feature depth typically decides the purchase in this category"),
+      easeOfUse: driverScoreField("How much ease of use typically decides the purchase in this category"),
+      supportQuality: driverScoreField("How much support quality typically decides the purchase in this category"),
+      brand: driverScoreField("How much brand typically decides the purchase in this category"),
+      trafficVisibility: driverScoreField("How much traffic/visibility typically decides the purchase in this category"),
+      contentQuality: driverScoreField("How much content quality typically decides the purchase in this category"),
+      marketShare: driverScoreField("How much market share typically decides the purchase in this category"),
+    })
+    .describe(
+      "One set of importance weights for the whole category (not per-competitor) — how much each driver typically decides a buyer's choice, inferred from what these pages are collectively selling. This is the one genuinely subjective judgment call in this call; the per-competitor scores above are the measured-ish half.",
+    ),
 });
 
 const BUYING_DRIVERS_SYSTEM = `You are scoring competitor landing pages on 8 buying-driver dimensions a prospective customer weighs when choosing between vendors, using only the automated findings and page-content excerpt provided — no external data, no browsing, no prior knowledge of these companies beyond what's in the excerpt.
 
-Score each dimension 0-10, 10 being best-in-class among the set being compared (not an absolute industry scale). Two dimensions — traffic/visibility and market share — cannot be measured from a single page; score them only from indirect signals (scale claims, customer-logo walls, category-leader language, press-mention badges) and say so plainly in the rationale. Never let a confident-sounding rationale imply more certainty than the evidence supports — these are directional estimates for a positioning conversation, not verified metrics.`;
+Score each dimension 0-10, 10 being best-in-class among the set being compared (not an absolute industry scale). Two dimensions — traffic/visibility and market share — cannot be measured from a single page; score them only from indirect signals (scale claims, customer-logo walls, category-leader language, press-mention badges) and say so plainly in the rationale. Never let a confident-sounding rationale imply more certainty than the evidence supports — these are directional estimates for a positioning conversation, not verified metrics.
+
+You also set one importance weight per driver for the category as a whole (not per competitor) — how much that dimension typically decides the purchase for whatever kind of product these pages are selling. This feeds a downstream calculation of which competitive gap is most worth closing, so weight it on purchase-decision leverage, not on how easy the dimension was to score.`;
 
 const synthesisSchema = z.object({
   synthesis: z

@@ -5,7 +5,8 @@ import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
 import { Tag } from "@/components/ui/Tag";
 import { Card } from "@/components/ui/Card";
 import { BuyingDriversRadarChart } from "@/components/charts/BuyingDriversRadarChart";
-import type { BuyingDriverResult } from "@/lib/ai/competitive-synthesis";
+import { OpportunityChart } from "@/components/charts/OpportunityChart";
+import { computeOpportunities, type BuyingDriverResult } from "@/lib/ai/competitive-synthesis";
 
 export const dynamic = "force-dynamic";
 
@@ -22,6 +23,7 @@ export default async function CompetitiveSetPage({ params }: { params: Promise<{
   const set = await getCompetitiveSet(setId);
   const runs = await runsForSet(setId);
   const buyingDrivers = set.buying_drivers as BuyingDriverResult | null;
+  const opportunities = buyingDrivers && buyingDrivers.competitors.length > 0 ? computeOpportunities(buyingDrivers) : null;
 
   return (
     <div>
@@ -73,6 +75,24 @@ export default async function CompetitiveSetPage({ params }: { params: Promise<{
               result={buyingDrivers}
               hostnames={Object.fromEntries(buyingDrivers.competitors.map((c) => [c.url, hostnameOf(c.url)]))}
             />
+          </div>
+        </Card>
+      )}
+
+      {opportunities && (
+        <Card hover={false} className="mt-8 border-2 border-terracotta-deep p-6">
+          <div className="flex items-center justify-between">
+            <h2 className="font-display text-[17px] font-semibold text-ink">Opportunities — where the money is</h2>
+            <span className="font-mono text-[10px] uppercase tracking-wide text-pink-deep">AI judgment — directional</span>
+          </div>
+          <p className="mt-1.5 text-[12.5px] text-ink-soft">
+            Ranked by gap (10 minus how well the set already serves that driver — arithmetic on
+            the scores above) times weight (how much that driver typically decides the purchase
+            for this category — the AI&rsquo;s judgment call). The top row is the biggest
+            underserved driver that also matters most to the buyer.
+          </p>
+          <div className="mt-6">
+            <OpportunityChart opportunities={opportunities} />
           </div>
         </Card>
       )}

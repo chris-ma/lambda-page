@@ -44,12 +44,25 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Every competitor URL failed to scan." }, { status: 500 });
     }
 
-    const [synthesis, buyingDrivers] = await Promise.all([
+    // Scraping (the expensive, already-completed part) and the two AI calls
+    // are independent failure domains — a Claude-side hiccup (rate limit,
+    // missing key, transient error) must not discard per-competitor scan
+    // results that already succeeded. allSettled + a visible fallback
+    // message beats losing the whole set to one flaky call.
+    const [synthesisResult, buyingDriversResult] = await Promise.allSettled([
       synthesizeCompetitiveSet(perSite),
-      // The buying-driver radar needs at least two competitors to be a
-      // comparison; skip it (not an error) for a single-URL scan.
-      perSite.length >= 2 ? scoreBuyingDrivers(perSite).catch((): BuyingDriverResult | null => null) : Promise.resolve(null),
+      // The buying-driver radar/opportunity read needs at least two
+      // competitors to be a comparison; skip it (not an error) for a
+      // single-URL scan.
+      perSite.length >= 2 ? scoreBuyingDrivers(perSite) : Promise.resolve(null as BuyingDriverResult | null),
     ]);
+
+    const synthesis =
+      synthesisResult.status === "fulfilled"
+        ? synthesisResult.value
+        : `Competitive synthesis unavailable: ${synthesisResult.reason instanceof Error ? synthesisResult.reason.message : String(synthesisResult.reason)}. The per-competitor scans below still completed.`;
+    const buyingDrivers = buyingDriversResult.status === "fulfilled" ? buyingDriversResult.value : null;
+
     await completeCompetitiveSet(set.id, synthesis, buyingDrivers);
     return NextResponse.json({ setId: set.id }, { status: 201 });
   } catch (err) {
