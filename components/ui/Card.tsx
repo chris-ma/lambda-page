@@ -8,7 +8,7 @@ export function Card({
 }: ComponentPropsWithoutRef<"div"> & { hover?: boolean }) {
   return (
     <div
-      className={cn("border-2 border-ink bg-paper", hover && "depth", !hover && "shadow-[6px_6px_0_rgba(51,42,34,0.16)]", className)}
+      className={cn("texture sheen border-2 border-ink bg-paper", hover ? "depth" : "shadow-depth-md", className)}
       {...props}
     />
   );

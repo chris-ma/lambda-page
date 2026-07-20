@@ -184,7 +184,7 @@ export function AssumptionInterviewRunner({
     <div className="flex min-h-screen items-center justify-center bg-cream px-6 py-16 text-center">
       <div className="w-full max-w-[480px]">
         <LambdaMark size={44} className="mx-auto" />
-        <div className="mt-8 border-2 border-ink bg-paper p-7 shadow-[6px_6px_0_rgba(51,42,34,0.18)]">
+        <div className="texture mt-8 border-2 border-ink bg-paper p-7 shadow-depth-md">
           <p className="font-display text-[20px] font-semibold text-ink">{name}</p>
           <p className="mt-3 text-[14px] leading-relaxed text-ink-soft">
             {context || "A few quick questions about a concept we're validating."}

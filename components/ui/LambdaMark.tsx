@@ -76,7 +76,7 @@ export function LambdaMark({
   return (
     <div
       className={cn(
-        "hatch-fill inline-flex shrink-0 items-center justify-center rounded-full border-2 border-ink bg-mustard font-display font-bold text-ink transition-transform duration-500 [transition-timing-function:cubic-bezier(.2,.8,.3,1.3)] hover:rotate-180",
+        "hatch-fill texture inline-flex shrink-0 items-center justify-center rounded-full border-2 border-ink bg-mustard font-display font-bold text-ink shadow-depth-xs transition-transform duration-500 [transition-timing-function:cubic-bezier(.2,.8,.3,1.3)] hover:rotate-180",
         className,
       )}
       style={{ width: size, height: size, fontSize: size * 0.46 }}

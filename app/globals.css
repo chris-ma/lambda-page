@@ -18,9 +18,24 @@
   --font-body: var(--font-body-raw), Arial, sans-serif;
   --font-mono: var(--font-mono-raw), "Courier New", monospace;
 
-  --shadow-depth-sm: 3px 3px 0 rgba(51, 42, 34, 0.18);
-  --shadow-depth-md: 6px 6px 0 rgba(51, 42, 34, 0.18);
-  --shadow-depth-lg: 9px 9px 0 rgba(51, 42, 34, 0.22);
+  /*
+   * Layered "raised card stock" shadows — a tight contact shadow plus a
+   * wider ambient one, with a faint inset top highlight/bottom shade so the
+   * edge itself reads as a bevel. Replaces the old flat 1-layer offset
+   * (Npx Npx 0 ...) that had no blur at all, which is what made every
+   * surface read as a flat sticker cut out and pasted down rather than an
+   * actually raised object.
+   */
+  --shadow-depth-xs: inset 0 1px 0 rgba(255, 255, 255, 0.45), inset 0 -1px 0 rgba(51, 42, 34, 0.1), 0 1px 1px rgba(51, 42, 34, 0.14),
+    0 3px 6px rgba(51, 42, 34, 0.12);
+  --shadow-depth-sm: inset 0 1px 0 rgba(255, 255, 255, 0.45), inset 0 -1px 0 rgba(51, 42, 34, 0.1), 0 1px 2px rgba(51, 42, 34, 0.12),
+    0 4px 8px rgba(51, 42, 34, 0.13), 0 9px 20px rgba(51, 42, 34, 0.09);
+  --shadow-depth-md: inset 0 1px 0 rgba(255, 255, 255, 0.5), inset 0 -1px 0 rgba(51, 42, 34, 0.1), 0 1px 2px rgba(51, 42, 34, 0.12),
+    0 7px 14px rgba(51, 42, 34, 0.15), 0 18px 34px rgba(51, 42, 34, 0.11);
+  --shadow-depth-lg: inset 0 1px 0 rgba(255, 255, 255, 0.55), inset 0 -1px 0 rgba(51, 42, 34, 0.1), 0 2px 4px rgba(51, 42, 34, 0.14),
+    0 12px 22px rgba(51, 42, 34, 0.17), 0 28px 50px rgba(51, 42, 34, 0.13);
+  /* A surface pressed into the page — active/pressed buttons and toggles. */
+  --shadow-depth-press: inset 0 2px 6px rgba(51, 42, 34, 0.3), inset 0 1px 2px rgba(51, 42, 34, 0.18);
 }
 
 html {
@@ -61,8 +76,39 @@ body::before {
     box-shadow 0.22s cubic-bezier(0.2, 0.7, 0.3, 1);
 }
 .depth:hover {
-  transform: translate(-3px, -3px);
+  transform: translateY(-4px) scale(1.008);
   box-shadow: var(--shadow-depth-lg);
+}
+
+/*
+ * Per-surface paper grain — the same fractal-noise texture as the
+ * page-level overlay below, but painted on the element itself (behind its
+ * content, via ::before) so individual cards/buttons/badges read as cut
+ * card stock rather than flat vector fill. Needs `position: relative` on
+ * the element, which every consumer already has via `border-2`'s box.
+ */
+.texture {
+  position: relative;
+}
+.texture::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  /* Match the host's own corner radius (e.g. the rounded-full λ badge) —
+     otherwise this rectangular noise layer's corners poke out past a round
+     or rounded-corner parent, since background-image clipping doesn't
+     apply to a separately-painted pseudo-element. */
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0.1;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* A faint top-light sheen on saturated surfaces (mustard/teal buttons, the
+   λ badge) implying a gently domed, not flat, material. */
+.sheen {
+  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0) 45%, rgba(51, 42, 34, 0.05) 100%);
 }
 
 /* Hatch fill — the λ mark and active-state pattern */

@@ -58,7 +58,7 @@ export function Benefits() {
           </div>
 
           <Reveal delay={240}>
-            <div className="border-2 border-ink bg-cream p-7 shadow-[6px_6px_0_rgba(51,42,34,0.16)]">
+            <div className="texture border-2 border-ink bg-cream p-7 shadow-depth-md">
               <div className="mb-5 font-mono text-[10px] tracking-wide text-ink-soft uppercase">
                 Funnel — Live Example
               </div>

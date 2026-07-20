@@ -69,7 +69,7 @@ export function FiveSecondRunner({
           <LambdaMark size={44} className="mx-auto" />
           <form
             onSubmit={onSubmit}
-            className="mt-8 space-y-6 border-2 border-ink bg-paper p-7 shadow-[6px_6px_0_rgba(51,42,34,0.18)]"
+            className="texture mt-8 space-y-6 border-2 border-ink bg-paper p-7 shadow-depth-md"
           >
             <p className="text-center font-display text-[18px] font-semibold text-ink">
               Now, from memory —
@@ -114,7 +114,7 @@ export function FiveSecondRunner({
     <div className="flex min-h-screen items-center justify-center bg-cream px-6 py-16 text-center">
       <div className="w-full max-w-[480px]">
         <LambdaMark size={44} className="mx-auto" />
-        <div className="mt-8 border-2 border-ink bg-paper p-7 shadow-[6px_6px_0_rgba(51,42,34,0.18)]">
+        <div className="texture mt-8 border-2 border-ink bg-paper p-7 shadow-depth-md">
           <p className="font-display text-[20px] font-semibold text-ink">5-Second Test</p>
           <p className="mt-3 text-[14px] leading-relaxed text-ink-soft">
             {brief || "You'll see a page for 5 seconds. Look it over, then answer a few questions about what you remember."}

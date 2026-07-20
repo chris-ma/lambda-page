@@ -203,7 +203,7 @@ export function CardSortRunner({
       <div className="flex min-h-screen items-center justify-center bg-cream px-6 py-16">
         <div className="w-full max-w-[560px]">
           <LambdaMark size={44} className="mx-auto" />
-          <div className="mt-8 border-2 border-ink bg-paper p-7 shadow-[6px_6px_0_rgba(51,42,34,0.18)]">
+          <div className="texture mt-8 border-2 border-ink bg-paper p-7 shadow-depth-md">
             <p className="text-center font-display text-[18px] font-semibold text-ink">
               One last thing — optional
             </p>
@@ -256,7 +256,7 @@ export function CardSortRunner({
                   onDragStart={(e) => e.dataTransfer.setData("text/card-id", c.id)}
                   onClick={() => setSelectedCard((s) => (s === c.id ? null : c.id))}
                   className={cn(
-                    "border-2 border-ink bg-mustard px-3 py-2 font-body text-[13px] text-ink shadow-[2px_2px_0_rgba(51,42,34,0.25)]",
+                    "sheen texture border-2 border-ink bg-mustard px-3 py-2 font-body text-[13px] text-ink shadow-depth-xs transition-transform active:translate-y-px active:shadow-depth-press",
                     selectedCard === c.id && "ring-2 ring-teal-deep ring-offset-2 ring-offset-cream",
                   )}
                 >
@@ -357,7 +357,7 @@ export function CardSortRunner({
     <div className="flex min-h-screen items-center justify-center bg-cream px-6 py-16 text-center">
       <div className="w-full max-w-[480px]">
         <LambdaMark size={44} className="mx-auto" />
-        <div className="mt-8 border-2 border-ink bg-paper p-7 shadow-[6px_6px_0_rgba(51,42,34,0.18)]">
+        <div className="texture mt-8 border-2 border-ink bg-paper p-7 shadow-depth-md">
           <p className="font-display text-[20px] font-semibold text-ink">Card Sort</p>
           <p className="mt-3 text-[14px] leading-relaxed text-ink-soft">
             {instructions || "Group these into categories that make sense to you."}

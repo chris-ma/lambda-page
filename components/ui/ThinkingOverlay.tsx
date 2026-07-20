@@ -44,7 +44,7 @@ export function ThinkingOverlay({ label }: { label?: string }) {
       <div
         role="status"
         aria-label="Loading"
-        className="hatch-fill flex items-center justify-center rounded-full border-2 border-ink bg-mustard font-display font-bold text-ink shadow-[6px_6px_0_rgba(51,42,34,0.18)]"
+        className="hatch-fill texture flex items-center justify-center rounded-full border-2 border-ink bg-mustard font-display font-bold text-ink shadow-depth-lg"
         style={{ width: 96, height: 96, fontSize: 44 }}
       >
         <span aria-hidden="true">{GREEK[index]}</span>

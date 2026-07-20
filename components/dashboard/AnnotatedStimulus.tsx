@@ -47,7 +47,7 @@ export function AnnotatedStimulus({
             onClick={() => setActive(f.id)}
             style={{ left: `${f.x * 100}%`, top: `${f.y * 100}%` }}
             className={cn(
-              "absolute flex h-6 w-6 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-2 border-ink font-mono text-[11px] font-bold text-ink shadow-[2px_2px_0_rgba(51,42,34,0.35)] transition-transform hover:scale-110",
+              "absolute flex h-6 w-6 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-2 border-ink font-mono text-[11px] font-bold text-ink shadow-depth-xs transition-transform hover:scale-110",
               DOT[f.status as Status],
               active === f.id && "ring-2 ring-ink ring-offset-2 ring-offset-cream",
             )}
