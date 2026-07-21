@@ -96,6 +96,41 @@ export function computeOutboundClicks(events: EventRow[]): OutboundStat[] {
     .slice(0, 10);
 }
 
+export type PageStat = { path: string; sessions: number; formSubmits: number };
+
+/**
+ * Sessions by landing page (the path of each session's first pageview) — the
+ * one view that only makes sense once the same snippet is installed across
+ * multiple pages of a site rather than a single URL, since it's what turns
+ * "one connected page" into genuinely site-wide analytics.
+ */
+export function computeTopPages(events: EventRow[]): PageStat[] {
+  const firstPv = sessionFirstPageview(events);
+
+  const formSubmitSessions = new Set<string>();
+  for (const e of events) {
+    if (e.type === "funnel_stage" && (e.payload as { stage?: string })?.stage === "form_submit") {
+      formSubmitSessions.add(e.session_id);
+    }
+  }
+
+  const sessionsByPath = new Map<string, string[]>();
+  for (const [sid, pv] of firstPv) {
+    const path = pv.path || "/";
+    if (!sessionsByPath.has(path)) sessionsByPath.set(path, []);
+    sessionsByPath.get(path)!.push(sid);
+  }
+
+  return Array.from(sessionsByPath.entries())
+    .map(([path, sids]) => ({
+      path,
+      sessions: sids.length,
+      formSubmits: sids.filter((s) => formSubmitSessions.has(s)).length,
+    }))
+    .sort((a, b) => b.sessions - a.sessions)
+    .slice(0, 15);
+}
+
 export type ReturnVisitStat = { returning: number; total: number; rate: number };
 
 /** Share of sessions that are a return visit within the snippet's 30-day window. */

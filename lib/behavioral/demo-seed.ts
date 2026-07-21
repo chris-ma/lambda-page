@@ -1,5 +1,5 @@
 import type { FieldStat } from "./aggregate";
-import type { ChannelStat, CtaStat, OutboundStat, ReturnVisitStat } from "./campaign";
+import type { ChannelStat, CtaStat, OutboundStat, PageStat, ReturnVisitStat } from "./campaign";
 
 /** Deterministic placeholder data shown until a page has real snippet traffic. Always labeled DEMO DATA in the UI. */
 export const DEMO_FUNNEL = [
@@ -64,3 +64,10 @@ export const DEMO_OUTBOUND_CLICKS: OutboundStat[] = [
 ];
 
 export const DEMO_RETURN_VISIT: ReturnVisitStat = { returning: 214, total: 1000, rate: 0.214 };
+
+export const DEMO_TOP_PAGES: PageStat[] = [
+  { path: "/", sessions: 480, formSubmits: 52 },
+  { path: "/pricing", sessions: 210, formSubmits: 18 },
+  { path: "/webinar", sessions: 174, formSubmits: 61 },
+  { path: "/blog/landing-page-checklist", sessions: 136, formSubmits: 4 },
+];

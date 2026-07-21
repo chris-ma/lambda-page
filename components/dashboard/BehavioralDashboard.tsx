@@ -11,7 +11,7 @@ import { DataTable } from "@/components/ui/DataTable";
 import { Tag } from "@/components/ui/Tag";
 import { ToolExplainer } from "@/components/ui/ToolExplainer";
 import type { FieldStat } from "@/lib/behavioral/aggregate";
-import type { ChannelStat, CtaStat, OutboundStat, ReturnVisitStat } from "@/lib/behavioral/campaign";
+import type { ChannelStat, CtaStat, OutboundStat, PageStat, ReturnVisitStat } from "@/lib/behavioral/campaign";
 import type { GA4Report } from "@/lib/analytics/ga4";
 import { formatPercent } from "@/lib/utils";
 
@@ -44,6 +44,7 @@ export function BehavioralDashboard({
   channels,
   topCtas,
   outboundClicks,
+  topPages,
   returnVisits,
   initialTab,
 }: {
@@ -62,6 +63,7 @@ export function BehavioralDashboard({
   channels: ChannelStat[];
   topCtas: CtaStat[];
   outboundClicks: OutboundStat[];
+  topPages: PageStat[];
   returnVisits: ReturnVisitStat;
   initialTab?: string;
 }) {
@@ -115,8 +117,10 @@ export function BehavioralDashboard({
           <div>
             <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
               <p className="max-w-[520px] text-[13px] text-ink-soft">
-                Click density across the page, bucketed into a 20×12 grid and shown in context on
-                a screenshot. Teal ramp only — never red-for-hot, since brick is reserved for a
+                Click density across this page specifically, bucketed into a 20×12 grid and shown
+                in context on a screenshot — scoped to this URL&rsquo;s own path even if the
+                snippet is installed site-wide, since coordinates only line up against this page&rsquo;s
+                own layout. Teal ramp only — never red-for-hot, since brick is reserved for a
                 failing status elsewhere in this system.
               </p>
               <button
@@ -261,15 +265,16 @@ export function BehavioralDashboard({
             {analyticsSource === "lambda" ? (
               <div>
                 <ToolExplainer
-                  what="Campaign and channel quality, read from the same first-party tracking snippet already installed for this page — UTM source/medium, top CTAs, outbound clicks, and return-visit rate, with no separate account to connect."
-                  problem="It's easy to know how much traffic a campaign sends and much harder to know whether that traffic is any good — whether visitors from LinkedIn convert as well as visitors from a Google ad, or just add to the session count."
-                  insight="Every session's first pageview carries its UTM/referrer source through to whether that session started and completed a form, so channels are ranked by conversion rate, not just volume — and because it's the same snippet as the rest of this pillar, there's nothing extra to install."
+                  what="Campaign and channel quality — UTM source/medium, landing pages, top CTAs, outbound clicks, and return-visit rate — from the same first-party tracking snippet already installed here. Install the same tag on every page of the site to track it site-wide, not just this one URL."
+                  problem="It's easy to know how much traffic a campaign sends and much harder to know whether that traffic is any good — whether visitors from LinkedIn convert as well as visitors from a Google ad, or just add to the session count, and which page they actually landed on first."
+                  insight="Every session's first pageview carries its UTM/referrer source and landing path through to whether that session started and completed a form, so channels and pages are ranked by conversion rate, not just volume — and because it's the same snippet as the rest of this pillar, there's nothing extra to install on any page."
                 />
                 <div className="mt-6">
                   <LambdaAnalyticsPanel
                     channels={channels}
                     topCtas={topCtas}
                     outboundClicks={outboundClicks}
+                    topPages={topPages}
                     returnVisits={returnVisits}
                   />
                 </div>

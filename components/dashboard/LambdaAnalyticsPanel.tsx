@@ -1,22 +1,27 @@
 import { DataTable } from "@/components/ui/DataTable";
 import { formatPercent } from "@/lib/utils";
-import type { ChannelStat, CtaStat, OutboundStat, ReturnVisitStat } from "@/lib/behavioral/campaign";
+import type { ChannelStat, CtaStat, OutboundStat, PageStat, ReturnVisitStat } from "@/lib/behavioral/campaign";
 
 /**
  * The native, no-setup analytics option — reads the same tracking snippet
  * already installed for Heatmaps/Funnel/Forms, so there's nothing to
- * connect. Answers the campaign-quality questions GA4 answers, from the
- * same first-party data, with no external account required.
+ * connect. Site-wide: the same snippet tag can go on every page of the
+ * site, and every event's `path` field keeps pages distinguishable even
+ * though they all roll up under one connected page's tracking ID. Answers
+ * the campaign-quality questions GA4 answers, from the same first-party
+ * data, with no external account required.
  */
 export function LambdaAnalyticsPanel({
   channels,
   topCtas,
   outboundClicks,
+  topPages,
   returnVisits,
 }: {
   channels: ChannelStat[];
   topCtas: CtaStat[];
   outboundClicks: OutboundStat[];
+  topPages: PageStat[];
   returnVisits: ReturnVisitStat;
 }) {
   return (
@@ -64,6 +69,29 @@ export function LambdaAnalyticsPanel({
               { header: "Form starts", cell: (r) => r.formStarts },
               { header: "Form submits", cell: (r) => r.formSubmits },
               { header: "Conversion rate", cell: (r) => formatPercent(r.conversionRate, 1) },
+            ]}
+          />
+        )}
+      </div>
+
+      <div className="mt-8">
+        <h3 className="font-display text-[15px] font-semibold text-ink">Landing pages</h3>
+        <p className="mt-1 text-[12px] text-ink-soft">
+          Sessions by the page each visitor actually landed on first — install the same snippet
+          tag on every page of the site to see this break out, instead of everything rolling up
+          into a single URL.
+        </p>
+        {topPages.length === 0 ? (
+          <p className="mt-3 text-[12.5px] text-ink-soft">No sessions yet.</p>
+        ) : (
+          <DataTable
+            className="mt-3"
+            keyFor={(r) => r.path}
+            rows={topPages}
+            columns={[
+              { header: "Path", cell: (r) => <span className="break-all">{r.path}</span> },
+              { header: "Sessions", cell: (r) => r.sessions },
+              { header: "Form submits", cell: (r) => r.formSubmits },
             ]}
           />
         )}
