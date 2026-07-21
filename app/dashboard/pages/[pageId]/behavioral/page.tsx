@@ -2,6 +2,8 @@ import Link from "next/link";
 import { getPage } from "@/lib/db/pages";
 import { eventsForPage, eventCountForPage } from "@/lib/db/events";
 import { getPageScreenshot } from "@/lib/db/page-screenshots";
+import { getAnalyticsConnectionMeta, getAnalyticsConnectionSecret } from "@/lib/db/analytics-connections";
+import { fetchGA4Report, type GA4Report } from "@/lib/analytics/ga4";
 import { appBaseUrl } from "@/lib/app-url";
 import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
 import { BehavioralDashboard } from "@/components/dashboard/BehavioralDashboard";
@@ -39,6 +41,19 @@ export default async function BehavioralPage({
   const isDemo = eventCount < REAL_DATA_THRESHOLD;
   const screenshot = await getPageScreenshot(pageId);
   const screenshotUrl = screenshot ? `/api/pages/${pageId}/screenshot` : null;
+
+  const analyticsConnection = await getAnalyticsConnectionMeta(pageId);
+  let analyticsReport: GA4Report | null = null;
+  let analyticsReportError: string | null = null;
+  if (analyticsConnection) {
+    const secret = await getAnalyticsConnectionSecret(pageId);
+    try {
+      if (!secret) throw new Error("Connection not found.");
+      analyticsReport = await fetchGA4Report(secret.property_id, secret.service_account_email, secret.service_account_private_key);
+    } catch (err) {
+      analyticsReportError = err instanceof Error ? err.message : String(err);
+    }
+  }
 
   let data;
   if (isDemo) {
@@ -96,6 +111,9 @@ export default async function BehavioralPage({
           isDemo={isDemo}
           pageId={page.id}
           screenshotUrl={screenshotUrl}
+          analyticsConnection={analyticsConnection}
+          analyticsReport={analyticsReport}
+          analyticsReportError={analyticsReportError}
           initialTab={tab}
         />
       </div>

@@ -10,6 +10,7 @@ const TAB_PARAM: Record<string, string> = {
   funnel: "Funnel",
   forms: "Form Analytics",
   vitals: "Vitals (RUM)",
+  "web-analytics": "Web Analytics",
 };
 
 export default async function BehavioralHub({

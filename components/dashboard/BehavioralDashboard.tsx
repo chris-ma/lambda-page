@@ -5,9 +5,11 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { FunnelChart, type FunnelStage } from "@/components/charts/FunnelChart";
 import { HeatmapGrid } from "@/components/charts/HeatmapGrid";
+import { AnalyticsConnectionPanel } from "@/components/dashboard/AnalyticsConnectionPanel";
 import { DataTable } from "@/components/ui/DataTable";
 import { Tag } from "@/components/ui/Tag";
 import type { FieldStat } from "@/lib/behavioral/aggregate";
+import type { GA4Report } from "@/lib/analytics/ga4";
 import { formatPercent } from "@/lib/utils";
 
 type RumVitals = {
@@ -17,7 +19,7 @@ type RumVitals = {
   inp: { p50: number; p75: number; p95: number };
 };
 
-const TABS = ["Heatmap", "Funnel", "Form Analytics", "Vitals (RUM)"] as const;
+const TABS = ["Heatmap", "Funnel", "Form Analytics", "Vitals (RUM)", "Web Analytics"] as const;
 
 export function BehavioralDashboard({
   funnel,
@@ -29,6 +31,9 @@ export function BehavioralDashboard({
   isDemo,
   pageId,
   screenshotUrl,
+  analyticsConnection,
+  analyticsReport,
+  analyticsReportError,
   initialTab,
 }: {
   funnel: FunnelStage[];
@@ -40,6 +45,9 @@ export function BehavioralDashboard({
   isDemo: boolean;
   pageId: string;
   screenshotUrl: string | null;
+  analyticsConnection: { property_id: string; service_account_email: string } | null;
+  analyticsReport: GA4Report | null;
+  analyticsReportError: string | null;
   initialTab?: string;
 }) {
   const validInitialTab = (TABS as readonly string[]).includes(initialTab ?? "")
@@ -185,6 +193,21 @@ export function BehavioralDashboard({
                 </div>
               ))}
             </div>
+          </div>
+        )}
+
+        {tab === "Web Analytics" && (
+          <div>
+            <p className="mb-4 max-w-[560px] text-[13px] text-ink-soft">
+              Traffic and acquisition data the tracking snippet can&rsquo;t see on its own — sessions,
+              users, channel mix, and top landing pages, read directly from Google Analytics 4.
+            </p>
+            <AnalyticsConnectionPanel
+              pageId={pageId}
+              connection={analyticsConnection}
+              report={analyticsReport}
+              reportError={analyticsReportError}
+            />
           </div>
         )}
       </div>

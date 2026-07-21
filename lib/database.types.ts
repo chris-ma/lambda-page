@@ -83,6 +83,23 @@ export type Database = {
           { foreignKeyName: "page_screenshots_page_id_fkey"; columns: ["page_id"]; isOneToOne: true; referencedRelation: "pages"; referencedColumns: ["id"] },
         ];
       };
+      analytics_connections: {
+        Row: {
+          id: string; page_id: string; provider: string; property_id: string;
+          service_account_email: string; service_account_private_key: string; created_at: string;
+        };
+        Insert: {
+          id?: string; page_id: string; provider?: string; property_id: string;
+          service_account_email: string; service_account_private_key: string; created_at?: string;
+        };
+        Update: {
+          id?: string; page_id?: string; provider?: string; property_id?: string;
+          service_account_email?: string; service_account_private_key?: string; created_at?: string;
+        };
+        Relationships: [
+          { foreignKeyName: "analytics_connections_page_id_fkey"; columns: ["page_id"]; isOneToOne: true; referencedRelation: "pages"; referencedColumns: ["id"] },
+        ];
+      };
       assumption_studies: {
         Row: { id: string; project_id: string; name: string; context: string | null; include_pricing: boolean; price_product_label: string | null; include_gabor_granger: boolean; created_at: string };
         Insert: { id?: string; project_id: string; name: string; context?: string | null; include_pricing?: boolean; price_product_label?: string | null; include_gabor_granger?: boolean; created_at?: string };
