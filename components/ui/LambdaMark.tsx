@@ -1,9 +1,11 @@
 import { cn } from "@/lib/utils";
 
 /**
- * The λ mark — a hatch-filled mustard plaque, never used as a static logo.
+ * The λ mark — a hatch-filled ink-on-paper plaque, never used as a static
+ * logo. Square, not circular — no ring, no mustard; the engraved-plate hatch
+ * texture is the signature detail instead of a color.
  * `badge` is the small recurring mark (nav, footer, function strip).
- * `plate` is the full hero specimen plate with the outer rings + circular caption.
+ * `plate` is the full hero specimen plate with a straight-line caption.
  */
 export function LambdaMark({
   variant = "badge",
@@ -33,25 +35,21 @@ export function LambdaMark({
           >
             <line x1="0" y1="0" x2="0" y2="6" stroke="#171717" strokeWidth="1" opacity="0.4" />
           </pattern>
-          <path
-            id="lp-circle-path"
-            d="M 80,80 m -66,0 a 66,66 0 1,1 132,0 a 66,66 0 1,1 -132,0"
-          />
         </defs>
-        <circle
-          cx="80"
-          cy="80"
-          r="72"
+        <rect
+          x="8"
+          y="8"
+          width="144"
+          height="144"
           fill="none"
           stroke="#171717"
           strokeWidth="1.5"
           strokeDasharray="1 5"
         />
-        <circle cx="80" cy="80" r="60" fill="none" stroke="#171717" strokeWidth="1" />
-        <g style={{ transformOrigin: "80px 80px" }}>
-          <circle cx="80" cy="80" r="46" fill="#D9A441" />
-          <circle cx="80" cy="80" r="46" fill="url(#lp-hatch)" />
-          <circle cx="80" cy="80" r="46" fill="none" stroke="#171717" strokeWidth="2" />
+        <g style={{ transformOrigin: "80px 76px" }}>
+          <rect x="34" y="30" width="92" height="92" fill="#fafafa" />
+          <rect x="34" y="30" width="92" height="92" fill="url(#lp-hatch)" />
+          <rect x="34" y="30" width="92" height="92" fill="none" stroke="#171717" strokeWidth="2" />
           <text
             x="80"
             y="97"
@@ -64,10 +62,16 @@ export function LambdaMark({
             λ
           </text>
         </g>
-        <text fontFamily="var(--font-mono)" fontSize="8.5" letterSpacing="2.5" fill="#171717">
-          <textPath href="#lp-circle-path" startOffset="50%" textAnchor="middle">
-            LANDING PAGE FUNCTION
-          </textPath>
+        <text
+          x="80"
+          y="145"
+          fontFamily="var(--font-mono)"
+          fontSize="8.5"
+          letterSpacing="2.5"
+          fill="#171717"
+          textAnchor="middle"
+        >
+          LANDING PAGE FUNCTION
         </text>
       </svg>
     );
@@ -76,7 +80,7 @@ export function LambdaMark({
   return (
     <div
       className={cn(
-        "hatch-fill inline-flex shrink-0 items-center justify-center rounded-full border-2 border-ink bg-mustard font-display font-bold text-ink transition-transform duration-500 [transition-timing-function:cubic-bezier(.2,.8,.3,1.3)] hover:rotate-180",
+        "hatch-fill inline-flex shrink-0 items-center justify-center border-2 border-ink bg-cream font-display font-bold text-ink transition-transform duration-500 [transition-timing-function:cubic-bezier(.2,.8,.3,1.3)] hover:rotate-180",
         className,
       )}
       style={{ width: size, height: size, fontSize: size * 0.46 }}

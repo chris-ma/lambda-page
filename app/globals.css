@@ -145,3 +145,88 @@ h4 {
 .pulse-circle {
   animation: pulse 1.8s ease-in-out infinite;
 }
+
+/* Closing CTA — a light dot-grid field with two soft, slowly drifting color
+   blobs, replacing the flat terracotta panel. Base stays light so the
+   section's existing ink text/button colors need no rework. */
+.cta-texture {
+  position: relative;
+  background-color: var(--color-cream);
+  background-image: radial-gradient(circle at 1px 1px, rgba(23, 23, 23, 0.16) 1px, transparent 0);
+  background-size: 22px 22px;
+  isolation: isolate;
+}
+.cta-texture::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(480px circle at 18% 25%, rgba(78, 133, 128, 0.22), transparent 60%),
+    radial-gradient(420px circle at 82% 78%, rgba(194, 96, 60, 0.16), transparent 60%);
+  animation: cta-drift 16s ease-in-out infinite alternate;
+}
+@keyframes cta-drift {
+  0% {
+    background-position:
+      0% 0%,
+      0% 0%;
+  }
+  100% {
+    background-position:
+      6% 8%,
+      -6% -8%;
+  }
+}
+
+/* traffic_in — λ — conversion_out strip — a moving diagonal-stripe texture
+   standing in for the flat teal fill, plus small particles that travel the
+   strip left to right to read as "flow" through the function. */
+.flow-texture {
+  position: relative;
+  overflow: hidden;
+  background-image: repeating-linear-gradient(
+    -45deg,
+    rgba(255, 255, 255, 0.14) 0,
+    rgba(255, 255, 255, 0.14) 2px,
+    transparent 2px,
+    transparent 16px
+  );
+  background-size: 200% 200%;
+  animation: flow-scroll 5s linear infinite;
+}
+@keyframes flow-scroll {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 160px 0;
+  }
+}
+.flow-particle {
+  position: absolute;
+  top: 50%;
+  width: 6px;
+  height: 6px;
+  margin-top: -3px;
+  border-radius: 9999px;
+  background: var(--color-cream);
+  box-shadow: 0 0 6px rgba(250, 250, 250, 0.8);
+  animation: flow-particle-travel 3.2s linear infinite;
+}
+@keyframes flow-particle-travel {
+  0% {
+    left: -4%;
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.9;
+  }
+  90% {
+    opacity: 0.9;
+  }
+  100% {
+    left: 104%;
+    opacity: 0;
+  }
+}

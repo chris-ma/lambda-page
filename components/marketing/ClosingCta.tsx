@@ -4,7 +4,7 @@ import { Reveal } from "@/components/ui/Reveal";
 
 export function ClosingCta() {
   return (
-    <section className="border-b-2 border-ink bg-terracotta px-6 py-24 text-center">
+    <section className="cta-texture border-b-2 border-ink px-6 py-24 text-center">
       <Reveal>
         <LambdaMark size={64} className="mx-auto" />
       </Reveal>
