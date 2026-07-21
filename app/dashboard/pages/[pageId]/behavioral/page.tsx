@@ -16,11 +16,21 @@ import {
   computeRageClicks,
 } from "@/lib/behavioral/aggregate";
 import {
+  computeChannelBreakdown,
+  computeTopCtas,
+  computeOutboundClicks,
+  computeReturnVisitRate,
+} from "@/lib/behavioral/campaign";
+import {
   DEMO_FUNNEL,
   DEMO_HEATMAP,
   DEMO_FORM_FIELDS,
   DEMO_RUM_VITALS,
   DEMO_SEGMENTS_DEVICE,
+  DEMO_CHANNELS,
+  DEMO_TOP_CTAS,
+  DEMO_OUTBOUND_CLICKS,
+  DEMO_RETURN_VISIT,
 } from "@/lib/behavioral/demo-seed";
 
 export const dynamic = "force-dynamic";
@@ -64,6 +74,10 @@ export default async function BehavioralPage({
       vitals: DEMO_RUM_VITALS,
       deviceSegments: DEMO_SEGMENTS_DEVICE,
       rageClicks: [] as { selector: string; count: number }[],
+      channels: DEMO_CHANNELS,
+      topCtas: DEMO_TOP_CTAS,
+      outboundClicks: DEMO_OUTBOUND_CLICKS,
+      returnVisits: DEMO_RETURN_VISIT,
     };
   } else {
     const events = await eventsForPage(pageId);
@@ -74,6 +88,10 @@ export default async function BehavioralPage({
       vitals: computeRumVitals(events),
       deviceSegments: segmentSessionCounts(events, "device"),
       rageClicks: computeRageClicks(events),
+      channels: computeChannelBreakdown(events),
+      topCtas: computeTopCtas(events),
+      outboundClicks: computeOutboundClicks(events),
+      returnVisits: computeReturnVisitRate(events),
     };
   }
 

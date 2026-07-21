@@ -6,10 +6,29 @@
   var endpoint = (script.getAttribute("data-endpoint") || "") + "/api/collect";
 
   var SESSION_KEY = "lp_sid_" + trackingId;
+  var isNewSession = !sessionStorage.getItem(SESSION_KEY);
   var sessionId = sessionStorage.getItem(SESSION_KEY);
   if (!sessionId) {
     sessionId = "s_" + Math.random().toString(36).slice(2) + Date.now().toString(36);
     sessionStorage.setItem(SESSION_KEY, sessionId);
+  }
+
+  // ---- return-visit detection (30-day window), Lambda Analytics ----
+  var RETURN_WINDOW_DAYS = 30;
+  var returning = false;
+  if (isNewSession) {
+    try {
+      var firstSeenKey = "lp_first_" + trackingId;
+      var firstSeenRaw = localStorage.getItem(firstSeenKey);
+      if (firstSeenRaw) {
+        var daysSince = (Date.now() - parseInt(firstSeenRaw, 10)) / 86400000;
+        returning = daysSince <= RETURN_WINDOW_DAYS;
+      } else {
+        localStorage.setItem(firstSeenKey, String(Date.now()));
+      }
+    } catch {
+      // localStorage blocked (private browsing, etc.) — return-visit detection just no-ops.
+    }
   }
 
   function device() {
@@ -61,7 +80,17 @@
   });
   window.addEventListener("pagehide", function () { flush(true); });
 
-  send("pageview", {});
+  // ---- campaign/source fields, Lambda Analytics ----
+  var urlParams = new URLSearchParams(location.search);
+  send("pageview", {
+    utm_source: urlParams.get("utm_source") || null,
+    utm_medium: urlParams.get("utm_medium") || null,
+    utm_campaign: urlParams.get("utm_campaign") || null,
+    utm_content: urlParams.get("utm_content") || null,
+    utm_term: urlParams.get("utm_term") || null,
+    referrer: document.referrer || null,
+    returning: returning,
+  });
 
   // ---- click density + rage-click detection ----
   var recentClicks = [];
@@ -74,7 +103,26 @@
       var yPct = (e.pageY - rect.top) / document.documentElement.scrollHeight;
       var selector = el.tagName ? el.tagName.toLowerCase() + (el.id ? "#" + el.id : "") : "unknown";
       send("click", { x: xPct, y: yPct, selector: selector });
-      if (el.closest && el.closest("button,a[href]")) send("funnel_stage", { stage: "cta_click" });
+
+      var ctaEl = el.closest && el.closest("button,a[href]");
+      if (ctaEl) {
+        var ctaSelector = ctaEl.tagName.toLowerCase() + (ctaEl.id ? "#" + ctaEl.id : "");
+        var ctaLabel = (ctaEl.textContent || "").trim().slice(0, 60);
+        send("funnel_stage", { stage: "cta_click", selector: ctaSelector, label: ctaLabel });
+
+        // ---- outbound link click, Lambda Analytics ----
+        var href = ctaEl.getAttribute && ctaEl.getAttribute("href");
+        if (href) {
+          try {
+            var linkHost = new URL(href, location.href).hostname;
+            if (linkHost && linkHost !== location.hostname) {
+              send("outbound_click", { href: href, selector: ctaSelector });
+            }
+          } catch {
+            // Unparseable href (mailto:, javascript:, etc.) — not an outbound link.
+          }
+        }
+      }
 
       var now = Date.now();
       recentClicks = recentClicks.filter(function (c) { return now - c.t < 1200; });

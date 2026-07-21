@@ -1,0 +1,110 @@
+import type { Database } from "@/lib/database.types";
+
+type EventRow = Database["public"]["Tables"]["events"]["Row"];
+
+function sessionFirstPageview(events: EventRow[]): Map<string, EventRow> {
+  const map = new Map<string, EventRow>();
+  for (const e of events) {
+    if (e.type !== "pageview") continue;
+    const existing = map.get(e.session_id);
+    if (!existing || new Date(e.created_at) < new Date(existing.created_at)) map.set(e.session_id, e);
+  }
+  return map;
+}
+
+function channelLabel(pv: EventRow): string {
+  const payload = pv.payload as { utm_source?: string | null; utm_medium?: string | null } | null;
+  if (payload?.utm_source) return payload.utm_medium ? `${payload.utm_source} / ${payload.utm_medium}` : payload.utm_source;
+  return pv.source || "direct";
+}
+
+export type ChannelStat = {
+  channel: string;
+  sessions: number;
+  formStarts: number;
+  formSubmits: number;
+  conversionRate: number;
+};
+
+/**
+ * Sessions grouped by acquisition channel — utm_source/medium when present,
+ * otherwise the referrer-derived `source` the snippet always records — with
+ * form-start and form-submit counts per channel, so traffic quality (not
+ * just volume) is visible per source.
+ */
+export function computeChannelBreakdown(events: EventRow[]): ChannelStat[] {
+  const firstPv = sessionFirstPageview(events);
+  const channelBySession = new Map<string, string>();
+  for (const [sid, pv] of firstPv) channelBySession.set(sid, channelLabel(pv));
+
+  const formStartSessions = new Set<string>();
+  const formSubmitSessions = new Set<string>();
+  for (const e of events) {
+    if (e.type === "form_focus") formStartSessions.add(e.session_id);
+    if (e.type === "funnel_stage" && (e.payload as { stage?: string })?.stage === "form_submit") {
+      formSubmitSessions.add(e.session_id);
+    }
+  }
+
+  const sessionsByChannel = new Map<string, string[]>();
+  for (const [sid, channel] of channelBySession) {
+    if (!sessionsByChannel.has(channel)) sessionsByChannel.set(channel, []);
+    sessionsByChannel.get(channel)!.push(sid);
+  }
+
+  return Array.from(sessionsByChannel.entries())
+    .map(([channel, sids]) => {
+      const sessions = sids.length;
+      const formStarts = sids.filter((s) => formStartSessions.has(s)).length;
+      const formSubmits = sids.filter((s) => formSubmitSessions.has(s)).length;
+      return { channel, sessions, formStarts, formSubmits, conversionRate: sessions > 0 ? formSubmits / sessions : 0 };
+    })
+    .sort((a, b) => b.sessions - a.sessions);
+}
+
+export type CtaStat = { label: string; selector: string; clicks: number };
+
+/** Which specific CTA elements are getting clicked, not just that "a CTA" was clicked. */
+export function computeTopCtas(events: EventRow[]): CtaStat[] {
+  const counts = new Map<string, CtaStat>();
+  for (const e of events) {
+    if (e.type !== "funnel_stage") continue;
+    const payload = e.payload as { stage?: string; selector?: string; label?: string };
+    if (payload.stage !== "cta_click") continue;
+    const key = payload.selector ?? "unknown";
+    const existing = counts.get(key);
+    if (existing) existing.clicks++;
+    else counts.set(key, { label: payload.label || key, selector: key, clicks: 1 });
+  }
+  return Array.from(counts.values())
+    .sort((a, b) => b.clicks - a.clicks)
+    .slice(0, 10);
+}
+
+export type OutboundStat = { href: string; clicks: number };
+
+export function computeOutboundClicks(events: EventRow[]): OutboundStat[] {
+  const counts = new Map<string, number>();
+  for (const e of events) {
+    if (e.type !== "outbound_click") continue;
+    const href = (e.payload as { href?: string })?.href ?? "unknown";
+    counts.set(href, (counts.get(href) ?? 0) + 1);
+  }
+  return Array.from(counts.entries())
+    .map(([href, clicks]) => ({ href, clicks }))
+    .sort((a, b) => b.clicks - a.clicks)
+    .slice(0, 10);
+}
+
+export type ReturnVisitStat = { returning: number; total: number; rate: number };
+
+/** Share of sessions that are a return visit within the snippet's 30-day window. */
+export function computeReturnVisitRate(events: EventRow[]): ReturnVisitStat {
+  const firstPv = sessionFirstPageview(events);
+  let returning = 0;
+  for (const pv of firstPv.values()) {
+    if ((pv.payload as { returning?: boolean })?.returning) returning++;
+  }
+  const total = firstPv.size;
+  return { returning, total, rate: total > 0 ? returning / total : 0 };
+}

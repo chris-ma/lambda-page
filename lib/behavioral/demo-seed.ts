@@ -1,4 +1,5 @@
 import type { FieldStat } from "./aggregate";
+import type { ChannelStat, CtaStat, OutboundStat, ReturnVisitStat } from "./campaign";
 
 /** Deterministic placeholder data shown until a page has real snippet traffic. Always labeled DEMO DATA in the UI. */
 export const DEMO_FUNNEL = [
@@ -40,3 +41,26 @@ export const DEMO_SEGMENTS_DEVICE = [
   { label: "desktop", count: 341 },
   { label: "tablet", count: 47 },
 ];
+
+export const DEMO_CHANNELS: ChannelStat[] = [
+  { channel: "google / cpc", sessions: 412, formStarts: 180, formSubmits: 61, conversionRate: 0.148 },
+  { channel: "linkedin / paid", sessions: 268, formStarts: 96, formSubmits: 19, conversionRate: 0.071 },
+  { channel: "direct", sessions: 190, formStarts: 71, formSubmits: 28, conversionRate: 0.147 },
+  { channel: "google / organic", sessions: 130, formStarts: 40, formSubmits: 16, conversionRate: 0.123 },
+  { channel: "newsletter / email", sessions: 74, formStarts: 38, formSubmits: 22, conversionRate: 0.297 },
+];
+
+export const DEMO_TOP_CTAS: CtaStat[] = [
+  { label: "Run a free diagnostic", selector: "a#hero-cta", clicks: 214 },
+  { label: "See a sample report", selector: "a#sample-report", clicks: 96 },
+  { label: "Sign up", selector: "button#signup", clicks: 71 },
+  { label: "Book a demo", selector: "a#book-demo", clicks: 44 },
+];
+
+export const DEMO_OUTBOUND_CLICKS: OutboundStat[] = [
+  { href: "https://calendly.com/lambda-page/demo", clicks: 38 },
+  { href: "https://twitter.com/lambdapage", clicks: 12 },
+  { href: "https://linkedin.com/company/lambda-page", clicks: 7 },
+];
+
+export const DEMO_RETURN_VISIT: ReturnVisitStat = { returning: 214, total: 1000, rate: 0.214 };

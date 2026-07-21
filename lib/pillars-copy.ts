@@ -16,7 +16,7 @@ export const PILLAR_COPY: Record<
   2: {
     tagline: "Find out what real visitors do, not what you assumed they'd do",
     why: "Structural checks catch what's broken in theory. They can't tell you that visitors abandon a specific form field, or that a hero section nobody scrolls past is where the real message lives. That only shows up once the page is live and instrumented — and only if what you're measuring reaches statistical significance instead of a hunch dressed up as data.",
-    what: "Behavioral Analysis turns real visitor activity into hard numbers once a page is live: click density and rage-clicks, stage-to-stage funnel drop-off segmented by device and source, field-level form abandonment, real-user Core Web Vitals, and — read directly from a connected Google Analytics 4 property — sessions, users, channel mix, and top landing pages.",
+    what: "Behavioral Analysis turns real visitor activity into hard numbers once a page is live: click density and rage-clicks, stage-to-stage funnel drop-off segmented by device and source, field-level form abandonment, real-user Core Web Vitals, and campaign/channel quality — either built in via Lambda Analytics or read from a connected Google Analytics 4 property.",
   },
   3: {
     tagline: "Behavioral data shows where; this shows why",

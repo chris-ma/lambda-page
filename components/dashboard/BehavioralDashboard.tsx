@@ -6,10 +6,12 @@ import { cn } from "@/lib/utils";
 import { FunnelChart, type FunnelStage } from "@/components/charts/FunnelChart";
 import { HeatmapGrid } from "@/components/charts/HeatmapGrid";
 import { AnalyticsConnectionPanel } from "@/components/dashboard/AnalyticsConnectionPanel";
+import { LambdaAnalyticsPanel } from "@/components/dashboard/LambdaAnalyticsPanel";
 import { DataTable } from "@/components/ui/DataTable";
 import { Tag } from "@/components/ui/Tag";
 import { ToolExplainer } from "@/components/ui/ToolExplainer";
 import type { FieldStat } from "@/lib/behavioral/aggregate";
+import type { ChannelStat, CtaStat, OutboundStat, ReturnVisitStat } from "@/lib/behavioral/campaign";
 import type { GA4Report } from "@/lib/analytics/ga4";
 import { formatPercent } from "@/lib/utils";
 
@@ -20,7 +22,11 @@ type RumVitals = {
   inp: { p50: number; p75: number; p95: number };
 };
 
-const TABS = ["Heatmap", "Funnel", "Form Analytics", "Vitals (RUM)", "Web Analytics"] as const;
+const TABS = ["Heatmap", "Funnel", "Form Analytics", "Vitals (RUM)", "Analytics"] as const;
+const ANALYTICS_SOURCES = [
+  { id: "lambda", label: "Lambda Analytics" },
+  { id: "ga4", label: "Google Analytics 4" },
+] as const;
 
 export function BehavioralDashboard({
   funnel,
@@ -35,6 +41,10 @@ export function BehavioralDashboard({
   analyticsConnection,
   analyticsReport,
   analyticsReportError,
+  channels,
+  topCtas,
+  outboundClicks,
+  returnVisits,
   initialTab,
 }: {
   funnel: FunnelStage[];
@@ -49,12 +59,19 @@ export function BehavioralDashboard({
   analyticsConnection: { property_id: string; service_account_email: string } | null;
   analyticsReport: GA4Report | null;
   analyticsReportError: string | null;
+  channels: ChannelStat[];
+  topCtas: CtaStat[];
+  outboundClicks: OutboundStat[];
+  returnVisits: ReturnVisitStat;
   initialTab?: string;
 }) {
   const validInitialTab = (TABS as readonly string[]).includes(initialTab ?? "")
     ? (initialTab as (typeof TABS)[number])
     : "Heatmap";
   const [tab, setTab] = useState<(typeof TABS)[number]>(validInitialTab);
+  // Lambda Analytics needs no setup (same snippet already installed for the
+  // rest of this dashboard), so it's the default; GA4 is opt-in.
+  const [analyticsSource, setAnalyticsSource] = useState<(typeof ANALYTICS_SOURCES)[number]["id"]>(analyticsConnection ? "ga4" : "lambda");
   const router = useRouter();
   const [capturing, setCapturing] = useState(false);
   const [captureError, setCaptureError] = useState<string | null>(null);
@@ -216,25 +233,64 @@ export function BehavioralDashboard({
           </div>
         )}
 
-        {tab === "Web Analytics" && (
+        {tab === "Analytics" && (
           <div>
-            <p className="mb-4 max-w-[560px] text-[13px] text-ink-soft">
-              Traffic and acquisition data the tracking snippet can&rsquo;t see on its own — sessions,
-              users, channel mix, and top landing pages, read directly from Google Analytics 4.
+            <p className="mb-4 max-w-[640px] text-[13px] text-ink-soft">
+              Acquisition and campaign quality — which channel sends visitors, and which channel
+              sends visitors who actually convert. Two sources to choose from: Lambda Analytics,
+              built into the snippet already installed on this page, or a connected Google
+              Analytics 4 property.
             </p>
-            <ToolExplainer
-              what="Sessions, users, channel mix, and top landing pages — read directly from a connected Google Analytics 4 property for the trailing 28 days."
-              problem="The tracking snippet sees behavior on the page itself, but it has no way to see where visitors came from or how many showed up in the first place — that acquisition picture lives in GA4, and switching tools to check it breaks the single-dashboard view everything else here gives you."
-              insight="Connects to GA4 read-only via a scoped service account and surfaces the acquisition numbers alongside the on-page behavioral data, so traffic source and on-page behavior sit in one place instead of two disconnected dashboards."
-            />
-            <div className="mt-6">
-              <AnalyticsConnectionPanel
-                pageId={pageId}
-                connection={analyticsConnection}
-                report={analyticsReport}
-                reportError={analyticsReportError}
-              />
+
+            <div className="flex gap-2">
+              {ANALYTICS_SOURCES.map((src) => (
+                <button
+                  key={src.id}
+                  type="button"
+                  onClick={() => setAnalyticsSource(src.id)}
+                  className={cn(
+                    "border-2 border-ink px-3 py-2 font-mono text-[10.5px] uppercase tracking-wide",
+                    analyticsSource === src.id ? "bg-ink text-paper" : "bg-paper text-ink-soft",
+                  )}
+                >
+                  {src.label}
+                </button>
+              ))}
             </div>
+
+            {analyticsSource === "lambda" ? (
+              <div>
+                <ToolExplainer
+                  what="Campaign and channel quality, read from the same first-party tracking snippet already installed for this page — UTM source/medium, top CTAs, outbound clicks, and return-visit rate, with no separate account to connect."
+                  problem="It's easy to know how much traffic a campaign sends and much harder to know whether that traffic is any good — whether visitors from LinkedIn convert as well as visitors from a Google ad, or just add to the session count."
+                  insight="Every session's first pageview carries its UTM/referrer source through to whether that session started and completed a form, so channels are ranked by conversion rate, not just volume — and because it's the same snippet as the rest of this pillar, there's nothing extra to install."
+                />
+                <div className="mt-6">
+                  <LambdaAnalyticsPanel
+                    channels={channels}
+                    topCtas={topCtas}
+                    outboundClicks={outboundClicks}
+                    returnVisits={returnVisits}
+                  />
+                </div>
+              </div>
+            ) : (
+              <div>
+                <ToolExplainer
+                  what="Sessions, users, channel mix, and top landing pages — read directly from a connected Google Analytics 4 property for the trailing 28 days."
+                  problem="The tracking snippet sees behavior on the page itself, but it has no way to see where visitors came from or how many showed up in the first place — that acquisition picture lives in GA4, and switching tools to check it breaks the single-dashboard view everything else here gives you."
+                  insight="Connects to GA4 read-only via a scoped service account and surfaces the acquisition numbers alongside the on-page behavioral data, so traffic source and on-page behavior sit in one place instead of two disconnected dashboards."
+                />
+                <div className="mt-6">
+                  <AnalyticsConnectionPanel
+                    pageId={pageId}
+                    connection={analyticsConnection}
+                    report={analyticsReport}
+                    reportError={analyticsReportError}
+                  />
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>
