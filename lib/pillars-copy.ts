@@ -15,12 +15,12 @@ export const PILLAR_COPY: Record<
   },
   2: {
     tagline: "Find out what real visitors do, not what you assumed they'd do",
-    why: "Structural checks catch what's broken in theory. They can't tell you that visitors abandon a specific form field, that a hero section nobody scrolls past is where the real message lives, or that Variant B actually outperforms Variant A once you run the numbers instead of eyeballing them. That only shows up once the page is live and instrumented — and only if what you're measuring reaches statistical significance instead of a hunch dressed up as data.",
-    what: "Behavioral Analysis turns real visitor activity into hard numbers once a page is live: click density and rage-clicks, stage-to-stage funnel drop-off segmented by device and source, field-level form abandonment, real-user Core Web Vitals, and A/B tests with a proper two-proportion significance check — not just \"which number is bigger.\"",
+    why: "Structural checks catch what's broken in theory. They can't tell you that visitors abandon a specific form field, or that a hero section nobody scrolls past is where the real message lives. That only shows up once the page is live and instrumented — and only if what you're measuring reaches statistical significance instead of a hunch dressed up as data.",
+    what: "Behavioral Analysis turns real visitor activity into hard numbers once a page is live: click density and rage-clicks, stage-to-stage funnel drop-off segmented by device and source, field-level form abandonment, and real-user Core Web Vitals.",
   },
   3: {
     tagline: "Behavioral data shows where; this shows why",
     why: "A funnel chart can tell you that 40% of visitors drop off at step three. It can't tell you whether that's because the copy confused them, the layout hid the next step, or the price surprised them. Answering \"why\" requires watching or asking real people directly — attention data, task-based sessions, structured comprehension tests — which is a fundamentally different (and slower, more expensive) kind of measurement than an analytics pipeline.",
-    what: "User Testing is the qualitative counterpart to Pillar 02: eye tracking for attention sequence, five-second comprehension tests for first-impression recall, task-based usability testing with a real per-participant activity log, card sorting plus tree testing for how people categorize your content, and pricing strategy — Van Westendorp price sensitivity and Gabor-Granger demand curves from a real respondent panel.",
+    what: "User Testing is the qualitative counterpart to Pillar 02: eye tracking for attention sequence, five-second comprehension tests for first-impression recall, task-based usability testing with a real per-participant activity log, card sorting plus tree testing for how people categorize your content, pricing strategy — Van Westendorp price sensitivity and Gabor-Granger demand curves from a real respondent panel — and A/B tests with a proper two-proportion significance check, not just \"which number is bigger.\"",
   },
 };

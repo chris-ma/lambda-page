@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { getPage } from "@/lib/db/pages";
 import { eventsForPage, eventCountForPage } from "@/lib/db/events";
-import { listABTestsForPage } from "@/lib/db/ab";
 import { getPageScreenshot } from "@/lib/db/page-screenshots";
 import { appBaseUrl } from "@/lib/app-url";
 import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
@@ -38,7 +37,6 @@ export default async function BehavioralPage({
   const page = await getPage(pageId);
   const eventCount = await eventCountForPage(pageId);
   const isDemo = eventCount < REAL_DATA_THRESHOLD;
-  const abTests = await listABTestsForPage(pageId);
   const screenshot = await getPageScreenshot(pageId);
   const screenshotUrl = screenshot ? `/api/pages/${pageId}/screenshot` : null;
 
@@ -77,8 +75,8 @@ export default async function BehavioralPage({
       <EyebrowLabel className="mt-3">Pillar 02</EyebrowLabel>
       <h1 className="mt-2 font-display text-[28px] font-semibold text-ink">Behavioral Analysis</h1>
       <p className="mt-2 max-w-[620px] text-[13.5px] text-ink-soft">
-        Heatmaps and session replay, funnel drop-off, field-level form analytics, real-user Core
-        Web Vitals, and A/B testing — requires the tracking snippet running on the live page.
+        Heatmaps and session replay, funnel drop-off, field-level form analytics, and real-user
+        Core Web Vitals — requires the tracking snippet running on the live page.
       </p>
 
       <div className="mt-6 border-2 border-ink bg-cream p-5">
@@ -98,7 +96,6 @@ export default async function BehavioralPage({
           isDemo={isDemo}
           pageId={page.id}
           screenshotUrl={screenshotUrl}
-          abTests={abTests}
           initialTab={tab}
         />
       </div>

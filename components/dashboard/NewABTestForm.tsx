@@ -31,7 +31,7 @@ export function NewABTestForm({ pageId }: { pageId: string }) {
       return;
     }
     const { test } = await res.json();
-    router.push(`/dashboard/pages/${pageId}/behavioral/ab/${test.id}`);
+    router.push(`/dashboard/pages/${pageId}/ab-testing/${test.id}`);
   }
 
   return (

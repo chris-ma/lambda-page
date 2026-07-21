@@ -66,7 +66,6 @@ export const PILLARS_NAV: PillarNavItem[] = [
       { label: "Heatmaps & Session Replay", description: "Click density, scroll depth, rage-clicks.", href: "/dashboard/behavioral?tab=heatmap" },
       { label: "Funnel Analytics", description: "Stage-to-stage drop-off, segmented by device and source.", href: "/dashboard/behavioral?tab=funnel" },
       { label: "Form Field Analytics", description: "Field-level abandonment, time-per-field, validation errors.", href: "/dashboard/behavioral?tab=forms" },
-      { label: "A/B Testing", description: "Conversion rate per variant with real significance testing.", href: "/dashboard/behavioral?tab=ab" },
     ],
   },
   {
@@ -79,6 +78,7 @@ export const PILLARS_NAV: PillarNavItem[] = [
       { label: "Usability Testing", description: "A task, a unique participant link, and a real activity log of what they did.", href: "/dashboard/usability-testing" },
       { label: "Card Sorting & Tree Testing", description: "How people group your content, and whether they can find it in your nav.", href: "/dashboard/card-sorting" },
       { label: "Pricing Strategy", description: "Van Westendorp price sensitivity, Gabor-Granger demand curves, and pricing assumptions — a real interview link, real panel.", href: "/dashboard/pricing-strategy" },
+      { label: "A/B Testing", description: "Conversion rate per variant with real significance testing.", href: "/dashboard/ab-testing" },
     ],
   },
 ];

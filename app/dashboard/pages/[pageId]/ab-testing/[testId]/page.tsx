@@ -16,10 +16,10 @@ export default async function ABTestResults({ params }: { params: Promise<{ page
 
   return (
     <div>
-      <Link href={`/dashboard/pages/${page.id}/behavioral`} className="font-mono text-[11px] text-ink-soft">
+      <Link href={`/dashboard/pages/${page.id}/ab-testing`} className="font-mono text-[11px] text-ink-soft">
         ← {page.url}
       </Link>
-      <EyebrowLabel className="mt-3">Pillar 02 — A/B Testing</EyebrowLabel>
+      <EyebrowLabel className="mt-3">Pillar 03 — A/B Testing</EyebrowLabel>
       <h1 className="mt-2 font-display text-[26px] font-semibold text-ink">{test.name}</h1>
       {test.hypothesis && <p className="mt-2 max-w-[600px] text-[13.5px] text-ink-soft">&ldquo;{test.hypothesis}&rdquo;</p>}
 

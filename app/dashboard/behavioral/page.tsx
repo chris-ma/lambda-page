@@ -10,7 +10,6 @@ const TAB_PARAM: Record<string, string> = {
   funnel: "Funnel",
   forms: "Form Analytics",
   vitals: "Vitals (RUM)",
-  ab: "A/B Testing",
 };
 
 export default async function BehavioralHub({
@@ -27,9 +26,9 @@ export default async function BehavioralHub({
       <EyebrowLabel>Pillar 02</EyebrowLabel>
       <h1 className="mt-3 font-display text-[28px] font-semibold text-ink">Behavioral Analysis</h1>
       <p className="mt-2 max-w-[640px] text-[13.5px] text-ink-soft">
-        Heatmaps &amp; session replay, funnel drop-off, form field analytics, real-user vitals, and
-        A/B testing all live on one dashboard per connected page — install the tracking snippet
-        there and everything below starts filling in from real traffic.
+        Heatmaps &amp; session replay, funnel drop-off, form field analytics, and real-user vitals
+        all live on one dashboard per connected page — install the tracking snippet there and
+        everything below starts filling in from real traffic.
       </p>
 
       {pages.length === 0 ? (

@@ -9,8 +9,8 @@ import { cn } from "@/lib/utils";
 const DESCRIPTIONS: Record<number, string> = {
   0: "Test the concept before a designer touches it. Message and headline variants get checked for comprehension against a real panel, competitor positioning gets mapped automatically, and wireframes get the same scrutiny a finished page would.",
   1: "Runs against the page itself — no live traffic required. Covers design and content, SEO, AEO/GEO, and lab-based Core Web Vitals. This is the pillar that runs on every deploy and can block a launch before a single visitor sees the problem.",
-  2: "Once the page is live, this is what real visitors are actually doing on it: heatmaps and session replay, funnel drop-off by stage, field-level form analytics, real-user Core Web Vitals, and A/B testing with proper statistical significance.",
-  3: "The “why” behind the numbers. Eye tracking, moderated and unmoderated usability sessions, five-second comprehension tests, card sorting, and pricing strategy testing (Van Westendorp and Gabor-Granger) for the questions a heatmap can't answer.",
+  2: "Once the page is live, this is what real visitors are actually doing on it: heatmaps and session replay, funnel drop-off by stage, field-level form analytics, and real-user Core Web Vitals.",
+  3: "The “why” behind the numbers. Eye tracking, moderated and unmoderated usability sessions, five-second comprehension tests, card sorting, pricing strategy testing (Van Westendorp and Gabor-Granger), and A/B testing with proper statistical significance.",
 };
 
 export function Pillars() {

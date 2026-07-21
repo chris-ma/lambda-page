@@ -1,20 +1,14 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/Button";
-import { Card } from "@/components/ui/Card";
 import { FunnelChart, type FunnelStage } from "@/components/charts/FunnelChart";
 import { HeatmapGrid } from "@/components/charts/HeatmapGrid";
 import { DataTable } from "@/components/ui/DataTable";
 import { Tag } from "@/components/ui/Tag";
 import type { FieldStat } from "@/lib/behavioral/aggregate";
 import { formatPercent } from "@/lib/utils";
-import type { Database } from "@/lib/database.types";
-
-type ABTest = Database["public"]["Tables"]["ab_tests"]["Row"];
 
 type RumVitals = {
   sampleSize: number;
@@ -23,7 +17,7 @@ type RumVitals = {
   inp: { p50: number; p75: number; p95: number };
 };
 
-const TABS = ["Heatmap", "Funnel", "Form Analytics", "Vitals (RUM)", "A/B Testing"] as const;
+const TABS = ["Heatmap", "Funnel", "Form Analytics", "Vitals (RUM)"] as const;
 
 export function BehavioralDashboard({
   funnel,
@@ -35,7 +29,6 @@ export function BehavioralDashboard({
   isDemo,
   pageId,
   screenshotUrl,
-  abTests,
   initialTab,
 }: {
   funnel: FunnelStage[];
@@ -47,7 +40,6 @@ export function BehavioralDashboard({
   isDemo: boolean;
   pageId: string;
   screenshotUrl: string | null;
-  abTests: ABTest[];
   initialTab?: string;
 }) {
   const validInitialTab = (TABS as readonly string[]).includes(initialTab ?? "")
@@ -193,40 +185,6 @@ export function BehavioralDashboard({
                 </div>
               ))}
             </div>
-          </div>
-        )}
-
-        {tab === "A/B Testing" && (
-          <div>
-            <div className="flex flex-wrap items-center justify-between gap-4">
-              <p className="max-w-[560px] text-[13px] text-ink-soft">
-                Cookie/session-consistent variant assignment plus a two-proportion z-test — real
-                significance testing, not &ldquo;the variant looks like it&rsquo;s winning.&rdquo;
-              </p>
-              <Button href={`/dashboard/pages/${pageId}/behavioral/ab/new`} className="px-4 py-2 text-[12px]">
-                New A/B test
-              </Button>
-            </div>
-
-            {abTests.length === 0 ? (
-              <Card hover={false} className="mt-6 border-dashed p-8 text-center text-[13px] text-ink-soft">
-                No A/B tests yet for this page. Create one, then call{" "}
-                <code className="font-mono text-[11.5px]">window.lambdaPage.abAssign(testId, cb)</code>{" "}
-                and <code className="font-mono text-[11.5px]">window.lambdaPage.abConvert(testId)</code>{" "}
-                from the live page.
-              </Card>
-            ) : (
-              <div className="mt-6 grid gap-3 sm:grid-cols-2">
-                {abTests.map((t) => (
-                  <Link key={t.id} href={`/dashboard/pages/${pageId}/behavioral/ab/${t.id}`}>
-                    <Card className="p-5">
-                      <span className="font-body text-[13.5px] text-ink">{t.name}</span>
-                      <p className="mt-1.5 font-mono text-[10.5px] text-ink-soft">{new Date(t.created_at).toLocaleString()}</p>
-                    </Card>
-                  </Link>
-                ))}
-              </div>
-            )}
           </div>
         )}
       </div>
