@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getPage } from "@/lib/db/pages";
 import { eventsForPage, eventCountForPage } from "@/lib/db/events";
 import { listABTestsForPage } from "@/lib/db/ab";
+import { getPageScreenshot } from "@/lib/db/page-screenshots";
 import { appBaseUrl } from "@/lib/app-url";
 import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
 import { BehavioralDashboard } from "@/components/dashboard/BehavioralDashboard";
@@ -38,6 +39,8 @@ export default async function BehavioralPage({
   const eventCount = await eventCountForPage(pageId);
   const isDemo = eventCount < REAL_DATA_THRESHOLD;
   const abTests = await listABTestsForPage(pageId);
+  const screenshot = await getPageScreenshot(pageId);
+  const screenshotUrl = screenshot ? `/api/pages/${pageId}/screenshot` : null;
 
   let data;
   if (isDemo) {
@@ -90,7 +93,14 @@ export default async function BehavioralPage({
       </div>
 
       <div className="mt-10">
-        <BehavioralDashboard {...data} isDemo={isDemo} pageId={page.id} abTests={abTests} initialTab={tab} />
+        <BehavioralDashboard
+          {...data}
+          isDemo={isDemo}
+          pageId={page.id}
+          screenshotUrl={screenshotUrl}
+          abTests={abTests}
+          initialTab={tab}
+        />
       </div>
     </div>
   );

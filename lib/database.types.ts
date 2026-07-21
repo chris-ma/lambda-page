@@ -66,6 +66,23 @@ export type Database = {
           { foreignKeyName: "eye_page_screenshots_page_id_fkey"; columns: ["page_id"]; isOneToOne: false; referencedRelation: "eye_pages"; referencedColumns: ["id"] },
         ];
       };
+      page_screenshots: {
+        Row: {
+          id: string; page_id: string; image: Buffer; image_mime: string;
+          viewport_width: number | null; page_height: number | null; captured_at: string;
+        };
+        Insert: {
+          id?: string; page_id: string; image: Buffer; image_mime?: string;
+          viewport_width?: number | null; page_height?: number | null; captured_at?: string;
+        };
+        Update: {
+          id?: string; page_id?: string; image?: Buffer; image_mime?: string;
+          viewport_width?: number | null; page_height?: number | null; captured_at?: string;
+        };
+        Relationships: [
+          { foreignKeyName: "page_screenshots_page_id_fkey"; columns: ["page_id"]; isOneToOne: true; referencedRelation: "pages"; referencedColumns: ["id"] },
+        ];
+      };
       assumption_studies: {
         Row: { id: string; project_id: string; name: string; context: string | null; include_pricing: boolean; price_product_label: string | null; include_gabor_granger: boolean; created_at: string };
         Insert: { id?: string; project_id: string; name: string; context?: string | null; include_pricing?: boolean; price_product_label?: string | null; include_gabor_granger?: boolean; created_at?: string };

@@ -34,6 +34,7 @@ const nextConfig: NextConfig = {
     // picomatch route-glob keys — an unescaped [pageId] is a character class,
     // not a literal, and silently fails to match this route at all.
     "/api/eye-pages/\\[pageId\\]/capture-screenshot": playwrightTrace,
+    "/api/pages/\\[pageId\\]/capture-screenshot": playwrightTrace,
   },
   async headers() {
     return [

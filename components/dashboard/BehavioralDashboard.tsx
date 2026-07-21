@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
@@ -33,6 +34,7 @@ export function BehavioralDashboard({
   rageClicks,
   isDemo,
   pageId,
+  screenshotUrl,
   abTests,
   initialTab,
 }: {
@@ -44,6 +46,7 @@ export function BehavioralDashboard({
   rageClicks: { selector: string; count: number }[];
   isDemo: boolean;
   pageId: string;
+  screenshotUrl: string | null;
   abTests: ABTest[];
   initialTab?: string;
 }) {
@@ -51,6 +54,25 @@ export function BehavioralDashboard({
     ? (initialTab as (typeof TABS)[number])
     : "Heatmap";
   const [tab, setTab] = useState<(typeof TABS)[number]>(validInitialTab);
+  const router = useRouter();
+  const [capturing, setCapturing] = useState(false);
+  const [captureError, setCaptureError] = useState<string | null>(null);
+
+  async function handleCapture() {
+    setCapturing(true);
+    setCaptureError(null);
+    try {
+      const res = await fetch(`/api/pages/${pageId}/capture-screenshot`, { method: "POST" });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        setCaptureError(body.error ?? "Couldn't capture a screenshot.");
+        return;
+      }
+      router.refresh();
+    } finally {
+      setCapturing(false);
+    }
+  }
 
   return (
     <div>
@@ -73,11 +95,23 @@ export function BehavioralDashboard({
       <div className="mt-8">
         {tab === "Heatmap" && (
           <div>
-            <p className="mb-4 text-[13px] text-ink-soft">
-              Click density across the page, bucketed into a 20×12 grid. Teal ramp only — never
-              red-for-hot, since brick is reserved for a failing status elsewhere in this system.
-            </p>
-            <HeatmapGrid buckets={heatmap} cols={20} />
+            <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
+              <p className="max-w-[520px] text-[13px] text-ink-soft">
+                Click density across the page, bucketed into a 20×12 grid and shown in context on
+                a screenshot. Teal ramp only — never red-for-hot, since brick is reserved for a
+                failing status elsewhere in this system.
+              </p>
+              <button
+                type="button"
+                onClick={handleCapture}
+                disabled={capturing}
+                className="shrink-0 border-2 border-ink bg-paper px-3 py-2 font-mono text-[10.5px] uppercase tracking-wide text-ink-soft hover:text-ink"
+              >
+                {capturing ? "Capturing…" : screenshotUrl ? "Re-capture screenshot" : "Capture screenshot"}
+              </button>
+            </div>
+            {captureError && <p className="mb-3 font-mono text-[11px] text-brick">{captureError}</p>}
+            <HeatmapGrid buckets={heatmap} cols={20} screenshotUrl={screenshotUrl} />
             {rageClicks.length > 0 && (
               <div className="mt-8">
                 <h3 className="font-display text-[15px] font-semibold text-ink">Rage clicks</h3>
