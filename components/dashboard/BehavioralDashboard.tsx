@@ -8,6 +8,7 @@ import { HeatmapGrid } from "@/components/charts/HeatmapGrid";
 import { AnalyticsConnectionPanel } from "@/components/dashboard/AnalyticsConnectionPanel";
 import { DataTable } from "@/components/ui/DataTable";
 import { Tag } from "@/components/ui/Tag";
+import { ToolExplainer } from "@/components/ui/ToolExplainer";
 import type { FieldStat } from "@/lib/behavioral/aggregate";
 import type { GA4Report } from "@/lib/analytics/ga4";
 import { formatPercent } from "@/lib/utils";
@@ -110,8 +111,15 @@ export function BehavioralDashboard({
                 {capturing ? "Capturing…" : screenshotUrl ? "Re-capture screenshot" : "Capture screenshot"}
               </button>
             </div>
-            {captureError && <p className="mb-3 font-mono text-[11px] text-brick">{captureError}</p>}
-            <HeatmapGrid buckets={heatmap} cols={20} screenshotUrl={screenshotUrl} />
+            <ToolExplainer
+              what="Click density across the live page, overlaid on a real screenshot so you can see exactly where clicks land in context — plus rage-click detection."
+              problem="Without this, you're guessing whether visitors are actually clicking your CTA, ignoring a whole section, or clicking on something that looks interactive but isn't — a guess that's usually wrong in a way that only shows up once conversion numbers are already bad."
+              insight="Real click coordinates from the tracking snippet get bucketed onto an actual screenshot of the page, so a hot spot means something concrete you can point to, not an abstract chart disconnected from what the page looks like."
+            />
+            {captureError && <p className="mt-4 mb-3 font-mono text-[11px] text-brick">{captureError}</p>}
+            <div className="mt-6">
+              <HeatmapGrid buckets={heatmap} cols={20} screenshotUrl={screenshotUrl} />
+            </div>
             {rageClicks.length > 0 && (
               <div className="mt-8">
                 <h3 className="font-display text-[15px] font-semibold text-ink">Rage clicks</h3>
@@ -134,7 +142,12 @@ export function BehavioralDashboard({
             <p className="mb-4 text-[13px] text-ink-soft">
               Session count per stage; drop-off = 1 − (count[N+1] / count[N]).
             </p>
-            <div className="max-w-[640px]">
+            <ToolExplainer
+              what="Stage-to-stage drop-off through page_view → scroll_50% → cta_click → form_submit, segmented by device and source."
+              problem="A single blended conversion rate tells you something is wrong without saying what — and averaging desktop and mobile, or paid and organic, together can hide a device- or channel-specific collapse that's actually the whole problem."
+              insight="Drop-off is computed directly as 1 − (count at next stage / count at this stage) and always shown segmented, so the exact stage — and the exact segment — losing people is visible instead of buried in an aggregate number."
+            />
+            <div className="mt-6 max-w-[640px]">
               <FunnelChart stages={funnel} />
             </div>
             <div className="mt-8">
@@ -162,16 +175,23 @@ export function BehavioralDashboard({
               Field-level abandonment — last field focused before a session goes idle or navigates
               away without submitting.
             </p>
-            <DataTable
-              keyFor={(r) => r.field}
-              rows={formFields}
-              columns={[
-                { header: "Field", cell: (r) => r.field },
-                { header: "Focused", cell: (r) => r.focusCount },
-                { header: "Abandon rate", cell: (r) => <span className={r.abandonRate > 0.3 ? "font-semibold text-brick" : ""}>{formatPercent(r.abandonRate)}</span> },
-                { header: "Validation errors", cell: (r) => r.errorCount },
-              ]}
+            <ToolExplainer
+              what="Field-level abandonment, time-per-field, and validation-error counts — which exact field visitors give up on, not just that the form has a low completion rate."
+              problem="“Form conversion is low” is a symptom, not a diagnosis — without field-level data, fixing it means guessing which field is the friction point, then shipping a change and hoping."
+              insight="Tracks focus/blur/change/validation-error events per field (never the values typed) and reports abandon rate per field directly, so the fix targets the actual field losing people instead of a redesign of the whole form."
             />
+            <div className="mt-6">
+              <DataTable
+                keyFor={(r) => r.field}
+                rows={formFields}
+                columns={[
+                  { header: "Field", cell: (r) => r.field },
+                  { header: "Focused", cell: (r) => r.focusCount },
+                  { header: "Abandon rate", cell: (r) => <span className={r.abandonRate > 0.3 ? "font-semibold text-brick" : ""}>{formatPercent(r.abandonRate)}</span> },
+                  { header: "Validation errors", cell: (r) => r.errorCount },
+                ]}
+              />
+            </div>
           </div>
         )}
 
@@ -202,12 +222,19 @@ export function BehavioralDashboard({
               Traffic and acquisition data the tracking snippet can&rsquo;t see on its own — sessions,
               users, channel mix, and top landing pages, read directly from Google Analytics 4.
             </p>
-            <AnalyticsConnectionPanel
-              pageId={pageId}
-              connection={analyticsConnection}
-              report={analyticsReport}
-              reportError={analyticsReportError}
+            <ToolExplainer
+              what="Sessions, users, channel mix, and top landing pages — read directly from a connected Google Analytics 4 property for the trailing 28 days."
+              problem="The tracking snippet sees behavior on the page itself, but it has no way to see where visitors came from or how many showed up in the first place — that acquisition picture lives in GA4, and switching tools to check it breaks the single-dashboard view everything else here gives you."
+              insight="Connects to GA4 read-only via a scoped service account and surfaces the acquisition numbers alongside the on-page behavioral data, so traffic source and on-page behavior sit in one place instead of two disconnected dashboards."
             />
+            <div className="mt-6">
+              <AnalyticsConnectionPanel
+                pageId={pageId}
+                connection={analyticsConnection}
+                report={analyticsReport}
+                reportError={analyticsReportError}
+              />
+            </div>
           </div>
         )}
       </div>

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { listPages } from "@/lib/db/pages";
 import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
+import { ToolExplainer } from "@/components/ui/ToolExplainer";
 import { Card } from "@/components/ui/Card";
 
 export const dynamic = "force-dynamic";
@@ -17,6 +18,11 @@ export default async function VitalsHub() {
         (via Total Blocking Time), Lighthouse performance score, and request count/weight —
         measured on a throttled mobile pass.
       </p>
+      <ToolExplainer
+        what="Lab-based Core Web Vitals and every technical loading stat behind them — LCP, CLS, INP, Lighthouse performance score, and request count/weight — measured on a throttled mobile pass."
+        problem="Load performance is one of the most measurable things about a page, but it's also one of the easiest to lose track of — a single unoptimized hero image or a blocking third-party script can quietly cost conversions long before anyone thinks to check, because it feels fine on a fast office connection."
+        insight="Runs a real Lighthouse audit against a throttled mobile connection — the conditions a meaningful share of real visitors are actually on — so the numbers reflect what a genuinely slow-network visitor experiences, not a developer's desktop."
+      />
 
       <section className="mt-10">
         {pages.length === 0 ? (

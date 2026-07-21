@@ -1,12 +1,12 @@
 import { Button } from "@/components/ui/Button";
 import { LambdaMark } from "@/components/ui/LambdaMark";
 import { Reveal } from "@/components/ui/Reveal";
-import { HeroBackgroundVideo } from "@/components/marketing/HeroBackgroundVideo";
+import { HeroInteractiveBackground } from "@/components/marketing/HeroInteractiveBackground";
 
 export function Hero() {
   return (
     <section className="relative overflow-hidden border-b-2 border-ink bg-paper px-6 pt-12 pb-24 md:px-10">
-      <HeroBackgroundVideo />
+      <HeroInteractiveBackground />
       <div className="relative mx-auto max-w-[1120px]">
         <Reveal>
           <div className="flex items-end justify-between gap-6 border-b border-ink/15 pb-4">

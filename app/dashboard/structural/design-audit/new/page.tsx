@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
+import { ToolExplainer } from "@/components/ui/ToolExplainer";
 import { NewDesignAuditForm } from "@/components/dashboard/NewDesignAuditForm";
 
 export default function NewDesignAudit() {
@@ -15,6 +16,11 @@ export default function NewDesignAudit() {
         on it — hierarchy, clarity, polish. This is separate from the rule-based SEO, AEO/GEO, and
         Content &amp; Accessibility checks under Structural Analysis, which stay measured facts.
       </p>
+      <ToolExplainer
+        what="A screenshot of the live page with AI critique pinned directly to the exact element it's about — hierarchy, clarity, visual polish, and copy quality."
+        problem="Rule-based checks can confirm a heading structure is technically valid or a contrast ratio passes, but they can't tell you a page reads cluttered, a CTA is visually buried, or a paragraph is confusing — that needs an actual reviewer's eye, which most teams only get once, right before launch."
+        insight="Every finding is pinned to its exact location on the screenshot and explicitly labeled a judgment call, not a fact — adding the qualitative read Pillar 01's rule-based checks can't produce, without pretending to be as certain as they are."
+      />
       <div className="mt-8">
         <NewDesignAuditForm />
       </div>

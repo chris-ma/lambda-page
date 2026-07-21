@@ -1,21 +1,33 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type MouseEvent as ReactMouseEvent } from "react";
+import { useGSAP } from "@gsap/react";
+import { gsap } from "@/lib/gsap";
 import { LambdaMark } from "@/components/ui/LambdaMark";
 import { Button } from "@/components/ui/Button";
 import { PILLARS_NAV } from "@/lib/pillars";
 import { PILLAR_COLOR } from "@/components/icons/PillarIcon";
 import { cn } from "@/lib/utils";
 
+function onLinkEnter(e: ReactMouseEvent<HTMLElement>) {
+  gsap.to(e.currentTarget, { y: -1, duration: 0.18, ease: "power2.out" });
+}
+function onLinkLeave(e: ReactMouseEvent<HTMLElement>) {
+  gsap.to(e.currentTarget, { y: 0, duration: 0.24, ease: "power2.out" });
+}
+
 export function Nav() {
   const [open, setOpen] = useState<number | null>(null);
+  const [panelPillar, setPanelPillar] = useState<(typeof PILLARS_NAV)[number] | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [progress, setProgress] = useState(0);
   const ref = useRef<HTMLDivElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+  const mobileRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    function onClick(e: MouseEvent) {
+    function onClick(e: globalThis.MouseEvent) {
       if (ref.current && !ref.current.contains(e.target as Node)) {
         setOpen(null);
         setMobileOpen(false);
@@ -48,6 +60,54 @@ export function Nav() {
 
   const active = PILLARS_NAV.find((p) => p.id === open);
 
+  // Keeps the panel's content set to whichever pillar was last opened, so the
+  // close animation still has something to fade out instead of going blank.
+  // Adjusted directly during render (React's sanctioned pattern for this)
+  // rather than in an effect, since it only ever needs to run when `active`
+  // itself changes and the guard below prevents any render loop.
+  if (active && active !== panelPillar) {
+    setPanelPillar(active);
+  }
+
+  useGSAP(
+    () => {
+      if (!panelRef.current) return;
+      if (open !== null) {
+        gsap.set(panelRef.current, { display: "block" });
+        gsap.fromTo(panelRef.current, { opacity: 0, y: -10 }, { opacity: 1, y: 0, duration: 0.22, ease: "power2.out" });
+        gsap.fromTo(
+          panelRef.current.querySelectorAll("[data-tool-item]"),
+          { opacity: 0, y: 6 },
+          { opacity: 1, y: 0, duration: 0.26, stagger: 0.03, ease: "power2.out", delay: 0.04 },
+        );
+      } else {
+        gsap.to(panelRef.current, {
+          opacity: 0,
+          y: -8,
+          duration: 0.16,
+          ease: "power1.in",
+          onComplete: () => gsap.set(panelRef.current, { display: "none" }),
+        });
+      }
+    },
+    { dependencies: [open, panelPillar], scope: ref },
+  );
+
+  useGSAP(
+    () => {
+      if (!mobileRef.current) return;
+      if (mobileOpen) {
+        gsap.fromTo(mobileRef.current, { opacity: 0, y: -12 }, { opacity: 1, y: 0, duration: 0.25, ease: "power2.out" });
+        gsap.fromTo(
+          mobileRef.current.querySelectorAll("[data-mobile-group]"),
+          { opacity: 0, y: 10 },
+          { opacity: 1, y: 0, duration: 0.3, stagger: 0.05, ease: "power2.out", delay: 0.05 },
+        );
+      }
+    },
+    { dependencies: [mobileOpen], scope: ref },
+  );
+
   return (
     <>
       <div className="hidden items-center justify-between border-b border-ink/12 bg-cream px-6 py-2 font-mono text-[10px] tracking-[0.14em] text-ink-soft uppercase sm:flex">
@@ -73,7 +133,8 @@ export function Nav() {
           {PILLARS_NAV.map((p) => (
             <button
               key={p.id}
-              onMouseEnter={() => setOpen(p.id)}
+              onMouseEnter={(e) => { setOpen(p.id); onLinkEnter(e); }}
+              onMouseLeave={onLinkLeave}
               onClick={() => setOpen(open === p.id ? null : p.id)}
               className={cn(
                 "relative py-2 font-body text-[14px] text-ink transition-colors",
@@ -92,7 +153,7 @@ export function Nav() {
             </button>
           ))}
           <span className="h-5.5 w-px bg-ink/40" />
-          <Link href="/login" className="font-body text-[14px] text-ink">
+          <Link href="/login" onMouseEnter={onLinkEnter} onMouseLeave={onLinkLeave} className="font-body text-[14px] text-ink">
             Log in
           </Link>
           <Button href="/dashboard" className="px-5 py-2.5 text-[13px]">
@@ -125,28 +186,33 @@ export function Nav() {
         </button>
       </nav>
 
-      {/* Desktop mega-menu panel */}
-      {active && !mobileOpen && (
-        <div className="hidden border-t-2 border-ink bg-paper md:block">
+      {/* Desktop mega-menu panel — kept mounted once opened; GSAP drives the
+          fade/slide in and out rather than mount/unmount, so it gets an exit
+          animation instead of vanishing instantly. */}
+      {/* Display is driven entirely by GSAP (set/fromTo above) — the trigger
+          buttons that set `open` only exist inside the desktop nav
+          (hidden md:flex), so this can't be shown on mobile. */}
+      {panelPillar && (
+        <div ref={panelRef} className="overflow-hidden border-t-2 border-ink bg-paper" style={{ display: "none" }}>
           <div className="mx-auto max-w-[1200px] px-6 py-6">
             <div className="mb-4 flex items-center justify-between font-mono text-[10px] tracking-wide text-ink-soft uppercase">
               <span>
-                {active.label} — Sub-Tools
-                {active.comingSoon && <span className="ml-2 text-terracotta-deep">Coming with User Testing</span>}
+                {panelPillar.label} — Sub-Tools
+                {panelPillar.comingSoon && <span className="ml-2 text-terracotta-deep">Coming with User Testing</span>}
               </span>
-              <Link href={`/pillars#${active.slug}`} onClick={() => setOpen(null)} className={cn("text-ink", PILLAR_COLOR[active.id].hoverPlain)}>
+              <Link href={`/pillars#${panelPillar.slug}`} onClick={() => setOpen(null)} className={cn("text-ink", PILLAR_COLOR[panelPillar.id].hoverPlain)}>
                 Why this pillar exists →
               </Link>
             </div>
             <div className="grid grid-cols-2 gap-x-8 gap-y-5 md:grid-cols-4">
-              {active.subTools.map((tool) =>
+              {panelPillar.subTools.map((tool) =>
                 tool.href ? (
-                  <Link key={tool.label} href={tool.href} onClick={() => setOpen(null)} className="group">
-                    <div className={cn("font-display text-[14px] font-semibold text-ink", PILLAR_COLOR[active.id].hoverText)}>{tool.label} →</div>
+                  <Link key={tool.label} data-tool-item href={tool.href} onClick={() => setOpen(null)} className="group">
+                    <div className={cn("font-display text-[14px] font-semibold text-ink", PILLAR_COLOR[panelPillar.id].hoverText)}>{tool.label} →</div>
                     <p className="mt-1.5 max-w-none text-[11.5px] leading-snug text-ink-soft">{tool.description}</p>
                   </Link>
                 ) : (
-                  <div key={tool.label}>
+                  <div key={tool.label} data-tool-item>
                     <div className="flex items-baseline gap-1.5 font-display text-[14px] font-semibold text-ink-soft">
                       {tool.label}
                       <span className="font-mono text-[8px] tracking-wide text-ink-soft uppercase">not built yet</span>
@@ -162,10 +228,10 @@ export function Nav() {
 
       {/* Mobile menu panel — all nav items */}
       {mobileOpen && (
-        <div className="max-h-[calc(100vh-76px)] overflow-y-auto border-t-2 border-ink bg-paper md:hidden">
+        <div ref={mobileRef} className="max-h-[calc(100vh-76px)] overflow-y-auto border-t-2 border-ink bg-paper md:hidden">
           <div className="px-6 py-5">
             {PILLARS_NAV.map((p) => (
-              <div key={p.id} className="border-b border-ink/15 py-4 first:pt-0">
+              <div key={p.id} data-mobile-group className="border-b border-ink/15 py-4 first:pt-0">
                 <div className="flex items-baseline gap-2">
                   <span className="font-display text-[16px] font-semibold text-ink">{p.label}</span>
                   {p.comingSoon && <span className="font-mono text-[9px] text-terracotta-deep uppercase">soon</span>}

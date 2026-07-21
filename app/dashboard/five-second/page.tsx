@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { listFiveSecondTests } from "@/lib/db/five-second";
 import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
+import { ToolExplainer } from "@/components/ui/ToolExplainer";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 
@@ -22,6 +23,12 @@ export default async function FiveSecondHub() {
         </div>
         <Button href="/dashboard/five-second/new">New test</Button>
       </div>
+
+      <ToolExplainer
+        what="Upload a screenshot, write a few questions, and see what people actually remember after a five-second glance at it."
+        problem="A hero section either communicates its core message almost instantly or it doesn't — but the people who built it have seen it a hundred times and can no longer judge that first-impression clarity for themselves."
+        insight="Strips the test down to exactly the constraint that matters — five seconds, then the screenshot disappears — so recall and comprehension answers reflect a genuine first impression, not a considered re-read."
+      />
 
       {tests.length === 0 ? (
         <Card hover={false} className="mt-10 border-dashed p-10 text-center">

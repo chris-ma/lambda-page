@@ -45,12 +45,6 @@ const nextConfig: NextConfig = {
         source: "/vendor/:file*",
         headers: [{ key: "Cache-Control", value: "public, max-age=31536000, immutable" }],
       },
-      {
-        // Hero background video — same filename forever, so cache it long
-        // rather than re-fetching the ~6.5MB clip on every homepage visit.
-        source: "/hero-bg.mp4",
-        headers: [{ key: "Cache-Control", value: "public, max-age=31536000, immutable" }],
-      },
     ];
   },
 };

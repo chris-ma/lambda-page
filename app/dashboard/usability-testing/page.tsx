@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { listUsabilityTests } from "@/lib/db/usability";
 import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
+import { ToolExplainer } from "@/components/ui/ToolExplainer";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 
@@ -22,6 +23,12 @@ export default async function UsabilityTestingHub() {
         </div>
         <Button href="/dashboard/usability-testing/new">New test</Button>
       </div>
+
+      <ToolExplainer
+        what="Give a recruited participant a task and a unique link, and get back a real per-participant activity log of exactly what they did, page by page, click by click."
+        problem="Aggregate behavioral data can show that people struggle somewhere in a flow, but it can't show why a specific person got stuck or what they tried before giving up — that requires watching one real person attempt one real task."
+        insight="Each participant gets their own unique link and their own activity log, so a specific point of confusion is traceable to what an actual person did in sequence, not inferred from an aggregate funnel number."
+      />
 
       {tests.length === 0 ? (
         <Card hover={false} className="mt-10 border-dashed p-10 text-center">

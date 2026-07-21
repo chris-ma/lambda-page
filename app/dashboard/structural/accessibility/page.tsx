@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { listPages } from "@/lib/db/pages";
 import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
+import { ToolExplainer } from "@/components/ui/ToolExplainer";
 import { Card } from "@/components/ui/Card";
 
 export const dynamic = "force-dynamic";
@@ -17,6 +18,11 @@ export default async function AccessibilityHub() {
         text (1.1.1), heading structure (1.3.1), mobile tap-target size (2.5.8), keyboard focus
         visibility (2.4.7), and form error identification (3.3.1).
       </p>
+      <ToolExplainer
+        what="WCAG checks run directly against the rendered page: color contrast, alt text, heading structure, tap-target size, keyboard focus visibility, and form error identification."
+        problem="Accessibility gaps are usually invisible to the team that built the page — a low-contrast label or a missing alt attribute looks fine to a sighted developer testing with a mouse, and typically only surfaces once a real user, or a legal complaint, hits it in production."
+        insight="Every check maps to a specific WCAG success criterion and is measured directly off the rendered DOM and computed styles — a contrast ratio is calculated, not guessed — so a FAILING result here is a real, fixable defect, not an opinion."
+      />
 
       <section className="mt-10">
         {pages.length === 0 ? (

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { listPages } from "@/lib/db/pages";
 import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
+import { ToolExplainer } from "@/components/ui/ToolExplainer";
 import { Card } from "@/components/ui/Card";
 
 export const dynamic = "force-dynamic";
@@ -17,6 +18,11 @@ export default async function ABTestingHub() {
         significance testing, not &ldquo;the variant looks like it&rsquo;s winning.&rdquo; Runs on
         live traffic, so pick a connected page to install it against.
       </p>
+      <ToolExplainer
+        what="Cookie/session-consistent variant assignment and conversion tracking on live traffic, with a real two-proportion significance test behind every result."
+        problem="“The variant looks like it's winning” is how most A/B tests actually get read — a difference gets declared a winner off a small sample or after peeking at partial data, and ships as fact when it might just be noise."
+        insight="Every visitor is assigned once and stays in that variant for the life of the test, and results only get called significant once they clear both a proper z-test and a minimum sample size per variant, so a result here means something statistically, not just visually."
+      />
 
       <section className="mt-10">
         {pages.length === 0 ? (

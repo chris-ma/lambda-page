@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { listStudies } from "@/lib/db/assumption";
 import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
+import { ToolExplainer } from "@/components/ui/ToolExplainer";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Tag } from "@/components/ui/Tag";
@@ -24,6 +25,11 @@ export default async function PricingStrategyHub() {
         candidate prices (Gabor-Granger) and pricing-related assumptions — all computed directly
         from raw responses, never a judgment call.
       </p>
+      <ToolExplainer
+        what="Van Westendorp price-sensitivity testing on every study, plus optional Gabor-Granger demand curves and pricing-assumption checks, from a real respondent panel via a shareable interview link."
+        problem="Pricing is usually set by competitor benchmarking or an internal gut-check, because directly asking “what would you pay” tends to produce unreliable answers — respondents anchor, round, or tell you what they think you want to hear."
+        insight="Van Westendorp's four-question structure and Gabor-Granger's price-ladder approach are specifically designed to extract a believable acceptable-price range from indirect questions, and every result here is computed directly from raw responses, never a judgment call — the same rule the rest of this pillar follows."
+      />
 
       {studies.length === 0 ? (
         <Card hover={false} className="mt-10 border-dashed p-10 text-center">

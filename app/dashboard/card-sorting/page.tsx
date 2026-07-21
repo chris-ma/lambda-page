@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { listStudies } from "@/lib/db/sorting";
 import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
+import { ToolExplainer } from "@/components/ui/ToolExplainer";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Tag } from "@/components/ui/Tag";
@@ -29,6 +30,12 @@ export default async function CardSortingHub() {
           </Button>
         </div>
       </div>
+
+      <ToolExplainer
+        what="Card sorting surfaces the mental model people already have for your content; tree testing checks whether a proposed navigation structure actually lets them find things."
+        problem="Navigation and content grouping decisions are usually made by whoever's building the site, based on how they think about the product — which is rarely how a new visitor actually categorizes the same content."
+        insight="Card sorting asks people to group real content with no menu system imposed on them yet, revealing their natural mental model; tree testing then validates a specific proposed structure against real find-it tasks, so the right check runs depending on whether you're designing from scratch or fixing something live."
+      />
 
       {studies.length === 0 ? (
         <Card hover={false} className="mt-10 border-dashed p-10 text-center">

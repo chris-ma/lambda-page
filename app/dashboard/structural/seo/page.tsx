@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { listPages } from "@/lib/db/pages";
 import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
+import { ToolExplainer } from "@/components/ui/ToolExplainer";
 import { Card } from "@/components/ui/Card";
 
 export const dynamic = "force-dynamic";
@@ -17,6 +18,11 @@ export default async function SeoHub() {
         extractability for answer and generative engines. Scored as two separate sections so a
         strong SEO read never masks a failing AI-search one.
       </p>
+      <ToolExplainer
+        what="Traditional SEO — meta tags, structured data, indexability — measured alongside AEO/GEO extractability for answer and generative engines, as two separate scored sections."
+        problem="A page can be perfectly optimized for a classic search crawler and still be functionally invisible to an AI answer engine that needs clean entity structure and chunkable content to quote from it — and because both disciplines get called “search,” teams often only check one."
+        insight="Every check here is a measured fact — a meta tag exists or it doesn't, a schema block validates or it doesn't — and SEO and AEO/GEO are scored and shown separately on purpose, so a strong classic-SEO score can never quietly mask a page that generative engines can't parse."
+      />
 
       <section className="mt-10">
         {pages.length === 0 ? (
