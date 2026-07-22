@@ -22,7 +22,10 @@ const nextConfig: NextConfig = {
   // statically inline — run them as native Node requires instead.
   // @sparticuz/chromium must stay external so its Brotli-packed binary is
   // traced into the serverless function and extracted at runtime.
-  serverExternalPackages: ["lighthouse", "chrome-launcher", "playwright-core", "@sparticuz/chromium"],
+  // sharp ships a platform-specific native binary the same way the packages
+  // above do — keep it external too rather than risk the bundler mishandling
+  // it, given this project has already hit that exact class of bug twice.
+  serverExternalPackages: ["lighthouse", "chrome-launcher", "playwright-core", "@sparticuz/chromium", "sharp"],
   outputFileTracingIncludes: {
     "/api/analyze/structural": [...playwrightTrace, ...lighthouseTrace],
     "/api/analyze/competitive": playwrightTrace,
