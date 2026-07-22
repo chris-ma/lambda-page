@@ -4,10 +4,11 @@ import { contrastRatio, parseRgb, blendOverWhite, passesAA } from "./contrast";
 import { fleschReadingEase, jargonDensity, readabilityLabel } from "./content";
 import type { FindingInput } from "@/lib/db/runs";
 
-type DomSnapshot = {
+export type DomSnapshot = {
   headings: { level: number; text: string }[];
   imgs: { hasAlt: boolean; src: string }[];
-  tapTargets: { tag: string; w: number; h: number; text: string }[];
+  tapTargets: { tag: string; id: string; w: number; h: number; text: string }[];
+  formFields: { field: string; type: string }[];
   contrastSamples: { tag: string; text: string; color: string; bg: string; fontSize: number; bold: boolean }[];
   title: string;
   metaDescription: string | null;
@@ -27,7 +28,7 @@ type DomSnapshot = {
   fontFamiliesUsed: string[];
 };
 
-async function extractDom(page: Page): Promise<DomSnapshot> {
+export async function extractDom(page: Page): Promise<DomSnapshot> {
   return page.evaluate(() => {
     function visible(el: Element): boolean {
       const r = el.getBoundingClientRect();
@@ -48,7 +49,26 @@ async function extractDom(page: Page): Promise<DomSnapshot> {
       .filter(visible)
       .map((el) => {
         const r = el.getBoundingClientRect();
-        return { tag: el.tagName.toLowerCase(), w: Math.round(r.width), h: Math.round(r.height), text: (el.textContent || "").trim().slice(0, 40) };
+        return {
+          tag: el.tagName.toLowerCase(),
+          id: el.id || "",
+          w: Math.round(r.width),
+          h: Math.round(r.height),
+          text: (el.textContent || "").trim().slice(0, 40),
+        };
+      });
+
+    // Same field-naming rule the tracking snippet uses (name || id || tag),
+    // so a form field found here matches the `field` value real form_focus
+    // events will carry once the snippet is running on this page.
+    const formFields = Array.from(document.querySelectorAll("input,select,textarea"))
+      .filter(visible)
+      .map((el) => {
+        const input = el as HTMLInputElement;
+        return {
+          field: input.name || input.id || el.tagName.toLowerCase(),
+          type: el.tagName.toLowerCase() === "input" ? input.type || "text" : el.tagName.toLowerCase(),
+        };
       });
 
     const textEls = Array.from(document.querySelectorAll("h1,h2,h3,p,a,button,span,li"))
@@ -136,6 +156,7 @@ async function extractDom(page: Page): Promise<DomSnapshot> {
       headings,
       imgs,
       tapTargets,
+      formFields,
       contrastSamples,
       title: document.title || "",
       metaDescription: document.querySelector('meta[name="description"]')?.getAttribute("content") || null,

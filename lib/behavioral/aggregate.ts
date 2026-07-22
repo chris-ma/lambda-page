@@ -1,4 +1,5 @@
 import type { Database } from "@/lib/database.types";
+import type { FunnelStageDef } from "./funnel-plan";
 
 type EventRow = Database["public"]["Tables"]["events"]["Row"];
 
@@ -29,6 +30,37 @@ export function computeFunnel(events: EventRow[], stages: readonly string[] = ST
   return stages.map((stage) => ({
     label: stage,
     count: Array.from(reached.values()).filter((set) => set.has(stage)).length,
+  }));
+}
+
+function sessionMatchesStage(sessionEvents: EventRow[], matcher: FunnelStageDef["matcher"]): boolean {
+  switch (matcher.type) {
+    case "pageview":
+      return sessionEvents.some((e) => e.type === "pageview");
+    case "scroll":
+      return sessionEvents.some((e) => e.type === "scroll_depth" && ((e.payload as { depth?: number })?.depth ?? 0) >= matcher.depth);
+    case "cta_click":
+      return sessionEvents.some(
+        (e) => e.type === "funnel_stage" && (e.payload as { stage?: string; selector?: string })?.stage === "cta_click" && (e.payload as { selector?: string })?.selector === matcher.selector,
+      );
+    case "form_focus":
+      return sessionEvents.some((e) => e.type === "form_focus" && (e.payload as { field?: string })?.field === matcher.field);
+    case "form_submit":
+      return sessionEvents.some((e) => e.type === "funnel_stage" && (e.payload as { stage?: string })?.stage === "form_submit");
+  }
+}
+
+/** Same shape as computeFunnel's output, but stages come from an AI-generated, page-specific plan (lib/ai/funnel-plan.ts) keyed to real selectors/fields instead of the generic STANDARD_STAGES labels. */
+export function computeFunnelFromDefs(events: EventRow[], defs: FunnelStageDef[]) {
+  const bySession = new Map<string, EventRow[]>();
+  for (const e of events) {
+    if (!bySession.has(e.session_id)) bySession.set(e.session_id, []);
+    bySession.get(e.session_id)!.push(e);
+  }
+  const sessions = Array.from(bySession.values());
+  return defs.map((def) => ({
+    label: def.label,
+    count: sessions.filter((sessionEvents) => sessionMatchesStage(sessionEvents, def.matcher)).length,
   }));
 }
 

@@ -100,6 +100,23 @@ export type Database = {
           { foreignKeyName: "analytics_connections_page_id_fkey"; columns: ["page_id"]; isOneToOne: true; referencedRelation: "pages"; referencedColumns: ["id"] },
         ];
       };
+      funnel_plans: {
+        Row: {
+          id: string; page_id: string; status: string; error: string | null;
+          overall_note: string | null; stages: Json; created_at: string;
+        };
+        Insert: {
+          id?: string; page_id: string; status?: string; error?: string | null;
+          overall_note?: string | null; stages?: Json; created_at?: string;
+        };
+        Update: {
+          id?: string; page_id?: string; status?: string; error?: string | null;
+          overall_note?: string | null; stages?: Json; created_at?: string;
+        };
+        Relationships: [
+          { foreignKeyName: "funnel_plans_page_id_fkey"; columns: ["page_id"]; isOneToOne: false; referencedRelation: "pages"; referencedColumns: ["id"] },
+        ];
+      };
       assumption_studies: {
         Row: { id: string; project_id: string; name: string; context: string | null; include_pricing: boolean; price_product_label: string | null; include_gabor_granger: boolean; created_at: string };
         Insert: { id?: string; project_id: string; name: string; context?: string | null; include_pricing?: boolean; price_product_label?: string | null; include_gabor_granger?: boolean; created_at?: string };

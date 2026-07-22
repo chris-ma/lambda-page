@@ -3,12 +3,14 @@ import { getPage } from "@/lib/db/pages";
 import { eventsForPage, eventCountForPage } from "@/lib/db/events";
 import { getPageScreenshot } from "@/lib/db/page-screenshots";
 import { getAnalyticsConnectionMeta, getAnalyticsConnectionSecret } from "@/lib/db/analytics-connections";
+import { getLatestFunnelPlan } from "@/lib/db/funnel-plans";
 import { fetchGA4Report, type GA4Report } from "@/lib/analytics/ga4";
 import { appBaseUrl } from "@/lib/app-url";
 import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
 import { BehavioralDashboard } from "@/components/dashboard/BehavioralDashboard";
 import {
   computeFunnel,
+  computeFunnelFromDefs,
   computeHeatmapBuckets,
   computeFormFieldStats,
   computeRumVitals,
@@ -68,6 +70,7 @@ export default async function BehavioralPage({
   }
 
   let data;
+  let funnelPlan: Awaited<ReturnType<typeof getLatestFunnelPlan>> = null;
   if (isDemo) {
     data = {
       funnel: DEMO_FUNNEL,
@@ -84,6 +87,7 @@ export default async function BehavioralPage({
     };
   } else {
     const events = await eventsForPage(pageId);
+    funnelPlan = await getLatestFunnelPlan(pageId);
     // Click coordinates are only meaningful against the one screenshot this
     // page captured — with the snippet installed site-wide, other pages'
     // clicks use a different layout entirely, so the heatmap and rage-click
@@ -97,7 +101,7 @@ export default async function BehavioralPage({
     }
     const pageEvents = events.filter((e) => (e.path ?? "/") === pagePathname);
     data = {
-      funnel: computeFunnel(events),
+      funnel: funnelPlan && funnelPlan.stages.length > 0 ? computeFunnelFromDefs(events, funnelPlan.stages) : computeFunnel(events),
       heatmap: computeHeatmapBuckets(pageEvents),
       formFields: computeFormFieldStats(events),
       vitals: computeRumVitals(events),
@@ -150,6 +154,7 @@ export default async function BehavioralPage({
           {...data}
           isDemo={isDemo}
           pageId={page.id}
+          funnelPlan={funnelPlan && funnelPlan.stages.length > 0 ? funnelPlan : null}
           screenshotUrl={screenshotUrl}
           analyticsConnection={analyticsConnection}
           analyticsReport={analyticsReport}

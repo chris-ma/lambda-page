@@ -12,6 +12,7 @@ import { Tag } from "@/components/ui/Tag";
 import { ToolExplainer } from "@/components/ui/ToolExplainer";
 import type { FieldStat } from "@/lib/behavioral/aggregate";
 import type { ChannelStat, CtaStat, OutboundStat, PageStat, ReturnVisitStat } from "@/lib/behavioral/campaign";
+import type { FunnelPlan } from "@/lib/db/funnel-plans";
 import type { GA4Report } from "@/lib/analytics/ga4";
 import { formatPercent } from "@/lib/utils";
 
@@ -46,6 +47,7 @@ export function BehavioralDashboard({
   outboundClicks,
   topPages,
   returnVisits,
+  funnelPlan,
   initialTab,
 }: {
   funnel: FunnelStage[];
@@ -56,6 +58,7 @@ export function BehavioralDashboard({
   rageClicks: { selector: string; count: number }[];
   isDemo: boolean;
   pageId: string;
+  funnelPlan: FunnelPlan | null;
   screenshotUrl: string | null;
   analyticsConnection: { property_id: string; service_account_email: string } | null;
   analyticsReport: GA4Report | null;
@@ -77,6 +80,8 @@ export function BehavioralDashboard({
   const router = useRouter();
   const [capturing, setCapturing] = useState(false);
   const [captureError, setCaptureError] = useState<string | null>(null);
+  const [generatingFunnel, setGeneratingFunnel] = useState(false);
+  const [funnelPlanError, setFunnelPlanError] = useState<string | null>(null);
 
   async function handleCapture() {
     setCapturing(true);
@@ -91,6 +96,26 @@ export function BehavioralDashboard({
       router.refresh();
     } finally {
       setCapturing(false);
+    }
+  }
+
+  async function handleGenerateFunnel(reset = false) {
+    setGeneratingFunnel(true);
+    setFunnelPlanError(null);
+    try {
+      const res = await fetch("/api/analyze/funnel-plan", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pageId, reset }),
+      });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        setFunnelPlanError(body.error ?? "Couldn't generate a funnel plan.");
+        return;
+      }
+      router.refresh();
+    } finally {
+      setGeneratingFunnel(false);
     }
   }
 
@@ -162,15 +187,65 @@ export function BehavioralDashboard({
           <div>
             <p className="mb-4 text-[13px] text-ink-soft">
               Session count per stage; drop-off = 1 − (count[N+1] / count[N]).
+              {funnelPlan && " Stages below are an AI-generated plan specific to this page — see rationale for each."}
             </p>
             <ToolExplainer
-              what="Stage-to-stage drop-off through page_view → scroll_50% → cta_click → form_submit, segmented by device and source."
-              problem="A single blended conversion rate tells you something is wrong without saying what — and averaging desktop and mobile, or paid and organic, together can hide a device- or channel-specific collapse that's actually the whole problem."
-              insight="Drop-off is computed directly as 1 − (count at next stage / count at this stage) and always shown segmented, so the exact stage — and the exact segment — losing people is visible instead of buried in an aggregate number."
+              what={
+                funnelPlan
+                  ? "An AI-proposed, page-specific funnel — named stages keyed to this page's actual CTAs and form fields, computed from clicks/submits already being tracked, not the generic 4-stage funnel."
+                  : "Stage-to-stage drop-off through page_view → scroll_50% → cta_click → form_submit, segmented by device and source."
+              }
+              problem="A single blended conversion rate tells you something is wrong without saying what — and a generic 'cta_click' stage lumps every link and button on the page into one bucket, so it can't say which specific step people are actually dropping off at."
+              insight={
+                funnelPlan
+                  ? "Claude reads this page's live headings, buttons, and form fields alongside clicks already tracked on them, and proposes named stages keyed to real selectors — so the funnel reads as 'clicked pricing' or 'started signup' instead of an opaque generic label, while still computing purely from data already being collected."
+                  : "Drop-off is computed directly as 1 − (count at next stage / count at this stage) and always shown segmented, so the exact stage — and the exact segment — losing people is visible instead of buried in an aggregate number."
+              }
             />
+
+            {!isDemo && (
+              <div className="mt-4 flex flex-wrap items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => handleGenerateFunnel(false)}
+                  disabled={generatingFunnel}
+                  className="border-2 border-ink bg-paper px-3 py-2 font-mono text-[10.5px] uppercase tracking-wide text-ink-soft hover:text-ink"
+                >
+                  {generatingFunnel ? "Generating…" : funnelPlan ? "Regenerate funnel with AI" : "Generate funnel with AI"}
+                </button>
+                {funnelPlan && (
+                  <button
+                    type="button"
+                    onClick={() => handleGenerateFunnel(true)}
+                    disabled={generatingFunnel}
+                    className="border-2 border-ink bg-paper px-3 py-2 font-mono text-[10.5px] uppercase tracking-wide text-ink-soft hover:text-ink"
+                  >
+                    Reset to default funnel
+                  </button>
+                )}
+              </div>
+            )}
+            {funnelPlanError && <p className="mt-3 font-mono text-[11px] text-brick">{funnelPlanError}</p>}
+            {funnelPlan?.overallNote && (
+              <p className="mt-3 max-w-[640px] font-mono text-[11px] text-pink-deep">{funnelPlan.overallNote}</p>
+            )}
+
             <div className="mt-6 max-w-[640px]">
               <FunnelChart stages={funnel} />
             </div>
+
+            {funnelPlan && (
+              <div className="mt-6 max-w-[640px] space-y-3">
+                <div className="font-mono text-[10px] uppercase tracking-wide text-pink-deep">Stage rationale — AI judgment</div>
+                {funnelPlan.stages.map((s) => (
+                  <div key={s.id} className="border-l-2 border-pink-deep pl-3">
+                    <div className="font-mono text-[11px] font-semibold text-ink">{s.label}</div>
+                    <p className="mt-0.5 text-[12px] text-ink-soft">{s.rationale}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+
             <div className="mt-8">
               <h3 className="font-display text-[15px] font-semibold text-ink">Segmented by device</h3>
               <p className="mt-1 text-[12px] text-ink-soft">

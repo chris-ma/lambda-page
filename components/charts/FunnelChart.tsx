@@ -13,7 +13,7 @@ export function FunnelChart({ stages }: { stages: FunnelStage[] }) {
         const dropoff = i > 0 && prev > 0 ? 1 - stage.count / prev : 0;
         return (
           <div key={stage.label} className="flex items-center gap-3.5">
-            <span className="w-28 shrink-0 font-mono text-[11px] text-ink-soft">
+            <span className="w-28 shrink-0 font-mono text-[11px] leading-tight text-ink-soft sm:w-40">
               {stage.label}
             </span>
             <div className="h-6 flex-1 border border-ink bg-cream-2">
