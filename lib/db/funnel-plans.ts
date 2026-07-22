@@ -10,6 +10,8 @@ export type FunnelPlan = {
   status: "complete" | "error";
   error: string | null;
   overallNote: string | null;
+  primaryGoal: string | null;
+  purposeSummary: string | null;
   stages: FunnelStageDef[];
   createdAt: string;
 };
@@ -21,16 +23,24 @@ function toFunnelPlan(row: FunnelPlanRow): FunnelPlan {
     status: row.status as "complete" | "error",
     error: row.error,
     overallNote: row.overall_note,
+    primaryGoal: row.primary_goal,
+    purposeSummary: row.purpose_summary,
     stages: (row.stages as unknown as FunnelStageDef[]) ?? [],
     createdAt: row.created_at,
   };
 }
 
 /** Inserts a new funnel plan. An empty `stages` array is how "reset to the default funnel" works — no separate flag/column needed, since the latest row for a page is always what's active. */
-export async function createFunnelPlan(pageId: string, stages: FunnelStageDef[], overallNote: string | null): Promise<FunnelPlan> {
+export async function createFunnelPlan(
+  pageId: string,
+  stages: FunnelStageDef[],
+  overallNote: string | null,
+  primaryGoal: string | null = null,
+  purposeSummary: string | null = null,
+): Promise<FunnelPlan> {
   const row = await queryOne<FunnelPlanRow>(
-    `insert into funnel_plans (page_id, status, overall_note, stages) values ($1, 'complete', $2, $3) returning *`,
-    [pageId, overallNote, JSON.stringify(stages)],
+    `insert into funnel_plans (page_id, status, overall_note, primary_goal, purpose_summary, stages) values ($1, 'complete', $2, $3, $4, $5) returning *`,
+    [pageId, overallNote, primaryGoal, purposeSummary, JSON.stringify(stages)],
   );
   if (!row) throw new Error("Failed to create funnel plan");
   return toFunnelPlan(row);

@@ -198,7 +198,7 @@ export function BehavioralDashboard({
               problem="A single blended conversion rate tells you something is wrong without saying what — and a generic 'cta_click' stage lumps every link and button on the page into one bucket, so it can't say which specific step people are actually dropping off at."
               insight={
                 funnelPlan
-                  ? "Claude reads this page's live headings, buttons, and form fields alongside clicks already tracked on them, and proposes named stages keyed to real selectors — so the funnel reads as 'clicked pricing' or 'started signup' instead of an opaque generic label, while still computing purely from data already being collected."
+                  ? "Two passes, not one: Claude first reads this page's live headings, buttons, and form fields with no analytics in view at all, to decide what the page is actually for and which elements matter to that goal — then, only for that shortlist, brings in the clicks/focuses already tracked, so the funnel is built from what's relevant to the goal rather than whichever elements happen to have traffic."
                   : "Drop-off is computed directly as 1 − (count at next stage / count at this stage) and always shown segmented, so the exact stage — and the exact segment — losing people is visible instead of buried in an aggregate number."
               }
             />
@@ -226,6 +226,17 @@ export function BehavioralDashboard({
               </div>
             )}
             {funnelPlanError && <p className="mt-3 font-mono text-[11px] text-brick">{funnelPlanError}</p>}
+
+            {funnelPlan?.primaryGoal && (
+              <div className="mt-4 max-w-[640px] border-2 border-ink bg-paper p-4">
+                <div className="font-mono text-[10px] uppercase tracking-wide text-pink-deep">Page analysis — AI judgment</div>
+                <div className="mt-2 font-mono text-[11px] font-semibold text-ink">Primary goal: {funnelPlan.primaryGoal}</div>
+                {funnelPlan.purposeSummary && <p className="mt-1.5 text-[12px] text-ink-soft">{funnelPlan.purposeSummary}</p>}
+                <p className="mt-1.5 text-[11px] text-ink-soft">
+                  Analytics were then scoped to only the elements identified as relevant to this goal — not every click on the page.
+                </p>
+              </div>
+            )}
             {funnelPlan?.overallNote && (
               <p className="mt-3 max-w-[640px] font-mono text-[11px] text-pink-deep">{funnelPlan.overallNote}</p>
             )}

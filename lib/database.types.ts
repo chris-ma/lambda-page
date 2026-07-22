@@ -103,15 +103,18 @@ export type Database = {
       funnel_plans: {
         Row: {
           id: string; page_id: string; status: string; error: string | null;
-          overall_note: string | null; stages: Json; created_at: string;
+          overall_note: string | null; primary_goal: string | null; purpose_summary: string | null;
+          stages: Json; created_at: string;
         };
         Insert: {
           id?: string; page_id: string; status?: string; error?: string | null;
-          overall_note?: string | null; stages?: Json; created_at?: string;
+          overall_note?: string | null; primary_goal?: string | null; purpose_summary?: string | null;
+          stages?: Json; created_at?: string;
         };
         Update: {
           id?: string; page_id?: string; status?: string; error?: string | null;
-          overall_note?: string | null; stages?: Json; created_at?: string;
+          overall_note?: string | null; primary_goal?: string | null; purpose_summary?: string | null;
+          stages?: Json; created_at?: string;
         };
         Relationships: [
           { foreignKeyName: "funnel_plans_page_id_fkey"; columns: ["page_id"]; isOneToOne: false; referencedRelation: "pages"; referencedColumns: ["id"] },
