@@ -3,6 +3,7 @@ import { getRun } from "@/lib/db/runs";
 import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
 import { FindingsReport } from "@/components/dashboard/FindingsReport";
 import { Tag } from "@/components/ui/Tag";
+import { ResultActions } from "@/components/dashboard/ResultActions";
 
 export const dynamic = "force-dynamic";
 
@@ -20,6 +21,9 @@ export default async function CompetitiveRunPage({ params }: { params: Promise<{
         <Tag status={run.status === "complete" ? "PASS" : run.status === "error" ? "FAILING" : "INFO"} label={run.status} size="sm" />
       </div>
       <h1 className="mt-2 break-all font-display text-[24px] font-semibold text-ink">{run.target_url}</h1>
+      <div className="mt-6">
+        <ResultActions />
+      </div>
 
       <div className="mt-10">
         {run.status === "error" ? (

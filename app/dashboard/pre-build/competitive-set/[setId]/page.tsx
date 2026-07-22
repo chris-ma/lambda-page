@@ -4,6 +4,7 @@ import { runsForSet } from "@/lib/db/runs";
 import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
 import { Tag } from "@/components/ui/Tag";
 import { Card } from "@/components/ui/Card";
+import { ResultActions } from "@/components/dashboard/ResultActions";
 import { BuyingDriversRadarChart } from "@/components/charts/BuyingDriversRadarChart";
 import { OpportunityChart } from "@/components/charts/OpportunityChart";
 import { PricingValueBubbleChart } from "@/components/charts/PricingValueBubbleChart";
@@ -57,6 +58,9 @@ export default async function CompetitiveSetPage({ params }: { params: Promise<{
         <Tag status={set.status === "complete" ? "PASS" : set.status === "error" ? "FAILING" : "INFO"} label={set.status} size="sm" />
       </div>
       <h1 className="mt-2 font-display text-[24px] font-semibold text-ink">{set.name}</h1>
+      <div className="mt-6">
+        <ResultActions />
+      </div>
 
       {set.status === "error" && (
         <p className="mt-8 border border-dashed border-ink p-8 text-center text-[13.5px] text-ink-soft">

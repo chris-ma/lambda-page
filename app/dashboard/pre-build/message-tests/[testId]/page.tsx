@@ -4,6 +4,7 @@ import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
 import { DataTable } from "@/components/ui/DataTable";
 import { formatPercent } from "@/lib/utils";
 import { ShareLink } from "@/components/dashboard/ShareLink";
+import { ResultActions } from "@/components/dashboard/ResultActions";
 
 export const dynamic = "force-dynamic";
 
@@ -20,6 +21,10 @@ export default async function MessageTestResults({ params }: { params: Promise<{
       <EyebrowLabel className="mt-3">Message & Concept Testing</EyebrowLabel>
       <h1 className="mt-2 font-display text-[26px] font-semibold text-ink">{test.name}</h1>
       {test.prompt && <p className="mt-2 max-w-[600px] text-[13.5px] text-ink-soft">&ldquo;{test.prompt}&rdquo;</p>}
+
+      <div className="mt-6">
+        <ResultActions />
+      </div>
 
       <div className="mt-6">
         <ShareLink path={`/t/${test.id}`} />

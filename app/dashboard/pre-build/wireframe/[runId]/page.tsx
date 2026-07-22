@@ -4,6 +4,7 @@ import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
 import { Tag } from "@/components/ui/Tag";
 import { Card } from "@/components/ui/Card";
 import { AnnotatedStimulus } from "@/components/dashboard/AnnotatedStimulus";
+import { ResultActions } from "@/components/dashboard/ResultActions";
 
 export const dynamic = "force-dynamic";
 
@@ -27,6 +28,9 @@ export default async function WireframeRunPage({ params }: { params: Promise<{ r
       {run.target_url !== "uploaded-image" && (
         <p className="mt-1 break-all font-mono text-[11px] text-ink-soft">Figma reference: {run.target_url}</p>
       )}
+      <div className="mt-6">
+        <ResultActions />
+      </div>
 
       <div className="mt-8">
         {run.status === "error" ? (

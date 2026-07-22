@@ -110,13 +110,13 @@ export function Nav() {
 
   return (
     <>
-      <div className="hidden items-center justify-between border-b border-ink/12 bg-cream px-6 py-2 font-mono text-[10px] tracking-[0.14em] text-ink-soft uppercase sm:flex">
+      <div className="hidden items-center justify-between border-b border-ink/12 bg-cream px-6 py-2 font-mono text-[10px] tracking-[0.14em] text-ink-soft uppercase sm:flex print:hidden">
         <span>Landing Page Diagnostics — Est. 2026</span>
         <Link href="/login" className="hover:text-ink">
           Log in
         </Link>
       </div>
-      <div ref={ref} className="sticky top-0 z-50 border-b-2 border-ink bg-paper">
+      <div ref={ref} className="sticky top-0 z-50 border-b-2 border-ink bg-paper print:hidden">
         <nav className="mx-auto flex h-[80px] max-w-[1200px] items-center justify-between px-6">
           <Link href="/" className="flex items-center gap-3" onClick={() => setMobileOpen(false)}>
             <LambdaMark size={38} />

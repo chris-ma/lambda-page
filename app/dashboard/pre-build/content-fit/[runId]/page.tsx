@@ -4,6 +4,7 @@ import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
 import { FindingsReport } from "@/components/dashboard/FindingsReport";
 import { Tag } from "@/components/ui/Tag";
 import { Card } from "@/components/ui/Card";
+import { ResultActions } from "@/components/dashboard/ResultActions";
 
 export const dynamic = "force-dynamic";
 
@@ -29,6 +30,9 @@ export default async function ContentFitRunPage({ params }: { params: Promise<{ 
           {run.context}
         </p>
       )}
+      <div className="mt-6">
+        <ResultActions />
+      </div>
 
       <div className="mt-10">
         {run.status === "error" ? (
