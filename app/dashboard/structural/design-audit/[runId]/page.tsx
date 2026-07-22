@@ -4,6 +4,7 @@ import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
 import { Tag } from "@/components/ui/Tag";
 import { Card } from "@/components/ui/Card";
 import { AnnotatedStimulus } from "@/components/dashboard/AnnotatedStimulus";
+import { ResultActions } from "@/components/dashboard/ResultActions";
 
 export const dynamic = "force-dynamic";
 
@@ -34,6 +35,9 @@ export default async function DesignAuditRunPage({ params }: { params: Promise<{
           <p className="border border-dashed border-ink p-8 text-center text-[13.5px] text-ink-soft">Auditing…</p>
         ) : (
           <>
+            <div className="mb-6">
+              <ResultActions />
+            </div>
             {overallImpression && (
               <Card hover={false} className="mb-6 border-2 border-pink-deep p-6">
                 <div className="font-mono text-[10px] uppercase tracking-wide text-pink-deep">Overall impression — AI judgment</div>

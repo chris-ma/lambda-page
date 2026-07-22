@@ -102,14 +102,47 @@ export function AnnotatedStimulus({
         ))}
       </div>
 
-      <p className="mt-3 font-mono text-[11px] text-ink-soft">
+      <p className="mt-3 font-mono text-[11px] text-ink-soft print:hidden">
         {pinned.length === 0 ? "No findings were localized to a specific point on the image." : "Click a numbered pin to see its finding."}
       </p>
+
+      {/* Print-only readout: the pin overlay below is a fixed-position modal,
+          which only exists on click and doesn't render sensibly on a printed
+          page — so every pinned finding's full detail is laid out here
+          instead, in flow, directly under the screenshot it prints with. */}
+      {pinned.length > 0 && (
+        <div className="mt-4 hidden space-y-4 print:block">
+          <h3 className="font-mono text-[10px] tracking-wide text-ink-soft uppercase">Pinned findings (numbers match the screenshot)</h3>
+          {pinned.map((f, i) => (
+            <div key={f.id} className="break-inside-avoid border border-ink p-4">
+              <div className="flex items-center gap-3">
+                <span
+                  className={cn(
+                    "flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 border-ink font-mono text-[11px] font-bold text-ink",
+                    DOT[f.status as Status],
+                  )}
+                >
+                  {i + 1}
+                </span>
+                <span className="font-display text-[14px] font-semibold text-ink">{f.attribute}</span>
+                <span className="font-mono text-[10px] tracking-wide text-ink-soft uppercase">{STATUS_LABEL[f.status as Status]}</span>
+              </div>
+              {f.detail && <p className="mt-2 text-[12px] leading-relaxed text-ink-soft">{f.detail}</p>}
+              {f.fix && (
+                <p className="mt-2 border-l-2 border-teal-deep pl-3 text-[12px] text-ink">
+                  <span className="block font-mono text-[10px] text-teal-deep uppercase">Fix</span>
+                  {f.fix}
+                </p>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
 
       {open && activeFinding && (
         <div
           ref={overlayRef}
-          className="fixed inset-0 z-[200] flex items-center justify-center bg-ink/75 p-6"
+          className="fixed inset-0 z-[200] flex items-center justify-center bg-ink/75 p-6 print:hidden"
           onClick={close}
           role="dialog"
           aria-modal="true"

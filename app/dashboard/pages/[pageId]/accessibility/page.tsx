@@ -5,6 +5,7 @@ import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
 import { FindingsReport } from "@/components/dashboard/FindingsReport";
 import { RunAnalysisButton } from "@/components/dashboard/RunAnalysisButton";
 import { AnnotatedStimulus } from "@/components/dashboard/AnnotatedStimulus";
+import { ResultActions } from "@/components/dashboard/ResultActions";
 
 export const dynamic = "force-dynamic";
 
@@ -64,6 +65,9 @@ export default async function AccessibilityPage({ params }: { params: Promise<{ 
           </p>
         ) : (
           <>
+            <div className="mb-6">
+              <ResultActions />
+            </div>
             {run?.stim_width && (
               <div className="mb-10">
                 <h2 className="font-display text-[16px] font-semibold text-ink">Screenshot</h2>
