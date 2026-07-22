@@ -98,9 +98,15 @@
     "click",
     function (e) {
       var el = e.target;
-      var rect = document.documentElement.getBoundingClientRect();
-      var xPct = (e.pageX - rect.left) / document.documentElement.scrollWidth;
-      var yPct = (e.pageY - rect.top) / document.documentElement.scrollHeight;
+      // pageX/pageY are already document-absolute (they include scroll
+      // offset), so dividing directly by the document's full scroll
+      // width/height gives the normalized position — no viewport-rect
+      // correction needed. Subtracting getBoundingClientRect() here used to
+      // double-count the scroll offset (that rect is viewport-relative, so
+      // its top/left are already ~ -scrollY/-scrollX), inflating y past 1.0
+      // for any click below the fold on a scrolled page.
+      var xPct = e.pageX / document.documentElement.scrollWidth;
+      var yPct = e.pageY / document.documentElement.scrollHeight;
       var selector = el.tagName ? el.tagName.toLowerCase() + (el.id ? "#" + el.id : "") : "unknown";
       send("click", { x: xPct, y: yPct, selector: selector });
 

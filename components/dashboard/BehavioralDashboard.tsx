@@ -145,8 +145,10 @@ export function BehavioralDashboard({
                 Click density across this page specifically, bucketed into a 20×12 grid and shown
                 in context on a screenshot — scoped to this URL&rsquo;s own path even if the
                 snippet is installed site-wide, since coordinates only line up against this page&rsquo;s
-                own layout. Teal ramp only — never red-for-hot, since brick is reserved for a
-                failing status elsewhere in this system.
+                own layout. Weighted by scroll depth, so a row few visitors ever scrolled to reads
+                as clicks-per-viewer rather than looking cold just because fewer people saw it.
+                Teal ramp only — never red-for-hot, since brick is reserved for a failing status
+                elsewhere in this system.
               </p>
               <button
                 type="button"
@@ -158,9 +160,9 @@ export function BehavioralDashboard({
               </button>
             </div>
             <ToolExplainer
-              what="Click density across the live page, overlaid on a real screenshot so you can see exactly where clicks land in context — plus rage-click detection."
-              problem="Without this, you're guessing whether visitors are actually clicking your CTA, ignoring a whole section, or clicking on something that looks interactive but isn't — a guess that's usually wrong in a way that only shows up once conversion numbers are already bad."
-              insight="Real click coordinates from the tracking snippet get bucketed onto an actual screenshot of the page, so a hot spot means something concrete you can point to, not an abstract chart disconnected from what the page looks like."
+              what="Click density and scroll depth together, overlaid on a real screenshot so you can see exactly where clicks land in context — plus rage-click detection."
+              problem="Without this, you're guessing whether visitors are actually clicking your CTA, ignoring a whole section, or clicking on something that looks interactive but isn't — and raw click counts alone mislead you further, since anything below the fold looks 'cold' just because fewer people scroll that far, not because they're ignoring it."
+              insight="Click coordinates and scroll-depth checkpoints both land in the same normalized page-height space, so each row's click count gets divided by the share of sessions that actually scrolled far enough to see it — a hot spot below the fold means the visitors who reached it clicked heavily, not that raw volume happens to be high near the top."
             />
             {captureError && <p className="mt-4 mb-3 font-mono text-[11px] text-brick">{captureError}</p>}
             <div className="mt-6">

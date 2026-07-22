@@ -73,6 +73,56 @@ export function computeFunnelBySegment(events: EventRow[], dimension: "device" |
   return result;
 }
 
+const MIN_REACH_SESSIONS = 3;
+
+/**
+ * Fraction of sessions that scrolled far enough to see each row of the
+ * heatmap grid, plus the total session count that fraction is drawn from.
+ * Click y and scroll depth are already in the same normalized page-height
+ * space (both computed against document height in the snippet), so a
+ * scroll_depth checkpoint of D can stand in directly for "reached D% down
+ * the page." Row 0 is always 1 — every session that loads the page sees the
+ * initial fold regardless of whether it ever scrolls.
+ */
+function computeScrollReachByRow(events: EventRow[], rows: number): { reach: number[]; totalSessions: number } {
+  const sessionIds = new Set<string>();
+  for (const e of events) if (e.type === "pageview") sessionIds.add(e.session_id);
+  const totalSessions = sessionIds.size;
+  if (totalSessions === 0) return { reach: new Array(rows).fill(1), totalSessions: 0 };
+
+  const maxDepthBySession = new Map<string, number>();
+  for (const e of events) {
+    if (e.type !== "scroll_depth") continue;
+    const depth = (e.payload as { depth?: number })?.depth ?? 0;
+    if (depth > (maxDepthBySession.get(e.session_id) ?? 0)) maxDepthBySession.set(e.session_id, depth);
+  }
+
+  const reach: number[] = [];
+  for (let row = 0; row < rows; row++) {
+    if (row === 0) {
+      reach.push(1);
+      continue;
+    }
+    const rowTop = row / rows;
+    let reached = 0;
+    for (const sid of sessionIds) {
+      if (((maxDepthBySession.get(sid) ?? 0) / 100) >= rowTop) reached++;
+    }
+    reach.push(reached / totalSessions);
+  }
+  return { reach, totalSessions };
+}
+
+/**
+ * Click density weighted by scroll-depth reach: a row only 30% of sessions
+ * ever scrolled to isn't "cold" because people ignore it, it's cold because
+ * most people never saw it — dividing by reach turns raw click counts into
+ * clicks-per-viewer, so a hot spot below the fold reads as hot precisely
+ * when the visitors who did reach it clicked heavily, not just when raw
+ * click volume happens to be high near the top of the page. Rows too few
+ * sessions ever reached (below MIN_REACH_SESSIONS) fall back to the raw
+ * count instead, so a division by a tiny sample doesn't produce noise.
+ */
 export function computeHeatmapBuckets(events: EventRow[], cols = 20, rows = 12): number[] {
   const buckets = new Array(cols * rows).fill(0);
   const clicks = events.filter((e) => e.type === "click");
@@ -83,8 +133,16 @@ export function computeHeatmapBuckets(events: EventRow[], cols = 20, rows = 12):
     const row = Math.min(rows - 1, Math.max(0, Math.floor(y * rows)));
     buckets[row * cols + col]++;
   }
-  const max = Math.max(...buckets, 1);
-  return buckets.map((b) => b / max);
+
+  const { reach, totalSessions } = computeScrollReachByRow(events, rows);
+  const weighted = buckets.map((count, i) => {
+    const row = Math.floor(i / cols);
+    const reachedSessions = reach[row] * totalSessions;
+    return reachedSessions >= MIN_REACH_SESSIONS ? count / Math.max(reach[row], 1e-6) : count;
+  });
+
+  const max = Math.max(...weighted, 1e-9);
+  return weighted.map((b) => b / max);
 }
 
 export function computeRageClicks(events: EventRow[]): { selector: string; count: number }[] {
