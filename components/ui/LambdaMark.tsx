@@ -70,15 +70,19 @@ export function LambdaMark({
       style={{ width: size, height: size, fontSize: size * 0.46 }}
       aria-hidden="true"
     >
-      {/* λ already reads as a "y" in this typeface — spin it upside down and let "es" slide out beside it, so the mark reveals "Yes" on hover. */}
-      <span className="inline-block transition-transform duration-500 [transition-timing-function:cubic-bezier(.2,.8,.3,1.3)] group-hover:rotate-180">
-        λ
-      </span>
-      <span
-        className="pointer-events-none absolute top-1/2 left-full -translate-x-2 -translate-y-1/2 pl-1.5 whitespace-nowrap opacity-0 transition-all duration-500 [transition-timing-function:cubic-bezier(.2,.8,.3,1.3)] group-hover:translate-x-0 group-hover:opacity-100"
-        style={{ fontSize: size * 0.46 }}
-      >
-        es
+      {/* λ already reads as a "y" in this typeface — spin it upside down and let "es" slide out beside it, so the mark reveals "Yes" on hover.
+          "es" is positioned off the glyph's own shrink-wrapped box (this inner span), not the outer fixed-size container — anchoring it to
+          the container left a wide empty gap, since the container is padded well past the glyph to keep a consistent layout footprint. */}
+      <span className="relative inline-block">
+        <span className="inline-block transition-transform duration-500 [transition-timing-function:cubic-bezier(.2,.8,.3,1.3)] group-hover:rotate-180">
+          λ
+        </span>
+        <span
+          className="pointer-events-none absolute top-1/2 left-full -translate-x-1 -translate-y-1/2 whitespace-nowrap opacity-0 transition-all duration-500 [transition-timing-function:cubic-bezier(.2,.8,.3,1.3)] group-hover:translate-x-0 group-hover:opacity-100"
+          style={{ fontSize: size * 0.46 }}
+        >
+          es
+        </span>
       </span>
     </div>
   );
