@@ -66,14 +66,20 @@ export function LambdaMark({
 
   return (
     <div
-      className={cn(
-        "inline-flex shrink-0 items-center justify-center border-2 border-ink bg-cream font-display font-bold text-ink transition-transform duration-500 [transition-timing-function:cubic-bezier(.2,.8,.3,1.3)] hover:rotate-180",
-        className,
-      )}
+      className={cn("group relative inline-flex shrink-0 items-center justify-center font-display font-bold text-ink", className)}
       style={{ width: size, height: size, fontSize: size * 0.46 }}
       aria-hidden="true"
     >
-      λ
+      {/* λ already reads as a "y" in this typeface — spin it upside down and let "es" slide out beside it, so the mark reveals "Yes" on hover. */}
+      <span className="inline-block transition-transform duration-500 [transition-timing-function:cubic-bezier(.2,.8,.3,1.3)] group-hover:rotate-180">
+        λ
+      </span>
+      <span
+        className="pointer-events-none absolute top-1/2 left-full -translate-x-2 -translate-y-1/2 pl-1.5 whitespace-nowrap opacity-0 transition-all duration-500 [transition-timing-function:cubic-bezier(.2,.8,.3,1.3)] group-hover:translate-x-0 group-hover:opacity-100"
+        style={{ fontSize: size * 0.46 }}
+      >
+        es
+      </span>
     </div>
   );
 }

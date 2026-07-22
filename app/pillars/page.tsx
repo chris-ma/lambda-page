@@ -39,10 +39,7 @@ export default function PillarsPage() {
                   background: "radial-gradient(closest-side, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0) 72%)",
                 }}
               />
-              <LambdaMark
-                size={48}
-                className="relative shadow-[0_1px_2px_rgba(23,23,23,0.08),0_14px_28px_-10px_rgba(23,23,23,0.22),0_32px_48px_-24px_rgba(23,23,23,0.14)]"
-              />
+              <LambdaMark size={48} className="relative" />
             </div>
           </Reveal>
           <Reveal delay={60}>
