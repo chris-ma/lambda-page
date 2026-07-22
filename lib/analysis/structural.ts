@@ -212,7 +212,11 @@ export async function runStructuralAnalysis(
 
   try {
     const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
-    await page.goto(targetUrl, { waitUntil: "networkidle", timeout: 30000 });
+    // "networkidle" hangs indefinitely on real sites with persistent
+    // connections (chat widgets, analytics, ads) until the 30s timeout fires
+    // — "load" is deterministic; the settle wait covers late-rendering content.
+    await page.goto(targetUrl, { waitUntil: "load", timeout: 30000 });
+    await page.waitForTimeout(1000);
     const dom = await extractDom(page);
     const origin = new URL(targetUrl).origin;
     await page.close();

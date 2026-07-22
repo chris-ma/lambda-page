@@ -22,7 +22,11 @@ export async function runCompetitiveScan(targetUrl: string): Promise<{ findings:
   const browser = await launchBrowser();
   try {
     const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
-    await page.goto(targetUrl, { waitUntil: "networkidle", timeout: 30000 });
+    // "networkidle" hangs indefinitely on real sites with persistent
+    // connections (chat widgets, analytics, ads) until the 30s timeout fires
+    // — "load" is deterministic; the settle wait covers late-rendering content.
+    await page.goto(targetUrl, { waitUntil: "load", timeout: 30000 });
+    await page.waitForTimeout(1000);
 
     const data = await page.evaluate(() => {
       const h1 = document.querySelector("h1");

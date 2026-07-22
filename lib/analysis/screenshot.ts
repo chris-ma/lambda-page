@@ -23,8 +23,13 @@ export async function capturePageScreenshot(
   const browser = await launchBrowser();
   try {
     const page = await browser.newPage({ viewport, deviceScaleFactor: 1 });
-    await page.goto(targetUrl, { waitUntil: "networkidle", timeout: 30000 });
-    // Let late images/fonts settle before capturing.
+    // "networkidle" is unreliable on real-world sites — chat widgets, ad
+    // networks, and analytics beacons routinely keep a connection open
+    // indefinitely, so the wait condition itself never resolves and the
+    // whole capture times out on an otherwise perfectly normal page. "load"
+    // (initial resources loaded) is deterministic; the settle wait below
+    // covers late images/fonts/lazy content the load event doesn't wait for.
+    await page.goto(targetUrl, { waitUntil: "load", timeout: 30000 });
     await page.waitForTimeout(1200);
     const png = (await page.screenshot({ type: "png", fullPage })) as Buffer;
     return { png, ...pngDimensions(png) };

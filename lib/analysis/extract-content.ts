@@ -5,7 +5,11 @@ export async function extractPageContent(targetUrl: string): Promise<{ title: st
   const browser = await launchBrowser();
   try {
     const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
-    await page.goto(targetUrl, { waitUntil: "networkidle", timeout: 30000 });
+    // "networkidle" hangs indefinitely on real sites with persistent
+    // connections (chat widgets, analytics, ads) until the 30s timeout fires
+    // — "load" is deterministic; the settle wait covers late-rendering content.
+    await page.goto(targetUrl, { waitUntil: "load", timeout: 30000 });
+    await page.waitForTimeout(1000);
     const data = await page.evaluate(() => {
       // Strip script/style/noscript before reading innerText so their contents
       // don't leak into what's supposed to be visible copy.
