@@ -27,7 +27,7 @@ export function UseCases() {
   return (
     <section className="border-b-2 border-ink bg-paper px-6 py-24 text-center">
       <Reveal>
-        <EyebrowLabel className="justify-center">Who Uses Lambda Page</EyebrowLabel>
+        <EyebrowLabel className="justify-center">Who Uses Lambda</EyebrowLabel>
       </Reveal>
       <Reveal delay={60}>
         <h2 className="mx-auto mt-4 max-w-[760px] font-display text-[30px] leading-[1.15] font-semibold text-ink sm:text-[38px]">

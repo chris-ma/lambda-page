@@ -1,4 +1,4 @@
-# Deploying Lambda Page to Vercel
+# Deploying Lambda to Vercel
 
 The marketing site, dashboard, Pillar 0 message testing, Pillar 2 collection,
 and A/B testing are standard Next.js and deploy with no special handling. The

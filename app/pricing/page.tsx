@@ -5,7 +5,7 @@ export default function PricingPage() {
     <PlaceholderPage
       eyebrow="Pricing"
       title="Pricing isn't set yet"
-      body="Every diagnostic is free to run while Lambda Page is in early build. Check back once Pillars 0-2 have real usage behind them."
+      body="Every diagnostic is free to run while Lambda is in early build. Check back once Pillars 0-2 have real usage behind them."
     />
   );
 }

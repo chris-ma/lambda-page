@@ -14,7 +14,7 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "Lambda Page — Diagnostic Toolkit for Landing Pages",
+  title: "Lambda — Diagnostic Toolkit for Landing Pages",
   description:
     "The function between traffic and conversion, made visible. See exactly where a landing page breaks — before you build, while it's live, and everywhere in between.",
 };

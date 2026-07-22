@@ -135,7 +135,7 @@ export function NewAssumptionStudyForm() {
       <input
         value={priceProductLabel}
         onChange={(e) => setPriceProductLabel(e.target.value)}
-        placeholder="e.g. this product, a monthly subscription to Lambda Page"
+        placeholder="e.g. this product, a monthly subscription to Lambda"
         className="mt-2 w-full border-2 border-ink bg-paper px-4 py-3 font-body text-[14px] text-ink focus:outline-none focus:ring-2 focus:ring-teal-deep"
       />
 

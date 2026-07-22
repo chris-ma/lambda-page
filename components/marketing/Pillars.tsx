@@ -22,7 +22,7 @@ export function Pillars() {
         </Reveal>
         <Reveal delay={60}>
           <h2 className="mx-auto mt-4 max-w-[620px] font-display text-[32px] leading-[1.1] font-semibold text-ink sm:text-[42px]">
-            How Lambda Page <em className="text-terracotta-deep font-normal italic">measures</em> a page
+            How Lambda <em className="text-terracotta-deep font-normal italic">measures</em> a page
           </h2>
         </Reveal>
 

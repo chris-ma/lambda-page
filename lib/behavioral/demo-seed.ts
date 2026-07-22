@@ -58,9 +58,9 @@ export const DEMO_TOP_CTAS: CtaStat[] = [
 ];
 
 export const DEMO_OUTBOUND_CLICKS: OutboundStat[] = [
-  { href: "https://calendly.com/lambda-page/demo", clicks: 38 },
-  { href: "https://twitter.com/lambdapage", clicks: 12 },
-  { href: "https://linkedin.com/company/lambda-page", clicks: 7 },
+  { href: "https://calendly.com/lambda/demo", clicks: 38 },
+  { href: "https://twitter.com/uselambda", clicks: 12 },
+  { href: "https://linkedin.com/company/lambda", clicks: 7 },
 ];
 
 export const DEMO_RETURN_VISIT: ReturnVisitStat = { returning: 214, total: 1000, rate: 0.214 };

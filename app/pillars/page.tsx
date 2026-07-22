@@ -20,7 +20,7 @@ const PILLAR_TITLE: Record<number, string> = {
 };
 
 export const metadata = {
-  title: "The Four Pillars — Lambda Page",
+  title: "The Four Pillars — Lambda",
   description: "Why each pillar exists, what it measures, and the tools inside it.",
 };
 
@@ -44,7 +44,7 @@ export default function PillarsPage() {
           <Reveal delay={180}>
             <p className="mx-auto mt-6 max-w-[640px] text-[15.5px] leading-relaxed text-ink-soft">
               Traffic goes in, a conversion either comes out or it doesn&rsquo;t. Instead of one
-              audit at launch, Lambda Page checks the page before it&rsquo;s built, before it
+              audit at launch, Lambda checks the page before it&rsquo;s built, before it
               ships, once it&rsquo;s live, and whenever you need to know why a real person
               didn&rsquo;t convert — four checkpoints, each answering a question the others
               can&rsquo;t.

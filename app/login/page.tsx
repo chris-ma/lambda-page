@@ -5,7 +5,7 @@ export default function LoginPage() {
     <PlaceholderPage
       eyebrow="Log In"
       title="Accounts aren't built yet"
-      body="Lambda Page runs in single-workspace mode for now — no account required for the first report. Head to the dashboard to get started."
+      body="Lambda runs in single-workspace mode for now — no account required for the first report. Head to the dashboard to get started."
     />
   );
 }

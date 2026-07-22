@@ -153,5 +153,5 @@ create table if not exists gaze_points (
 create index if not exists gaze_points_session_idx on gaze_points(session_id);
 
 insert into projects (name)
-select 'Lambda Page Workspace'
+select 'Lambda Workspace'
 where not exists (select 1 from projects);

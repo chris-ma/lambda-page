@@ -1,4 +1,4 @@
-# Lambda Page
+# Lambda
 
 Diagnostic toolkit for landing pages — Pillars 00 (Pre-Build Validation), 01 (Structural
 Analysis), and 02 (Behavioral Analysis), plus the marketing homepage. Pillar 03 (User Testing)

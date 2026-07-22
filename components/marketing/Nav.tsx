@@ -120,7 +120,7 @@ export function Nav() {
         <nav className="mx-auto flex h-[80px] max-w-[1200px] items-center justify-between px-6">
           <Link href="/" className="flex items-center gap-3" onClick={() => setMobileOpen(false)}>
             <LambdaMark size={38} />
-            <span className="font-display text-[19px] text-ink">Lambda Page</span>
+            <span className="font-display text-[19px] text-ink">Lambda</span>
           </Link>
 
         {/* Reading-progress bar */}
