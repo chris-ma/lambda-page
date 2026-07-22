@@ -7,10 +7,10 @@ import type { FindingInput } from "@/lib/db/runs";
 
 export type DomSnapshot = {
   headings: { level: number; text: string }[];
-  imgs: { hasAlt: boolean; src: string }[];
-  tapTargets: { tag: string; id: string; w: number; h: number; text: string }[];
+  imgs: { hasAlt: boolean; src: string; x: number | null; y: number | null }[];
+  tapTargets: { tag: string; id: string; w: number; h: number; text: string; x: number | null; y: number | null }[];
   formFields: { field: string; type: string }[];
-  contrastSamples: { tag: string; text: string; color: string; bg: string; fontSize: number; bold: boolean }[];
+  contrastSamples: { tag: string; text: string; color: string; bg: string; fontSize: number; bold: boolean; x: number | null; y: number | null }[];
   title: string;
   metaDescription: string | null;
   canonical: string | null;
@@ -61,21 +61,29 @@ export async function extractDom(page: Page): Promise<DomSnapshot> {
       .filter(visible)
       .map((h) => ({ level: Number(h.tagName[1]), text: (h.textContent || "").trim().slice(0, 120) }));
 
-    const imgs = Array.from(document.querySelectorAll("img")).map((img) => ({
-      hasAlt: img.hasAttribute("alt") && img.getAttribute("alt")!.trim().length > 0,
-      src: img.getAttribute("src") || "",
-    }));
+    const imgs = Array.from(document.querySelectorAll("img")).map((img) => {
+      const pos = centerPos(img);
+      return {
+        hasAlt: img.hasAttribute("alt") && img.getAttribute("alt")!.trim().length > 0,
+        src: img.getAttribute("src") || "",
+        x: pos?.x ?? null,
+        y: pos?.y ?? null,
+      };
+    });
 
     const tapTargets = Array.from(document.querySelectorAll("a,button,[role=button],input[type=submit]"))
       .filter(visible)
       .map((el) => {
         const r = el.getBoundingClientRect();
+        const pos = centerPos(el);
         return {
           tag: el.tagName.toLowerCase(),
           id: el.id || "",
           w: Math.round(r.width),
           h: Math.round(r.height),
           text: (el.textContent || "").trim().slice(0, 40),
+          x: pos?.x ?? null,
+          y: pos?.y ?? null,
         };
       });
 
@@ -109,6 +117,7 @@ export async function extractDom(page: Page): Promise<DomSnapshot> {
         }
         bgEl = bgEl.parentElement;
       }
+      const pos = centerPos(el);
       return {
         tag: el.tagName.toLowerCase(),
         text: (el.textContent || "").trim().slice(0, 60),
@@ -116,6 +125,8 @@ export async function extractDom(page: Page): Promise<DomSnapshot> {
         bg,
         fontSize: parseFloat(style.fontSize),
         bold: parseInt(style.fontWeight, 10) >= 600,
+        x: pos?.x ?? null,
+        y: pos?.y ?? null,
       };
     });
 
@@ -255,16 +266,25 @@ export async function runStructuralAnalysis(
     try {
       const png = (await page.screenshot({ type: "png", fullPage: true })) as Buffer;
       screenshot = { png, ...pngDimensions(png) };
-    } catch {
-      // Screenshot capture failing (e.g. a page too tall to render) shouldn't
-      // sink the whole rule-based findings pass — it just means no pins.
+    } catch (err) {
+      // Full-page capture can fail on very tall pages (raster buffer size in
+      // the serverless sandbox) — fall back to a viewport-only shot rather
+      // than losing the screenshot entirely.
+      console.error("[structural] full-page screenshot failed, falling back to viewport", err);
+      try {
+        const png = (await page.screenshot({ type: "png", fullPage: false })) as Buffer;
+        screenshot = { png, ...pngDimensions(png) };
+      } catch (fallbackErr) {
+        // Shouldn't sink the whole rule-based findings pass — it just means no pins.
+        console.error("[structural] viewport screenshot fallback also failed", fallbackErr);
+      }
     }
     await page.close();
 
     // ---- Design & Content Audit: heading hierarchy ----
     const h1Count = dom.headings.filter((h) => h.level === 1).length;
     if (h1Count === 1) {
-      findings.push({ component: "Content & Accessibility", attribute: "Heading hierarchy — single H1", status: "PASS", value: "1", detail: `H1: "${dom.headings.find((h) => h.level === 1)?.text}"` });
+      findings.push({ component: "Content & Accessibility", attribute: "Heading hierarchy — single H1", status: "PASS", value: "1", detail: `H1: "${dom.headings.find((h) => h.level === 1)?.text}"`, x: dom.h1Position?.x, y: dom.h1Position?.y });
     } else if (h1Count === 0) {
       findings.push({ component: "Content & Accessibility", attribute: "Heading hierarchy — single H1", status: "FAILING", value: "0", detail: "No H1 found on the page.", fix: "Add exactly one H1 that states the page's primary subject." });
     } else {
@@ -285,6 +305,8 @@ export async function runStructuralAnalysis(
     let contrastFails = 0;
     let contrastChecked = 0;
     const worstFails: string[] = [];
+    let worstRatio = Infinity;
+    let worstPos: { x: number; y: number } | null = null;
     for (const s of dom.contrastSamples) {
       const fg = parseRgb(s.color);
       const bgRaw = parseRgb(s.bg);
@@ -296,6 +318,10 @@ export async function runStructuralAnalysis(
       if (!passesAA(ratio, isLarge)) {
         contrastFails++;
         if (worstFails.length < 5) worstFails.push(`"${s.text}" — ${ratio.toFixed(2)}:1`);
+        if (ratio < worstRatio && s.x !== null && s.y !== null) {
+          worstRatio = ratio;
+          worstPos = { x: s.x, y: s.y };
+        }
       }
     }
     if (contrastChecked === 0) {
@@ -310,6 +336,8 @@ export async function runStructuralAnalysis(
         value: `${contrastFails}/${contrastChecked} fail`,
         detail: `Examples: ${worstFails.join("; ")}`,
         fix: "Darken text or lighten/darken the background so the ratio reaches 4.5:1 (or 3:1 for large/bold text).",
+        x: worstPos?.x,
+        y: worstPos?.y,
       });
     }
 
@@ -320,7 +348,16 @@ export async function runStructuralAnalysis(
         ? { component: "Content & Accessibility", attribute: "Image alt text", status: "INFO", detail: "No <img> elements found on the page." }
         : missingAlt.length === 0
           ? { component: "Content & Accessibility", attribute: "Image alt text", status: "PASS", value: `${dom.imgs.length}/${dom.imgs.length}`, detail: "Every image has non-empty alt text." }
-          : { component: "Content & Accessibility", attribute: "Image alt text", status: "FAILING", value: `${missingAlt.length}/${dom.imgs.length} missing`, detail: `${missingAlt.length} image(s) missing alt text, e.g. ${missingAlt[0]?.src.slice(0, 60)}`, fix: "Add descriptive alt text to every content image; use alt=\"\" only for purely decorative images." },
+          : {
+              component: "Content & Accessibility",
+              attribute: "Image alt text",
+              status: "FAILING",
+              value: `${missingAlt.length}/${dom.imgs.length} missing`,
+              detail: `${missingAlt.length} image(s) missing alt text, e.g. ${missingAlt[0]?.src.slice(0, 60)}`,
+              fix: "Add descriptive alt text to every content image; use alt=\"\" only for purely decorative images.",
+              x: missingAlt[0]?.x ?? undefined,
+              y: missingAlt[0]?.y ?? undefined,
+            },
     );
 
     // ---- Tap targets (mobile ≥24×24) ----
@@ -330,7 +367,16 @@ export async function runStructuralAnalysis(
         ? { component: "Content & Accessibility", attribute: "Mobile tap-target size", status: "INFO", detail: "No interactive elements found to measure." }
         : smallTargets.length === 0
           ? { component: "Content & Accessibility", attribute: "Mobile tap-target size", status: "PASS", value: `${dom.tapTargets.length} checked`, detail: "All interactive elements are at least 24×24px at mobile width." }
-          : { component: "Content & Accessibility", attribute: "Mobile tap-target size", status: "FLAGGED", value: `${smallTargets.length}/${dom.tapTargets.length} under 24px`, detail: `Examples: ${smallTargets.slice(0, 3).map((t) => `${t.tag} "${t.text}" (${t.w}×${t.h}px)`).join("; ")}`, fix: "Increase padding so tap targets are at least 24×24px." },
+          : {
+              component: "Content & Accessibility",
+              attribute: "Mobile tap-target size",
+              status: "FLAGGED",
+              value: `${smallTargets.length}/${dom.tapTargets.length} under 24px`,
+              detail: `Examples: ${smallTargets.slice(0, 3).map((t) => `${t.tag} "${t.text}" (${t.w}×${t.h}px)`).join("; ")}`,
+              fix: "Increase padding so tap targets are at least 24×24px.",
+              x: smallTargets[0]?.x ?? undefined,
+              y: smallTargets[0]?.y ?? undefined,
+            },
     );
 
     // ---- Interaction-state definitions (hover / focus / error) ----

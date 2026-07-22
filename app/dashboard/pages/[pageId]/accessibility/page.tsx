@@ -4,6 +4,7 @@ import { latestRunWithFindings } from "@/lib/db/runs";
 import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
 import { FindingsReport } from "@/components/dashboard/FindingsReport";
 import { RunAnalysisButton } from "@/components/dashboard/RunAnalysisButton";
+import { AnnotatedStimulus } from "@/components/dashboard/AnnotatedStimulus";
 
 export const dynamic = "force-dynamic";
 
@@ -29,6 +30,9 @@ export default async function AccessibilityPage({ params }: { params: Promise<{ 
     .filter((f) => f.component === "Content & Accessibility")
     .filter((f) => WCAG_ATTRIBUTES.some((attr) => f.attribute.includes(attr)))
     .map((f) => ({ ...f, component: "Accessibility" }));
+
+  const pinned = a11yFindings.filter((f) => f.x !== null && f.y !== null);
+  const aspectRatio = run?.stim_width && run?.stim_height ? `${run.stim_width} / ${run.stim_height}` : "9 / 16";
 
   return (
     <div>
@@ -59,7 +63,26 @@ export default async function AccessibilityPage({ params }: { params: Promise<{ 
               : "No findings yet. Run the diagnostic to get a first read."}
           </p>
         ) : (
-          <FindingsReport findings={a11yFindings} />
+          <>
+            {run?.stim_width && (
+              <div className="mb-10">
+                <h2 className="font-display text-[16px] font-semibold text-ink">Screenshot</h2>
+                <p className="mt-1 max-w-[640px] text-[12.5px] text-ink-soft">
+                  {pinned.length > 0
+                    ? "Findings with a real on-page location — heading structure, contrast, alt text, and tap-target size — are pinned below. Page-wide checks (hover/focus states, brand consistency, readability) aren't tied to one spot, so they stay in the list below instead."
+                    : "This mobile screenshot is what the DOM pass actually crawled — none of this run's findings had a specific on-page location to pin."}
+                </p>
+                <div className="mt-4 max-w-[420px]">
+                  <AnnotatedStimulus
+                    stimulusUrl={`/api/runs/${run.id}/stimulus`}
+                    aspectRatio={aspectRatio}
+                    findings={a11yFindings.map((f) => ({ id: f.id, attribute: f.attribute, detail: f.detail, fix: f.fix, status: f.status, x: f.x, y: f.y }))}
+                  />
+                </div>
+              </div>
+            )}
+            <FindingsReport findings={a11yFindings} />
+          </>
         )}
       </div>
     </div>
