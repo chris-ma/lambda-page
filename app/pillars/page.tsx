@@ -29,9 +29,21 @@ export default function PillarsPage() {
     <>
       <Nav />
       <main>
-        <section className="border-b-2 border-ink bg-cream px-6 py-24 text-center">
+        <section className="border-b-2 border-ink bg-[radial-gradient(120%_100%_at_50%_-10%,#ffffff_0%,#fafafa_50%,#f0f0f0_100%)] px-6 py-24 text-center">
           <Reveal>
-            <LambdaMark size={48} className="mx-auto" />
+            <div className="relative mx-auto flex h-[132px] w-[132px] items-center justify-center">
+              <div
+                aria-hidden="true"
+                className="absolute inset-0 rounded-full"
+                style={{
+                  background: "radial-gradient(closest-side, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0) 72%)",
+                }}
+              />
+              <LambdaMark
+                size={48}
+                className="relative shadow-[0_1px_2px_rgba(23,23,23,0.08),0_14px_28px_-10px_rgba(23,23,23,0.22),0_32px_48px_-24px_rgba(23,23,23,0.14)]"
+              />
+            </div>
           </Reveal>
           <Reveal delay={60}>
             <EyebrowLabel className="mt-8 justify-center">Four Pillars</EyebrowLabel>
@@ -136,7 +148,7 @@ export default function PillarsPage() {
           );
         })}
 
-        <section className="bg-terracotta px-6 py-24 text-center">
+        <section className="cta-texture border-b-2 border-ink px-6 py-24 text-center">
           <Reveal>
             <h2 className="mx-auto max-w-[420px] font-display text-[32px] font-semibold text-ink">
               See where your page breaks
