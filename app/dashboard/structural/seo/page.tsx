@@ -12,16 +12,17 @@ export default async function SeoHub() {
   return (
     <div>
       <EyebrowLabel>Pillar 01 — Structural Analysis</EyebrowLabel>
-      <h1 className="mt-3 font-display text-[28px] font-semibold text-ink">SEO &amp; AI Search Analysis</h1>
+      <h1 className="mt-3 font-display text-[28px] font-semibold text-ink">SEO, AI Search &amp; Vitals</h1>
       <p className="mt-2 max-w-[640px] text-[13.5px] text-ink-soft">
         Traditional SEO — meta tags, structured data, indexability — alongside AEO/GEO
-        extractability for answer and generative engines. Scored as two separate sections so a
-        strong SEO read never masks a failing AI-search one.
+        extractability for answer and generative engines, plus lab-based Core Web Vitals with
+        plain-language explanations of what the numbers actually mean. A mobile screenshot shows
+        where findings with a real on-page location — like the H1 or an FAQ block — land.
       </p>
       <ToolExplainer
-        what="Traditional SEO — meta tags, structured data, indexability — measured alongside AEO/GEO extractability for answer and generative engines, as two separate scored sections."
-        problem="A page can be perfectly optimized for a classic search crawler and still be functionally invisible to an AI answer engine that needs clean entity structure and chunkable content to quote from it — and because both disciplines get called “search,” teams often only check one."
-        insight="Every check here is a measured fact — a meta tag exists or it doesn't, a schema block validates or it doesn't — and SEO and AEO/GEO are scored and shown separately on purpose, so a strong classic-SEO score can never quietly mask a page that generative engines can't parse."
+        what="Traditional SEO — meta tags, structured data, indexability — measured alongside AEO/GEO extractability for answer and generative engines, plus lab-based Core Web Vitals, as separate scored sections on one screenshot."
+        problem="A page can be perfectly optimized for a classic search crawler and still be functionally invisible to an AI answer engine that needs clean entity structure and chunkable content to quote from it — and raw vitals numbers like “2.4s LCP” mean nothing to most people without translation into what it actually costs the business."
+        insight="Every check here is a measured fact — a meta tag exists or it doesn't, a schema block validates or it doesn't, a Lighthouse pass returns a real millisecond value — and SEO, AEO/GEO, and Vitals are scored and shown separately on purpose, with vitals numbers translated into plain language, so a strong score in one area can never quietly mask a real problem in another."
       />
 
       <section className="mt-10">

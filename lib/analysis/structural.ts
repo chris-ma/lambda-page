@@ -1,5 +1,6 @@
 import type { Page } from "playwright-core";
 import { launchBrowser } from "./browser";
+import { pngDimensions } from "./screenshot";
 import { contrastRatio, parseRgb, blendOverWhite, passesAA } from "./contrast";
 import { fleschReadingEase, jargonDensity, readabilityLabel } from "./content";
 import type { FindingInput } from "@/lib/db/runs";
@@ -26,6 +27,10 @@ export type DomSnapshot = {
   errorStateRuleCount: number;
   colorUsage: { color: string; count: number }[];
   fontFamiliesUsed: string[];
+  /** Normalized (0..1, same space as click-heatmap coordinates) center position of the H1, for pinning an SEO/AEO finding to it on a screenshot. Null if no visible H1. */
+  h1Position: { x: number; y: number } | null;
+  /** Same, for the first element actually matching the FAQ/Q&A selector (not the looser body-text regex fallback, which has no single position). */
+  faqPosition: { x: number; y: number } | null;
 };
 
 export async function extractDom(page: Page): Promise<DomSnapshot> {
@@ -34,6 +39,22 @@ export async function extractDom(page: Page): Promise<DomSnapshot> {
       const r = el.getBoundingClientRect();
       const style = window.getComputedStyle(el);
       return r.width > 0 && r.height > 0 && style.visibility !== "hidden" && style.display !== "none";
+    }
+
+    // Normalized center position of an element, in the same document-space
+    // (0..1 against full scrollWidth/scrollHeight) the click heatmap already
+    // uses — getBoundingClientRect() is viewport-relative, so scroll offset
+    // has to be added back in to get a document-absolute position.
+    function centerPos(el: Element | null): { x: number; y: number } | null {
+      if (!el || !visible(el)) return null;
+      const r = el.getBoundingClientRect();
+      const scrollWidth = document.documentElement.scrollWidth;
+      const scrollHeight = document.documentElement.scrollHeight;
+      if (scrollWidth <= 0 || scrollHeight <= 0) return null;
+      return {
+        x: (r.left + window.scrollX + r.width / 2) / scrollWidth,
+        y: (r.top + window.scrollY + r.height / 2) / scrollHeight,
+      };
     }
 
     const headings = Array.from(document.querySelectorAll("h1,h2,h3,h4,h5,h6"))
@@ -106,9 +127,12 @@ export async function extractDom(page: Page): Promise<DomSnapshot> {
     bodyClone.querySelectorAll("script,style,noscript").forEach((n) => n.remove());
     const bodyText = (bodyClone.textContent || "").replace(/\s+/g, " ").trim();
 
-    const faqLike =
-      document.querySelectorAll("dl dt, [itemtype*='FAQPage'], details summary").length > 0 ||
-      /\bQ:|\bFAQ\b|frequently asked/i.test(bodyText.slice(0, 5000));
+    const faqEl = document.querySelector("dl dt, [itemtype*='FAQPage'], details summary");
+    const faqLike = faqEl !== null || /\bQ:|\bFAQ\b|frequently asked/i.test(bodyText.slice(0, 5000));
+    const faqPosition = centerPos(faqEl);
+
+    const h1El = document.querySelector("h1");
+    const h1Position = centerPos(h1El);
 
     const linkEls = Array.from(document.querySelectorAll("a[href]"));
     let internalLinks = 0;
@@ -174,6 +198,8 @@ export async function extractDom(page: Page): Promise<DomSnapshot> {
       errorStateRuleCount,
       colorUsage,
       fontFamiliesUsed: Array.from(fontSet),
+      h1Position,
+      faqPosition,
     };
   });
 }
@@ -206,7 +232,7 @@ async function fetchText(url: string): Promise<{ ok: boolean; text: string }> {
 export async function runStructuralAnalysis(
   targetUrl: string,
   brand?: BrandSpec,
-): Promise<{ findings: FindingInput[]; summary: Record<string, unknown> }> {
+): Promise<{ findings: FindingInput[]; summary: Record<string, unknown>; screenshot: { png: Buffer; width: number; height: number } | null }> {
   const browser = await launchBrowser();
   const findings: FindingInput[] = [];
 
@@ -219,6 +245,20 @@ export async function runStructuralAnalysis(
     await page.waitForTimeout(1000);
     const dom = await extractDom(page);
     const origin = new URL(targetUrl).origin;
+    // Reuses this same already-open page/session rather than a separate
+    // capturePageScreenshot() call — an extra full Chromium launch here would
+    // compete with the Lighthouse pass that runs right after this for the
+    // same memory-constrained serverless function (see orchestrate.ts). Lets
+    // SEO/AEO findings with a real on-page location (H1, FAQ block) be pinned
+    // to it, same as Design & Content Audit's screenshot.
+    let screenshot: { png: Buffer; width: number; height: number } | null = null;
+    try {
+      const png = (await page.screenshot({ type: "png", fullPage: true })) as Buffer;
+      screenshot = { png, ...pngDimensions(png) };
+    } catch {
+      // Screenshot capture failing (e.g. a page too tall to render) shouldn't
+      // sink the whole rule-based findings pass — it just means no pins.
+    }
     await page.close();
 
     // ---- Design & Content Audit: heading hierarchy ----
@@ -437,14 +477,14 @@ export async function runStructuralAnalysis(
     );
     findings.push(
       dom.faqLike
-        ? { component: "AEO / GEO Analysis", attribute: "Extractable Q&A / FAQ structure", status: "PASS", detail: "Detected FAQ-like markup or Q&A phrasing." }
+        ? { component: "AEO / GEO Analysis", attribute: "Extractable Q&A / FAQ structure", status: "PASS", detail: "Detected FAQ-like markup or Q&A phrasing.", x: dom.faqPosition?.x, y: dom.faqPosition?.y }
         : { component: "AEO / GEO Analysis", attribute: "Extractable Q&A / FAQ structure", status: "FLAGGED", detail: "No FAQ/Q&A block detected.", fix: "Add a direct Q&A or definition block a model can extract in isolation." },
     );
     const h1Text = dom.headings.find((h) => h.level === 1)?.text ?? "";
     findings.push(
       h1Text.length >= 8
-        ? { component: "AEO / GEO Analysis", attribute: "Entity clarity (H1 states the subject)", status: "PASS", value: `"${h1Text}"` }
-        : { component: "AEO / GEO Analysis", attribute: "Entity clarity (H1 states the subject)", status: "FLAGGED", detail: "H1 is missing or too short to unambiguously state the page's subject.", fix: "Make the H1 explicitly name the product/subject of the page." },
+        ? { component: "AEO / GEO Analysis", attribute: "Entity clarity (H1 states the subject)", status: "PASS", value: `"${h1Text}"`, x: dom.h1Position?.x, y: dom.h1Position?.y }
+        : { component: "AEO / GEO Analysis", attribute: "Entity clarity (H1 states the subject)", status: "FLAGGED", detail: "H1 is missing or too short to unambiguously state the page's subject.", fix: "Make the H1 explicitly name the product/subject of the page.", x: dom.h1Position?.x, y: dom.h1Position?.y },
     );
     const chunkRatio = dom.paragraphCount > 0 ? dom.headingCount / dom.paragraphCount : 0;
     findings.push({
@@ -466,6 +506,7 @@ export async function runStructuralAnalysis(
         readability: score,
         wordCount: words,
       },
+      screenshot,
     };
   } finally {
     await browser.close();

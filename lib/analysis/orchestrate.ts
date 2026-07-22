@@ -1,4 +1,4 @@
-import { createRun, completeRun, failRun } from "@/lib/db/runs";
+import { createRun, completeRun, failRun, setRunStimulus } from "@/lib/db/runs";
 import { runStructuralAnalysis, type BrandSpec } from "./structural";
 import { runLabVitals } from "./vitals";
 import { getProjectForPage } from "@/lib/db/projects";
@@ -32,6 +32,9 @@ export async function runPillar1(pageId: string, targetUrl: string) {
     if (dom.status === "fulfilled") {
       findings.push(...dom.value.findings);
       Object.assign(summary, dom.value.summary);
+      if (dom.value.screenshot) {
+        await setRunStimulus(run.id, dom.value.screenshot.png, dom.value.screenshot.width, dom.value.screenshot.height, "image/png");
+      }
     } else {
       findings.push({ component: "Content & Accessibility", attribute: "Page render", status: "FAILING", detail: `Could not render the page: ${String(dom.reason?.message ?? dom.reason)}`, fix: "Confirm the URL is publicly reachable and does not block headless browsers." });
     }

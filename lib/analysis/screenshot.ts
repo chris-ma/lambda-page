@@ -4,7 +4,7 @@ import { launchBrowser } from "./browser";
 // "IHDR", then big-endian width/height at offsets 16 and 20. Reading it
 // directly avoids trusting the requested viewport size, which is wrong for
 // full-page captures (the real height is the page's scroll height).
-function pngDimensions(png: Buffer): { width: number; height: number } {
+export function pngDimensions(png: Buffer): { width: number; height: number } {
   return { width: png.readUInt32BE(16), height: png.readUInt32BE(20) };
 }
 

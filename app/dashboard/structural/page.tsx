@@ -16,14 +16,10 @@ export default async function StructuralHub() {
       <EyebrowLabel>Pillar 01</EyebrowLabel>
       <h1 className="mt-3 font-display text-[28px] font-semibold text-ink">Structural Analysis</h1>
       <p className="mt-2 max-w-[640px] text-[13.5px] text-ink-soft">
-        SEO &amp; AI Search, Page Vitals, and Content &amp; Accessibility are rule-based checks
-        that run together per connected page — see{" "}
+        SEO &amp; AI Search (with Page Vitals included), and Content &amp; Accessibility are
+        rule-based checks that run together per connected page — see{" "}
         <Link href="/dashboard/structural/seo" className="underline">
-          SEO &amp; AI Search
-        </Link>{" "}
-        or{" "}
-        <Link href="/dashboard/structural/vitals" className="underline">
-          Page Vitals
+          SEO, AI Search &amp; Vitals
         </Link>{" "}
         directly, or the full combined report below. Design &amp; Content Audit is a separate,
         Claude-powered visual critique that runs against any URL directly.
