@@ -21,12 +21,12 @@ export default async function WireframeRunPage({ params }: { params: Promise<{ r
         ← Pre-Build
       </Link>
       <div className="mt-3 flex flex-wrap items-center gap-3">
-        <EyebrowLabel>Wireframe Testing</EyebrowLabel>
+        <EyebrowLabel>Wireframe Analysis</EyebrowLabel>
         <Tag status={run.status === "complete" ? "PASS" : run.status === "error" ? "FAILING" : "INFO"} label={run.status} size="sm" />
       </div>
-      <h1 className="mt-2 font-display text-[24px] font-semibold text-ink">{run.name ?? "Wireframe test"}</h1>
+      <h1 className="mt-2 font-display text-[24px] font-semibold text-ink">{run.name ?? "Wireframe analysis"}</h1>
       {run.target_url !== "uploaded-image" && (
-        <p className="mt-1 break-all font-mono text-[11px] text-ink-soft">Figma reference: {run.target_url}</p>
+        <p className="mt-1 break-all font-mono text-[11px] text-ink-soft">Source: {run.target_url}</p>
       )}
       <div className="mt-6">
         <ResultActions />

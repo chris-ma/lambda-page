@@ -91,16 +91,16 @@ export default async function PreBuildHub() {
 
       <section className="mt-14">
         <div className="flex flex-wrap items-center justify-between gap-4">
-          <h2 className="font-display text-[18px] font-semibold text-ink">Wireframe Testing</h2>
-          <Button href="/dashboard/pre-build/wireframe/new">New test</Button>
+          <h2 className="font-display text-[18px] font-semibold text-ink">Wireframe Analysis</h2>
+          <Button href="/dashboard/pre-build/wireframe/new">New analysis</Button>
         </div>
         <p className="mt-1.5 text-[12.5px] text-ink-soft">
-          Upload a prototype screenshot (or paste a Figma link for reference) and get pinned visual
-          feedback before a single line of code is written.
+          Upload a prototype screenshot, or scan a live prototype URL directly, and get pinned
+          visual feedback before a single line of code is written.
         </p>
         {wireframeRuns.length === 0 ? (
           <Card hover={false} className="mt-4 border-dashed p-8 text-center text-[13px] text-ink-soft">
-            No wireframe tests yet. Upload a prototype image to get started.
+            No wireframe analyses yet. Upload a prototype image or scan a URL to get started.
           </Card>
         ) : (
           <div className="mt-4 grid gap-3 sm:grid-cols-2">

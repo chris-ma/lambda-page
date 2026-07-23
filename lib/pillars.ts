@@ -25,8 +25,8 @@ export const PILLARS_NAV: PillarNavItem[] = [
         href: "/dashboard/pre-build/competitive/new",
       },
       {
-        label: "Wireframe Testing",
-        description: "Upload a prototype screenshot for pinned AI critique.",
+        label: "Wireframe Analysis",
+        description: "Upload a prototype screenshot or scan a live prototype URL for pinned AI critique.",
         href: "/dashboard/pre-build/wireframe/new",
       },
       {
