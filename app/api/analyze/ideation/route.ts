@@ -23,7 +23,7 @@ export async function POST(request: Request) {
   const run = await createIdeationRun({ businessName, description, monetization, targetAudience, brandFeel });
   try {
     const result = await generateLandingPage({ businessName, description, monetization, targetAudience, brandFeel });
-    await completeIdeationRun(run.id, result);
+    await completeIdeationRun(run.id, { html: result.html, pageTitle: businessName });
     return NextResponse.json({ runId: run.id }, { status: 201 });
   } catch (err) {
     await failIdeationRun(run.id, err instanceof Error ? err.message : String(err));

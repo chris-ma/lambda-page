@@ -55,13 +55,10 @@ export async function createIdeationRun(input: {
   return toIdeationRun(row);
 }
 
-export async function completeIdeationRun(
-  id: string,
-  result: { pageTitle: string; html: string; patternsUsed: string[]; rationale: string },
-): Promise<void> {
+export async function completeIdeationRun(id: string, result: { html: string; pageTitle: string }): Promise<void> {
   await query(
-    `update ideation_runs set status = 'complete', page_title = $2, html = $3, patterns_used = $4, rationale = $5, completed_at = now() where id = $1`,
-    [id, result.pageTitle, result.html, JSON.stringify(result.patternsUsed), result.rationale],
+    `update ideation_runs set status = 'complete', page_title = $2, html = $3, completed_at = now() where id = $1`,
+    [id, result.pageTitle, result.html],
   );
 }
 

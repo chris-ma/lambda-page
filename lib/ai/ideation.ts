@@ -32,6 +32,8 @@ Name every pattern you actually apply, using its exact P·NN id and name, in pat
 
 const IDEATION_SYSTEM = `You are a senior product marketer and front-end designer building a single promotional landing page for a pre-launch business idea. This is an MVP marketing page only — not a working app, not a prototype, not a signup flow with a real backend. The business itself still needs to be built; this page's only job is to explain the idea clearly and capture interest.
 
+Your ONLY deliverable is that one HTML document. Don't narrate your reasoning, don't produce anything alongside it — just design and write the page itself, informed by (not narrating) the pattern reference below.
+
 ${PATTERN_LIBRARY}
 
 Requirements for the HTML you produce:
@@ -45,18 +47,12 @@ Requirements for the HTML you produce:
 - The primary call to action must match how the business actually makes money — a free trial reads differently than a waitlist, a one-time purchase, a booked call, or a marketplace listing. Read the monetization description and choose the CTA verb and framing that actually fits it.
 - Any form on the page is presentational only — no real backend, no real network request. A friendly inline confirmation shown via the small vanilla-JS script on submit is enough.
 - Write real, specific copy about the described business — no lorem ipsum, no generic "Your Company Name Here" placeholders.
+- Give the document a real, appropriate <title>.
 
-Return the complete document in html, a short browser-tab-appropriate title in pageTitle, which named patterns you actually drew from and why in patternsUsed, and a short judgment-call rationale for the structural choices in rationale.`;
+Return ONLY the complete HTML document in the html field — nothing else.`;
 
 const ideationResultSchema = z.object({
-  pageTitle: z.string().describe("Browser tab title for the generated landing page."),
-  html: z.string().describe("A complete, valid, self-contained HTML5 document — from <!DOCTYPE html> through </html>."),
-  patternsUsed: z
-    .array(z.string())
-    .min(1)
-    .max(5)
-    .describe("Which patterns from the reference library shaped this page's structure, e.g. \"P·06 — Five-second hero\"."),
-  rationale: z.string().describe("2-4 sentences: the structural/behavioral reasoning behind this page's layout and flow — a judgment call, not a fact."),
+  html: z.string().describe("A complete, valid, self-contained HTML5 document — from <!DOCTYPE html> through </html>. This is the only output — no separate commentary or explanation."),
 });
 
 export type IdeationResult = z.infer<typeof ideationResultSchema>;
@@ -80,5 +76,10 @@ Brand feel: ${input.brandFeel}
 
 Design and write the full one-page landing site now.`;
 
-  return judge({ system: IDEATION_SYSTEM, prompt, schema: ideationResultSchema, maxTokens: 16000 });
+  // Medium effort + a tighter token cap: the schema is now just one HTML
+  // field (no separate rationale/pattern-citation output to plan around),
+  // and this is a single creative-generation pass rather than the kind of
+  // multi-angle judgment call "high" effort is meant for elsewhere in this
+  // app — cuts real wall-clock time without visibly hurting page quality.
+  return judge({ system: IDEATION_SYSTEM, prompt, schema: ideationResultSchema, maxTokens: 10000, effort: "medium" });
 }

@@ -3,7 +3,6 @@ import { getIdeationRun } from "@/lib/db/ideation";
 import { minutesSince } from "@/lib/utils";
 import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
 import { Tag } from "@/components/ui/Tag";
-import { Card } from "@/components/ui/Card";
 import { IdeationPreview } from "@/components/dashboard/IdeationPreview";
 
 export const dynamic = "force-dynamic";
@@ -55,18 +54,7 @@ export default async function IdeationRunPage({ params }: { params: Promise<{ ru
             <p className="border border-dashed border-ink p-8 text-center text-[13.5px] text-ink-soft">Building…</p>
           )
         ) : (
-          <>
-            {run.rationale && (
-              <Card hover={false} className="mb-8 border-2 border-pink-deep p-6">
-                <div className="font-mono text-[10px] uppercase tracking-wide text-pink-deep">Structural approach — AI judgment</div>
-                <p className="mt-2 text-[14px] leading-relaxed text-ink">{run.rationale}</p>
-                {run.patternsUsed.length > 0 && (
-                  <p className="mt-3 font-mono text-[10.5px] text-ink-soft">Patterns: {run.patternsUsed.join(" · ")}</p>
-                )}
-              </Card>
-            )}
-            <IdeationPreview html={run.html} businessName={run.businessName} pageTitle={run.pageTitle ?? run.businessName} />
-          </>
+          <IdeationPreview html={run.html} businessName={run.businessName} pageTitle={run.pageTitle ?? run.businessName} />
         )}
       </div>
     </div>
