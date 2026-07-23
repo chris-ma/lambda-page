@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { FunnelChart, type FunnelStage } from "@/components/charts/FunnelChart";
+import { FunnelSankey } from "@/components/charts/FunnelSankey";
 import { HeatmapGrid } from "@/components/charts/HeatmapGrid";
 import { AnalyticsConnectionPanel } from "@/components/dashboard/AnalyticsConnectionPanel";
 import { LambdaAnalyticsPanel } from "@/components/dashboard/LambdaAnalyticsPanel";
@@ -11,7 +12,7 @@ import { DataTable } from "@/components/ui/DataTable";
 import { Tag } from "@/components/ui/Tag";
 import { ToolExplainer } from "@/components/ui/ToolExplainer";
 import type { FieldStat } from "@/lib/behavioral/aggregate";
-import type { ChannelStat, CtaStat, FlowLink, OutboundStat, PageStat, ReturnVisitStat } from "@/lib/behavioral/campaign";
+import type { ChannelStat, CtaStat, EngagementStats, FlowLink, OutboundStat, PageStat, ReturnVisitStat } from "@/lib/behavioral/campaign";
 import type { FunnelPlan } from "@/lib/db/funnel-plans";
 import type { GA4Report } from "@/lib/analytics/ga4";
 import { formatPercent } from "@/lib/utils";
@@ -48,6 +49,8 @@ export function BehavioralDashboard({
   topPages,
   returnVisits,
   trafficFlow,
+  scrollDepth,
+  engagement,
   funnelPlan,
   initialTab,
 }: {
@@ -70,6 +73,8 @@ export function BehavioralDashboard({
   topPages: PageStat[];
   returnVisits: ReturnVisitStat;
   trafficFlow: FlowLink[];
+  scrollDepth: FunnelStage[];
+  engagement: EngagementStats;
   initialTab?: string;
 }) {
   const validInitialTab = (TABS as readonly string[]).includes(initialTab ?? "")
@@ -170,20 +175,40 @@ export function BehavioralDashboard({
             <div className="mt-6">
               <HeatmapGrid buckets={heatmap} cols={20} screenshotUrl={screenshotUrl} />
             </div>
-            {rageClicks.length > 0 && (
-              <div className="mt-8">
-                <h3 className="font-display text-[15px] font-semibold text-ink">Rage clicks</h3>
-                <DataTable
-                  className="mt-3"
-                  keyFor={(r) => r.selector}
-                  rows={rageClicks}
-                  columns={[
-                    { header: "Element", cell: (r) => r.selector },
-                    { header: "Rage-click sessions", cell: (r) => r.count },
-                  ]}
-                />
+
+            <div className="mt-10 grid gap-8 lg:grid-cols-2">
+              <div>
+                <h3 className="font-display text-[15px] font-semibold text-ink">Scroll depth</h3>
+                <p className="mt-1 text-[12px] text-ink-soft">
+                  How far down the page sessions actually scroll — the same reach numbers the click
+                  heatmap divides by, shown on their own instead of only baked into the weighting.
+                </p>
+                <div className="mt-4 max-w-[420px]">
+                  <FunnelChart stages={scrollDepth} />
+                </div>
               </div>
-            )}
+              <div>
+                <h3 className="font-display text-[15px] font-semibold text-ink">Clicks on page</h3>
+                <p className="mt-1 text-[12px] text-ink-soft">
+                  Every click event captured for this page, feeding the density grid above — a rage
+                  click is 3+ clicks in the same small area within a couple seconds, usually a sign
+                  visitors think something is clickable when it isn&rsquo;t.
+                </p>
+                {rageClicks.length > 0 ? (
+                  <DataTable
+                    className="mt-4"
+                    keyFor={(r) => r.selector}
+                    rows={rageClicks}
+                    columns={[
+                      { header: "Element", cell: (r) => r.selector },
+                      { header: "Rage-click sessions", cell: (r) => r.count },
+                    ]}
+                  />
+                ) : (
+                  <p className="mt-4 text-[12.5px] text-ink-soft">No rage clicks detected.</p>
+                )}
+              </div>
+            </div>
           </div>
         )}
 
@@ -245,8 +270,8 @@ export function BehavioralDashboard({
               <p className="mt-3 max-w-[640px] font-mono text-[11px] text-pink-deep">{funnelPlan.overallNote}</p>
             )}
 
-            <div className="mt-6 max-w-[640px]">
-              <FunnelChart stages={funnel} />
+            <div className="mt-6 max-w-[720px]">
+              <FunnelSankey stages={funnel} />
             </div>
 
             {funnelPlan && (
@@ -367,6 +392,7 @@ export function BehavioralDashboard({
                     topPages={topPages}
                     returnVisits={returnVisits}
                     trafficFlow={trafficFlow}
+                    engagement={engagement}
                   />
                 </div>
               </div>

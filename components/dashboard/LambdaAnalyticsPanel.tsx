@@ -1,7 +1,7 @@
 import { DataTable } from "@/components/ui/DataTable";
 import { SankeyChart } from "@/components/charts/SankeyChart";
-import { formatPercent } from "@/lib/utils";
-import type { ChannelStat, CtaStat, FlowLink, OutboundStat, PageStat, ReturnVisitStat } from "@/lib/behavioral/campaign";
+import { formatDuration, formatPercent } from "@/lib/utils";
+import type { ChannelStat, CtaStat, EngagementStats, FlowLink, OutboundStat, PageStat, ReturnVisitStat } from "@/lib/behavioral/campaign";
 
 /**
  * The native, no-setup analytics option — reads the same tracking snippet
@@ -19,6 +19,7 @@ export function LambdaAnalyticsPanel({
   topPages,
   returnVisits,
   trafficFlow,
+  engagement,
 }: {
   channels: ChannelStat[];
   topCtas: CtaStat[];
@@ -26,15 +27,18 @@ export function LambdaAnalyticsPanel({
   topPages: PageStat[];
   returnVisits: ReturnVisitStat;
   trafficFlow: FlowLink[];
+  engagement: EngagementStats;
 }) {
   return (
     <div>
       <div className="grid gap-4 sm:grid-cols-3">
         <div className="border-2 border-ink bg-paper p-5">
-          <div className="font-mono text-[10px] tracking-wide text-ink-soft uppercase">Return visitors</div>
-          <div className="mt-2 font-display text-[26px] font-semibold text-ink">{formatPercent(returnVisits.rate, 1)}</div>
+          <div className="font-mono text-[10px] tracking-wide text-ink-soft uppercase">New vs returning</div>
+          <div className="mt-2 font-display text-[22px] font-semibold text-ink">
+            {formatPercent(1 - returnVisits.rate, 1)} new
+          </div>
           <p className="mt-1 font-mono text-[10.5px] text-ink-soft">
-            {returnVisits.returning} of {returnVisits.total} sessions, within 30 days
+            {formatPercent(returnVisits.rate, 1)} returning — {returnVisits.returning} of {returnVisits.total} sessions, within 30 days
           </p>
         </div>
         <div className="border-2 border-ink bg-paper p-5">
@@ -50,6 +54,21 @@ export function LambdaAnalyticsPanel({
           <p className="mt-1 font-mono text-[10.5px] text-ink-soft">
             {channels[0] ? formatPercent(channels[0].conversionRate, 1) + " conversion" : "no sessions yet"}
           </p>
+        </div>
+        <div className="border-2 border-ink bg-paper p-5">
+          <div className="font-mono text-[10px] tracking-wide text-ink-soft uppercase">Avg. time on page</div>
+          <div className="mt-2 font-display text-[26px] font-semibold text-ink">{formatDuration(engagement.avgTimeOnPageSec)}</div>
+          <p className="mt-1 font-mono text-[10.5px] text-ink-soft">first to last event in a session</p>
+        </div>
+        <div className="border-2 border-ink bg-paper p-5">
+          <div className="font-mono text-[10px] tracking-wide text-ink-soft uppercase">Pageviews / session</div>
+          <div className="mt-2 font-display text-[26px] font-semibold text-ink">{engagement.avgPageviewsPerSession.toFixed(1)}</div>
+          <p className="mt-1 font-mono text-[10.5px] text-ink-soft">rises above 1.0 once the snippet tracks more than one page</p>
+        </div>
+        <div className="border-2 border-ink bg-paper p-5">
+          <div className="font-mono text-[10px] tracking-wide text-ink-soft uppercase">Bounce rate</div>
+          <div className="mt-2 font-display text-[26px] font-semibold text-ink">{formatPercent(engagement.bounceRate, 1)}</div>
+          <p className="mt-1 font-mono text-[10.5px] text-ink-soft">landed and left with zero interaction</p>
         </div>
       </div>
 

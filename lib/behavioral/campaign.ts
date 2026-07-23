@@ -188,6 +188,57 @@ export function computeTrafficFlow(events: EventRow[]): FlowLink[] {
     .sort((a, b) => b.value - a.value);
 }
 
+export type EngagementStats = {
+  avgTimeOnPageSec: number;
+  avgPageviewsPerSession: number;
+  bounceRate: number;
+  totalSessions: number;
+};
+
+/**
+ * Time on page, pageviews/session, and bounce rate — all derivable from
+ * events already being collected, no new snippet instrumentation needed.
+ * "Time on page" has no explicit duration ping (the snippet only flushes
+ * its queue on pagehide, it doesn't record how long that took), so it's
+ * approximated as first-to-last event timestamp within a session, capped
+ * so an abandoned/backgrounded tab left open for hours doesn't blow out the
+ * average. "Bounce" is a session that produced exactly one event total —
+ * loaded the page and did nothing else, not even scroll.
+ */
+export function computeEngagementStats(events: EventRow[]): EngagementStats {
+  const bySession = new Map<string, EventRow[]>();
+  for (const e of events) {
+    if (!bySession.has(e.session_id)) bySession.set(e.session_id, []);
+    bySession.get(e.session_id)!.push(e);
+  }
+  const sessions = Array.from(bySession.values());
+  const totalSessions = sessions.length;
+  if (totalSessions === 0) {
+    return { avgTimeOnPageSec: 0, avgPageviewsPerSession: 0, bounceRate: 0, totalSessions: 0 };
+  }
+
+  const MAX_SESSION_SEC = 30 * 60;
+  let totalPageviews = 0;
+  let bounced = 0;
+  let durationSum = 0;
+
+  for (const sessionEvents of sessions) {
+    const pageviews = sessionEvents.filter((e) => e.type === "pageview");
+    totalPageviews += pageviews.length;
+    if (sessionEvents.length === 1 && pageviews.length === 1) bounced++;
+
+    const times = sessionEvents.map((e) => new Date(e.created_at).getTime());
+    durationSum += Math.min((Math.max(...times) - Math.min(...times)) / 1000, MAX_SESSION_SEC);
+  }
+
+  return {
+    avgTimeOnPageSec: durationSum / totalSessions,
+    avgPageviewsPerSession: totalPageviews / totalSessions,
+    bounceRate: bounced / totalSessions,
+    totalSessions,
+  };
+}
+
 export type ReturnVisitStat = { returning: number; total: number; rate: number };
 
 /** Share of sessions that are a return visit within the snippet's 30-day window. */

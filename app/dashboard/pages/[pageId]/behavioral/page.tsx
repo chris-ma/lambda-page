@@ -16,6 +16,7 @@ import {
   computeRumVitals,
   segmentSessionCounts,
   computeRageClicks,
+  computeScrollDepthFunnel,
 } from "@/lib/behavioral/aggregate";
 import {
   computeChannelBreakdown,
@@ -24,6 +25,7 @@ import {
   computeTopPages,
   computeReturnVisitRate,
   computeTrafficFlow,
+  computeEngagementStats,
 } from "@/lib/behavioral/campaign";
 import {
   DEMO_FUNNEL,
@@ -37,6 +39,8 @@ import {
   DEMO_TOP_PAGES,
   DEMO_RETURN_VISIT,
   DEMO_TRAFFIC_FLOW,
+  DEMO_SCROLL_DEPTH,
+  DEMO_ENGAGEMENT,
 } from "@/lib/behavioral/demo-seed";
 
 export const dynamic = "force-dynamic";
@@ -87,6 +91,8 @@ export default async function BehavioralPage({
       topPages: DEMO_TOP_PAGES,
       returnVisits: DEMO_RETURN_VISIT,
       trafficFlow: DEMO_TRAFFIC_FLOW,
+      scrollDepth: DEMO_SCROLL_DEPTH,
+      engagement: DEMO_ENGAGEMENT,
     };
   } else {
     const events = await eventsForPage(pageId);
@@ -116,6 +122,8 @@ export default async function BehavioralPage({
       topPages: computeTopPages(events),
       returnVisits: computeReturnVisitRate(events),
       trafficFlow: computeTrafficFlow(events),
+      scrollDepth: computeScrollDepthFunnel(pageEvents),
+      engagement: computeEngagementStats(events),
     };
   }
 

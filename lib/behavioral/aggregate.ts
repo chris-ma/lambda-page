@@ -145,6 +145,33 @@ export function computeHeatmapBuckets(events: EventRow[], cols = 20, rows = 12):
   return weighted.map((b) => b / max);
 }
 
+/**
+ * What share of sessions actually scrolled how far — the click heatmap
+ * already divides by scroll reach internally to weight cold spots
+ * correctly, but that reach is never shown on its own, so a real drop-off
+ * in attention down the page (as opposed to just fewer clicks) had no
+ * explicit read anywhere. Same {label, count} shape as a funnel stage, so
+ * it draws with FunnelChart with no separate component.
+ */
+export function computeScrollDepthFunnel(events: EventRow[]): { label: string; count: number }[] {
+  const sessionIds = new Set<string>();
+  for (const e of events) if (e.type === "pageview") sessionIds.add(e.session_id);
+  const total = sessionIds.size;
+
+  const maxDepthBySession = new Map<string, number>();
+  for (const e of events) {
+    if (e.type !== "scroll_depth") continue;
+    const depth = (e.payload as { depth?: number })?.depth ?? 0;
+    if (depth > (maxDepthBySession.get(e.session_id) ?? 0)) maxDepthBySession.set(e.session_id, depth);
+  }
+
+  const checkpoints = [0, 25, 50, 75, 100];
+  return checkpoints.map((depth) => ({
+    label: depth === 0 ? "Loaded page" : `Scrolled ${depth}%+`,
+    count: depth === 0 ? total : Array.from(sessionIds).filter((sid) => (maxDepthBySession.get(sid) ?? 0) >= depth).length,
+  }));
+}
+
 export function computeRageClicks(events: EventRow[]): { selector: string; count: number }[] {
   const counts = new Map<string, number>();
   for (const e of events) {

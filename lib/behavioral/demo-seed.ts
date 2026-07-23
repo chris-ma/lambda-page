@@ -1,5 +1,5 @@
 import type { FieldStat } from "./aggregate";
-import type { ChannelStat, CtaStat, FlowLink, OutboundStat, PageStat, ReturnVisitStat } from "./campaign";
+import type { ChannelStat, CtaStat, EngagementStats, FlowLink, OutboundStat, PageStat, ReturnVisitStat } from "./campaign";
 
 /** Deterministic placeholder data shown until a page has real snippet traffic. Always labeled DEMO DATA in the UI. */
 export const DEMO_FUNNEL = [
@@ -8,6 +8,21 @@ export const DEMO_FUNNEL = [
   { label: "cta_click", count: 410 },
   { label: "form_submit", count: 130 },
 ];
+
+export const DEMO_SCROLL_DEPTH = [
+  { label: "Loaded page", count: 1000 },
+  { label: "Scrolled 25%+", count: 862 },
+  { label: "Scrolled 50%+", count: 740 },
+  { label: "Scrolled 75%+", count: 511 },
+  { label: "Scrolled 100%+", count: 298 },
+];
+
+export const DEMO_ENGAGEMENT: EngagementStats = {
+  avgTimeOnPageSec: 94,
+  avgPageviewsPerSession: 1.3,
+  bounceRate: 0.34,
+  totalSessions: 1000,
+};
 
 export const DEMO_HEATMAP: number[] = (() => {
   const cols = 20;
