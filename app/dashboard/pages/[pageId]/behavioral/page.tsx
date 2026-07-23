@@ -17,6 +17,7 @@ import {
   segmentSessionCounts,
   computeRageClicks,
   computeScrollDepthFunnel,
+  computeScrollDepthGrid,
 } from "@/lib/behavioral/aggregate";
 import {
   computeChannelBreakdown,
@@ -40,6 +41,7 @@ import {
   DEMO_RETURN_VISIT,
   DEMO_TRAFFIC_FLOW,
   DEMO_SCROLL_DEPTH,
+  DEMO_SCROLL_DEPTH_GRID,
   DEMO_ENGAGEMENT,
 } from "@/lib/behavioral/demo-seed";
 
@@ -81,6 +83,7 @@ export default async function BehavioralPage({
     data = {
       funnel: DEMO_FUNNEL,
       heatmap: DEMO_HEATMAP,
+      scrollDepthGrid: DEMO_SCROLL_DEPTH_GRID,
       formFields: DEMO_FORM_FIELDS,
       vitals: DEMO_RUM_VITALS,
       deviceSegments: DEMO_SEGMENTS_DEVICE,
@@ -112,6 +115,7 @@ export default async function BehavioralPage({
     data = {
       funnel: funnelPlan && funnelPlan.stages.length > 0 ? computeFunnelFromDefs(events, funnelPlan.stages) : computeFunnel(events),
       heatmap: computeHeatmapBuckets(pageEvents),
+      scrollDepthGrid: computeScrollDepthGrid(pageEvents),
       formFields: computeFormFieldStats(events),
       vitals: computeRumVitals(events),
       deviceSegments: segmentSessionCounts(events, "device"),

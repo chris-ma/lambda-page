@@ -33,6 +33,7 @@ const ANALYTICS_SOURCES = [
 export function BehavioralDashboard({
   funnel,
   heatmap,
+  scrollDepthGrid,
   formFields,
   vitals,
   deviceSegments,
@@ -56,6 +57,7 @@ export function BehavioralDashboard({
 }: {
   funnel: FunnelStage[];
   heatmap: number[];
+  scrollDepthGrid: number[];
   formFields: FieldStat[];
   vitals: RumVitals;
   deviceSegments: { label: string; count: number }[];
@@ -149,12 +151,13 @@ export function BehavioralDashboard({
           <div>
             <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
               <p className="max-w-[520px] text-[13px] text-ink-soft">
-                Click density across this page specifically, bucketed into a 20×12 grid and shown
-                in context on a screenshot — scoped to this URL&rsquo;s own path even if the
-                snippet is installed site-wide, since coordinates only line up against this page&rsquo;s
-                own layout. Weighted by scroll depth, so a row few visitors ever scrolled to reads
-                as clicks-per-viewer rather than looking cold just because fewer people saw it.
-                Teal ramp only — never red-for-hot, since brick is reserved for a failing status
+                Click density and scroll depth, each bucketed into a 20×12 grid and shown in
+                context on a screenshot — toggle between them directly on the image. Scoped to
+                this URL&rsquo;s own path even if the snippet is installed site-wide, since
+                coordinates only line up against this page&rsquo;s own layout. Click density is
+                already weighted by scroll depth, so a row few visitors ever scrolled to reads as
+                clicks-per-viewer rather than looking cold just because fewer people saw it. Teal
+                ramp only — never red-for-hot, since brick is reserved for a failing status
                 elsewhere in this system.
               </p>
               <button
@@ -173,7 +176,7 @@ export function BehavioralDashboard({
             />
             {captureError && <p className="mt-4 mb-3 font-mono text-[11px] text-brick">{captureError}</p>}
             <div className="mt-6">
-              <HeatmapGrid buckets={heatmap} cols={20} screenshotUrl={screenshotUrl} />
+              <HeatmapGrid clickBuckets={heatmap} scrollBuckets={scrollDepthGrid} cols={20} screenshotUrl={screenshotUrl} />
             </div>
 
             <div className="mt-10 grid gap-8 lg:grid-cols-2">

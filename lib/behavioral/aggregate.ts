@@ -146,6 +146,22 @@ export function computeHeatmapBuckets(events: EventRow[], cols = 20, rows = 12):
 }
 
 /**
+ * Same per-row reach fraction the click heatmap divides by internally, but
+ * exposed as its own cols×rows grid (every cell in a row shares that row's
+ * value) so it can be plotted spatially over the same screenshot the click
+ * density grid uses — a Hotjar-style scroll map, toggled against clicks
+ * rather than shown only as an abandonment funnel.
+ */
+export function computeScrollDepthGrid(events: EventRow[], cols = 20, rows = 12): number[] {
+  const { reach } = computeScrollReachByRow(events, rows);
+  const grid = new Array(cols * rows).fill(0);
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < cols; col++) grid[row * cols + col] = reach[row];
+  }
+  return grid;
+}
+
+/**
  * What share of sessions actually scrolled how far — the click heatmap
  * already divides by scroll reach internally to weight cold spots
  * correctly, but that reach is never shown on its own, so a real drop-off

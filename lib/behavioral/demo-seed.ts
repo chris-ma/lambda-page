@@ -37,6 +37,17 @@ export const DEMO_HEATMAP: number[] = (() => {
   return buckets;
 })();
 
+/** Same per-row-reach shape computeScrollDepthGrid produces from real events — a smooth decay curve down the page, uniform across columns within a row. */
+export const DEMO_SCROLL_DEPTH_GRID: number[] = (() => {
+  const cols = 20;
+  const rowReach = [1, 0.97, 0.91, 0.83, 0.74, 0.65, 0.56, 0.48, 0.4, 0.34, 0.29, 0.24];
+  const grid = new Array(cols * rowReach.length).fill(0);
+  rowReach.forEach((v, row) => {
+    for (let col = 0; col < cols; col++) grid[row * cols + col] = v;
+  });
+  return grid;
+})();
+
 export const DEMO_FORM_FIELDS: FieldStat[] = [
   { field: "email", focusCount: 420, abandonCount: 38, abandonRate: 0.09, errorCount: 12 },
   { field: "phone", focusCount: 310, abandonCount: 211, abandonRate: 0.68, errorCount: 54 },
