@@ -116,7 +116,11 @@ export function Nav() {
           Log in
         </Link>
       </div>
-      <div ref={ref} className="sticky top-0 z-50 border-b-2 border-ink bg-paper print:hidden">
+      <div
+        ref={ref}
+        onMouseLeave={() => setOpen(null)}
+        className="sticky top-0 z-50 border-b-2 border-ink bg-paper print:hidden"
+      >
         <nav className="mx-auto flex h-[80px] max-w-[1200px] items-center justify-between px-6">
           <Link href="/" className="flex items-center gap-3" onClick={() => setMobileOpen(false)}>
             <LambdaMark size={38} />
