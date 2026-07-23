@@ -3,6 +3,7 @@ import { listPages } from "@/lib/db/pages";
 import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
 import { ToolExplainer } from "@/components/ui/ToolExplainer";
 import { Card } from "@/components/ui/Card";
+import { AddPageShortcut } from "@/components/dashboard/AddPageShortcut";
 
 export const dynamic = "force-dynamic";
 
@@ -26,6 +27,10 @@ export default async function SeoHub() {
       />
 
       <section className="mt-10">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h2 className="font-display text-[16px] font-semibold text-ink">Connected pages</h2>
+          <AddPageShortcut toolPath="seo" />
+        </div>
         {pages.length === 0 ? (
           <Card hover={false} className="mt-4 border-dashed p-8 text-center text-[13px] text-ink-soft">
             No pages connected yet.{" "}
