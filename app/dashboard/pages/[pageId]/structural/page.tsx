@@ -4,6 +4,7 @@ import { latestRunWithFindings } from "@/lib/db/runs";
 import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
 import { FindingsReport } from "@/components/dashboard/FindingsReport";
 import { RunAnalysisButton } from "@/components/dashboard/RunAnalysisButton";
+import { AddPageShortcut } from "@/components/dashboard/AddPageShortcut";
 
 export const dynamic = "force-dynamic";
 
@@ -14,9 +15,12 @@ export default async function StructuralPage({ params }: { params: Promise<{ pag
 
   return (
     <div>
-      <Link href={`/dashboard/pages/${page.id}`} className="font-mono text-[11px] text-ink-soft">
-        ← {page.url}
-      </Link>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <Link href={`/dashboard/pages/${page.id}`} className="font-mono text-[11px] text-ink-soft">
+          ← {page.url}
+        </Link>
+        <AddPageShortcut toolPath="structural" />
+      </div>
       <div className="mt-3 flex flex-wrap items-center justify-between gap-4">
         <div>
           <EyebrowLabel>Pillar 01</EyebrowLabel>
