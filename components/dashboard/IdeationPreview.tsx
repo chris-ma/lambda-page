@@ -2,18 +2,10 @@
 
 import { useMemo } from "react";
 import { Button } from "@/components/ui/Button";
-
-function slugify(name: string): string {
-  const slug = name
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-  return slug || "landing-page";
-}
+import { slugify } from "@/lib/utils";
 
 export function IdeationPreview({ html, businessName, pageTitle }: { html: string; businessName: string; pageTitle: string }) {
-  const filename = useMemo(() => `${slugify(businessName)}.html`, [businessName]);
+  const filename = useMemo(() => `${slugify(businessName) || "landing-page"}.html`, [businessName]);
 
   function download() {
     const blob = new Blob([html], { type: "text/html" });

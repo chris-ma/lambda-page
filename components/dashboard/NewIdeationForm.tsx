@@ -121,7 +121,7 @@ export function NewIdeationForm() {
         </Button>
       </div>
       {loading && (
-        <ThinkingOverlay label="Writing copy and building a modern, self-contained landing page — this can take a minute." />
+        <ThinkingOverlay label="Writing copy and building a modern, self-contained landing page — this can take a couple of minutes." />
       )}
       {error && <p className="mt-2 font-mono text-[11px] text-brick">{error}</p>}
     </form>

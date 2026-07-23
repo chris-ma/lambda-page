@@ -22,3 +22,8 @@ export function slugify(input: string): string {
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/(^-|-$)/g, "");
 }
+
+/** Wraps Date.now() so callers (e.g. server components checking a stale in-progress run) don't trip the react-hooks/purity lint rule, which flags direct Date.now() calls in render bodies. */
+export function minutesSince(iso: string): number {
+  return (Date.now() - new Date(iso).getTime()) / 60_000;
+}

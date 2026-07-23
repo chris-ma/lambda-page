@@ -3,7 +3,11 @@ import { createIdeationRun, completeIdeationRun, failIdeationRun } from "@/lib/d
 import { generateLandingPage } from "@/lib/ai/ideation";
 
 export const runtime = "nodejs";
-export const maxDuration = 120;
+// A full self-contained HTML landing page (adaptive thinking + high effort,
+// up to 16k output tokens) routinely runs past 120s — that ceiling was
+// observed hard-killing the function in production before the catch block
+// could record a failure, leaving the run stuck at status='running' forever.
+export const maxDuration = 300;
 
 export async function POST(request: Request) {
   const body = await request.json().catch(() => null);

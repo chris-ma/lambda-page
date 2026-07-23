@@ -23,7 +23,7 @@
       "maxDuration": 60
     },
     "app/api/analyze/ideation/route.ts": {
-      "maxDuration": 120
+      "maxDuration": 300
     }
   }
 }

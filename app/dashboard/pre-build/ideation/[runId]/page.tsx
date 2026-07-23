@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getIdeationRun } from "@/lib/db/ideation";
+import { minutesSince } from "@/lib/utils";
 import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
 import { Tag } from "@/components/ui/Tag";
 import { Card } from "@/components/ui/Card";
@@ -42,7 +43,17 @@ export default async function IdeationRunPage({ params }: { params: Promise<{ ru
             Generation failed: {run.error}
           </p>
         ) : !run.html ? (
-          <p className="border border-dashed border-ink p-8 text-center text-[13.5px] text-ink-soft">Building…</p>
+          minutesSince(run.createdAt) > 6 ? (
+            <p className="border border-dashed border-ink p-8 text-center text-[13.5px] text-ink-soft">
+              This is taking far longer than normal and likely failed without recording an error.{" "}
+              <Link href="/dashboard/pre-build/ideation/new" className="underline">
+                Try building it again
+              </Link>
+              .
+            </p>
+          ) : (
+            <p className="border border-dashed border-ink p-8 text-center text-[13.5px] text-ink-soft">Building…</p>
+          )
         ) : (
           <>
             {run.rationale && (
