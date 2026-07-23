@@ -29,6 +29,11 @@ export const PILLARS_NAV: PillarNavItem[] = [
         description: "Upload a prototype screenshot for pinned AI critique.",
         href: "/dashboard/pre-build/wireframe/new",
       },
+      {
+        label: "Ideation",
+        description: "Describe a business idea — Claude builds a promotional MVP landing page for it.",
+        href: "/dashboard/pre-build/ideation/new",
+      },
     ],
   },
   {

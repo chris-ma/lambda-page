@@ -1,0 +1,63 @@
+import Link from "next/link";
+import { getIdeationRun } from "@/lib/db/ideation";
+import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
+import { Tag } from "@/components/ui/Tag";
+import { Card } from "@/components/ui/Card";
+import { IdeationPreview } from "@/components/dashboard/IdeationPreview";
+
+export const dynamic = "force-dynamic";
+
+export default async function IdeationRunPage({ params }: { params: Promise<{ runId: string }> }) {
+  const { runId } = await params;
+  const run = await getIdeationRun(runId);
+
+  if (!run) {
+    return (
+      <div>
+        <Link href="/dashboard/pre-build" className="font-mono text-[11px] text-ink-soft">
+          ← Pre-Build
+        </Link>
+        <p className="mt-8 border border-dashed border-ink p-8 text-center text-[13.5px] text-ink-soft">
+          That ideation run doesn&rsquo;t exist.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <Link href="/dashboard/pre-build" className="font-mono text-[11px] text-ink-soft">
+        ← Pre-Build
+      </Link>
+      <div className="mt-3 flex flex-wrap items-center gap-3">
+        <EyebrowLabel>Ideation</EyebrowLabel>
+        <Tag status={run.status === "complete" ? "PASS" : run.status === "error" ? "FAILING" : "INFO"} label={run.status} size="sm" />
+      </div>
+      <h1 className="mt-2 font-display text-[24px] font-semibold text-ink">{run.businessName}</h1>
+      <p className="mt-2 max-w-[620px] text-[13px] text-ink-soft">{run.description}</p>
+
+      <div className="mt-10">
+        {run.status === "error" ? (
+          <p className="border border-dashed border-ink p-8 text-center text-[13.5px] text-ink-soft">
+            Generation failed: {run.error}
+          </p>
+        ) : !run.html ? (
+          <p className="border border-dashed border-ink p-8 text-center text-[13.5px] text-ink-soft">Building…</p>
+        ) : (
+          <>
+            {run.rationale && (
+              <Card hover={false} className="mb-8 border-2 border-pink-deep p-6">
+                <div className="font-mono text-[10px] uppercase tracking-wide text-pink-deep">Structural approach — AI judgment</div>
+                <p className="mt-2 text-[14px] leading-relaxed text-ink">{run.rationale}</p>
+                {run.patternsUsed.length > 0 && (
+                  <p className="mt-3 font-mono text-[10.5px] text-ink-soft">Patterns: {run.patternsUsed.join(" · ")}</p>
+                )}
+              </Card>
+            )}
+            <IdeationPreview html={run.html} businessName={run.businessName} pageTitle={run.pageTitle ?? run.businessName} />
+          </>
+        )}
+      </div>
+    </div>
+  );
+}

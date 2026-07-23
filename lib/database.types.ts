@@ -120,6 +120,24 @@ export type Database = {
           { foreignKeyName: "funnel_plans_page_id_fkey"; columns: ["page_id"]; isOneToOne: false; referencedRelation: "pages"; referencedColumns: ["id"] },
         ];
       };
+      ideation_runs: {
+        Row: {
+          id: string; business_name: string; description: string; monetization: string; target_audience: string; brand_feel: string;
+          status: string; error: string | null; page_title: string | null; html: string | null; patterns_used: Json; rationale: string | null;
+          created_at: string; completed_at: string | null;
+        };
+        Insert: {
+          id?: string; business_name: string; description: string; monetization: string; target_audience: string; brand_feel: string;
+          status?: string; error?: string | null; page_title?: string | null; html?: string | null; patterns_used?: Json; rationale?: string | null;
+          created_at?: string; completed_at?: string | null;
+        };
+        Update: {
+          id?: string; business_name?: string; description?: string; monetization?: string; target_audience?: string; brand_feel?: string;
+          status?: string; error?: string | null; page_title?: string | null; html?: string | null; patterns_used?: Json; rationale?: string | null;
+          created_at?: string; completed_at?: string | null;
+        };
+        Relationships: [];
+      };
       assumption_studies: {
         Row: { id: string; project_id: string; name: string; context: string | null; include_pricing: boolean; price_product_label: string | null; include_gabor_granger: boolean; created_at: string };
         Insert: { id?: string; project_id: string; name: string; context?: string | null; include_pricing?: boolean; price_product_label?: string | null; include_gabor_granger?: boolean; created_at?: string };

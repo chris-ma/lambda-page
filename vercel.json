@@ -21,6 +21,9 @@
     },
     "app/api/eye-tests/route.ts": {
       "maxDuration": 60
+    },
+    "app/api/analyze/ideation/route.ts": {
+      "maxDuration": 120
     }
   }
 }

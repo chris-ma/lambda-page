@@ -54,6 +54,8 @@ export async function judge<T extends z.ZodType>(params: {
   prompt: string;
   images?: ImageInput[];
   schema: T;
+  /** Overrides the default 8000-token cap — needed for calls whose output is a long free-text field (e.g. a full HTML document) rather than a handful of findings. */
+  maxTokens?: number;
 }): Promise<z.infer<T>> {
   const content: Anthropic.MessageParam["content"] = [];
   for (const image of params.images ?? []) {
@@ -64,7 +66,7 @@ export async function judge<T extends z.ZodType>(params: {
 
   const response = await getClient().messages.parse({
     model: MODEL,
-    max_tokens: 8000,
+    max_tokens: params.maxTokens ?? 8000,
     thinking: { type: "adaptive" },
     output_config: { effort: "high", format: zodOutputFormat(params.schema) },
     system: params.system,

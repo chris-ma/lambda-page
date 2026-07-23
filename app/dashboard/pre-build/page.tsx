@@ -2,6 +2,7 @@ import Link from "next/link";
 import { listCompetitiveSets } from "@/lib/db/competitive-sets";
 import { listRunsByKind } from "@/lib/db/runs";
 import { listMessageTests } from "@/lib/db/message-tests";
+import { listIdeationRuns } from "@/lib/db/ideation";
 import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -10,11 +11,12 @@ import { Tag } from "@/components/ui/Tag";
 export const dynamic = "force-dynamic";
 
 export default async function PreBuildHub() {
-  const [sets, tests, contentFitRuns, wireframeRuns] = await Promise.all([
+  const [sets, tests, contentFitRuns, wireframeRuns, ideationRuns] = await Promise.all([
     listCompetitiveSets(),
     listMessageTests(),
     listRunsByKind("content_fit"),
     listRunsByKind("wireframe"),
+    listIdeationRuns(),
   ]);
 
   return (
@@ -110,6 +112,37 @@ export default async function PreBuildHub() {
                     <Tag status={r.status === "complete" ? "PASS" : r.status === "error" ? "FAILING" : "INFO"} label={r.status} size="sm" />
                   </div>
                   <p className="mt-1.5 font-mono text-[10.5px] text-ink-soft">{new Date(r.created_at).toLocaleString()}</p>
+                </Card>
+              </Link>
+            ))}
+          </div>
+        )}
+      </section>
+
+      <section className="mt-14">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <h2 className="font-display text-[18px] font-semibold text-ink">Ideation</h2>
+          <Button href="/dashboard/pre-build/ideation/new">New idea</Button>
+        </div>
+        <p className="mt-1.5 text-[12.5px] text-ink-soft">
+          Describe a business idea and Claude builds a single promotional MVP landing page for it —
+          not an app or prototype, just the page you&rsquo;d put in front of someone to see if the
+          idea lands. Preview on screen, download the code.
+        </p>
+        {ideationRuns.length === 0 ? (
+          <Card hover={false} className="mt-4 border-dashed p-8 text-center text-[13px] text-ink-soft">
+            No landing pages built yet.
+          </Card>
+        ) : (
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            {ideationRuns.map((r) => (
+              <Link key={r.id} href={`/dashboard/pre-build/ideation/${r.id}`}>
+                <Card className="p-5">
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="truncate font-body text-[13.5px] text-ink">{r.businessName}</span>
+                    <Tag status={r.status === "complete" ? "PASS" : r.status === "error" ? "FAILING" : "INFO"} label={r.status} size="sm" />
+                  </div>
+                  <p className="mt-1.5 font-mono text-[10.5px] text-ink-soft">{new Date(r.createdAt).toLocaleString()}</p>
                 </Card>
               </Link>
             ))}
