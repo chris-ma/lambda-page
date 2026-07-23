@@ -46,11 +46,6 @@ export const PILLARS_NAV: PillarNavItem[] = [
         description: "Meta tags, structured data, and indexability alongside extractability for answer and generative engines, plus lab-based Core Web Vitals with plain-language explanations — one combined read, pick a connected page.",
         href: "/dashboard/structural/seo",
       },
-      {
-        label: "Accessibility",
-        description: "WCAG checks — contrast, alt text, tap-target size, focus and error states, heading structure — pick a connected page.",
-        href: "/dashboard/structural/accessibility",
-      },
     ],
   },
   {

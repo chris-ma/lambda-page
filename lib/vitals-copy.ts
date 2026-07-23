@@ -1,4 +1,7 @@
 import type { Status } from "@/lib/status";
+import type { Database } from "@/lib/database.types";
+
+type Finding = Database["public"]["Tables"]["findings"]["Row"];
 
 type VitalCopy = { measures: string; pass: string; flagged: string; failing: string; advice: string };
 
@@ -65,4 +68,20 @@ export function explainVital(attribute: string, status: Status): string {
   const statusText = status === "PASS" ? entry.copy.pass : status === "FLAGGED" ? entry.copy.flagged : entry.copy.failing;
   const advice = status === "PASS" ? "" : ` ${entry.copy.advice}`;
   return `${entry.copy.measures} ${statusText}${advice}`;
+}
+
+/**
+ * The findings list (FindingsReport) otherwise shows a Page Vitals row's raw
+ * Lighthouse detail/fix text verbatim — fine for the stat cards, which
+ * already call explainVital() directly, but a second, more technical
+ * explanation of the same metric right below it undercuts the plain-language
+ * point. Swaps it for the same explanation everywhere a Page Vitals finding
+ * is listed.
+ */
+export function withVitalsExplained<T extends Pick<Finding, "component" | "attribute" | "status" | "detail" | "fix">>(
+  findings: T[],
+): T[] {
+  return findings.map((f) =>
+    f.component === "Page Vitals" ? { ...f, detail: explainVital(f.attribute, f.status as Status), fix: null } : f,
+  );
 }

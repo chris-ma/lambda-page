@@ -8,7 +8,7 @@ import { AnnotatedStimulus } from "@/components/dashboard/AnnotatedStimulus";
 import { ResultActions } from "@/components/dashboard/ResultActions";
 import { AddPageShortcut } from "@/components/dashboard/AddPageShortcut";
 import { StatCard } from "@/components/ui/StatCard";
-import { explainVital } from "@/lib/vitals-copy";
+import { explainVital, withVitalsExplained } from "@/lib/vitals-copy";
 import type { Status } from "@/lib/status";
 
 export const dynamic = "force-dynamic";
@@ -32,7 +32,7 @@ export default async function SeoAnalysisPage({ params }: { params: Promise<{ pa
   const { run, findings } = await latestRunWithFindings(pageId, 1);
   const seoFindings = findings.filter((f) => SEO_AI_COMPONENTS.has(f.component));
   const vitalsFindings = findings.filter((f) => f.component === "Page Vitals");
-  const allFindings = [...seoFindings, ...vitalsFindings];
+  const allFindings = [...seoFindings, ...withVitalsExplained(vitalsFindings)];
 
   const stats = [
     statFor(vitalsFindings, "Largest Contentful Paint"),

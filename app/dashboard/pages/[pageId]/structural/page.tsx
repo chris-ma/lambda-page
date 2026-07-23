@@ -5,6 +5,7 @@ import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
 import { FindingsReport } from "@/components/dashboard/FindingsReport";
 import { RunAnalysisButton } from "@/components/dashboard/RunAnalysisButton";
 import { AddPageShortcut } from "@/components/dashboard/AddPageShortcut";
+import { withVitalsExplained } from "@/lib/vitals-copy";
 
 export const dynamic = "force-dynamic";
 
@@ -45,7 +46,7 @@ export default async function StructuralPage({ params }: { params: Promise<{ pag
               : "No findings yet. Run the diagnostic to get a first read."}
           </p>
         ) : (
-          <FindingsReport findings={findings} />
+          <FindingsReport findings={withVitalsExplained(findings)} />
         )}
       </div>
     </div>
