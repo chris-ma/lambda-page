@@ -58,10 +58,9 @@ export const PILLARS_NAV: PillarNavItem[] = [
     slug: "behavioral",
     label: "Behavioral",
     subTools: [
+      { label: "Analytics", description: "Campaign/channel quality and conversion, from the built-in Lambda Analytics or a connected Google Analytics 4 property.", href: "/dashboard/behavioral?tab=analytics" },
       { label: "Heatmaps & Session Replay", description: "Click density, scroll depth, rage-clicks.", href: "/dashboard/behavioral?tab=heatmap" },
       { label: "Funnel Analytics", description: "Stage-to-stage drop-off, segmented by device and source.", href: "/dashboard/behavioral?tab=funnel" },
-      { label: "Form Field Analytics", description: "Field-level abandonment, time-per-field, validation errors.", href: "/dashboard/behavioral?tab=forms" },
-      { label: "Analytics", description: "Campaign/channel quality and conversion, from the built-in Lambda Analytics or a connected Google Analytics 4 property.", href: "/dashboard/behavioral?tab=analytics" },
     ],
   },
   {

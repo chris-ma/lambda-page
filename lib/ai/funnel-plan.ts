@@ -4,7 +4,7 @@ import { judge } from "./client";
 import { launchBrowser } from "@/lib/analysis/browser";
 import { extractDom } from "@/lib/analysis/structural";
 import { computeTopCtas } from "@/lib/behavioral/campaign";
-import { computeFormFieldStats, computeFunnel } from "@/lib/behavioral/aggregate";
+import { computeFieldFocusCounts, computeFunnel } from "@/lib/behavioral/aggregate";
 import type { FunnelStageDef } from "@/lib/behavioral/funnel-plan";
 import type { Database } from "@/lib/database.types";
 
@@ -102,7 +102,7 @@ export async function generateFunnelPlan(pageUrl: string, events: EventRow[]): P
   // live crawl found fewer elements than have actually been clicked (e.g.
   // the page changed since traffic started, or the crawl failed outright).
   const topCtas = computeTopCtas(events);
-  const fieldStats = computeFormFieldStats(events);
+  const fieldStats = computeFieldFocusCounts(events);
   const ctaCandidates = new Map<string, { selector: string; text: string; clicksSoFar: number }>();
   for (const t of crawledTapTargets) ctaCandidates.set(t.selector, { selector: t.selector, text: t.text, clicksSoFar: 0 });
   for (const c of topCtas) {

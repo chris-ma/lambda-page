@@ -8,10 +8,6 @@ const BENEFITS = [
     body: "Pillar 01 runs pre-launch, so the mobile load failure or the broken contrast ratio gets caught in a deploy check, not discovered three weeks into a paid campaign.",
   },
   {
-    title: "Stop guessing which field is killing your form.",
-    body: "Field-level abandonment data names the exact point of friction instead of a single blended conversion rate that tells you something's wrong without saying what.",
-  },
-  {
     title: "Know the difference between a real problem and a design opinion.",
     body: "Every finding is either a measured fact (a number, a stage, a field) or explicitly marked as a judgment call — never presented with the same confidence.",
   },

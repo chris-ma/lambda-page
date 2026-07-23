@@ -198,63 +198,16 @@ export function computeRageClicks(events: EventRow[]): { selector: string; count
   return Array.from(counts.entries()).map(([selector, count]) => ({ selector, count })).sort((a, b) => b.count - a.count);
 }
 
-export type FieldStat = { field: string; focusCount: number; abandonCount: number; abandonRate: number; errorCount: number };
-
-export function computeFormFieldStats(events: EventRow[]): FieldStat[] {
-  const bySession = new Map<string, EventRow[]>();
-  for (const e of events) {
-    if (!["form_focus", "form_blur", "form_change", "form_error", "funnel_stage"].includes(e.type)) continue;
-    if (!bySession.has(e.session_id)) bySession.set(e.session_id, []);
-    bySession.get(e.session_id)!.push(e);
-  }
-
+/** Focus counts per form field, used only to ground the AI funnel-plan generator's candidate form-field stages in real focus volume — not a display feature of its own. */
+export function computeFieldFocusCounts(events: EventRow[]): { field: string; focusCount: number }[] {
   const focusCount = new Map<string, number>();
-  const abandonCount = new Map<string, number>();
-  const errorCount = new Map<string, number>();
-
-  for (const sessionEvents of bySession.values()) {
-    sessionEvents.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
-    const submitted = sessionEvents.some((e) => e.type === "funnel_stage" && (e.payload as { stage?: string })?.stage === "form_submit");
-    let lastFocusedField: string | null = null;
-    for (const e of sessionEvents) {
-      const field = (e.payload as { field?: string })?.field;
-      if (!field) continue;
-      if (e.type === "form_focus") {
-        focusCount.set(field, (focusCount.get(field) ?? 0) + 1);
-        lastFocusedField = field;
-      }
-      if (e.type === "form_error") errorCount.set(field, (errorCount.get(field) ?? 0) + 1);
-    }
-    if (!submitted && lastFocusedField) {
-      abandonCount.set(lastFocusedField, (abandonCount.get(lastFocusedField) ?? 0) + 1);
-    }
+  for (const e of events) {
+    if (e.type !== "form_focus") continue;
+    const field = (e.payload as { field?: string })?.field;
+    if (!field) continue;
+    focusCount.set(field, (focusCount.get(field) ?? 0) + 1);
   }
-
-  return Array.from(focusCount.keys()).map((field) => {
-    const focus = focusCount.get(field) ?? 0;
-    const abandon = abandonCount.get(field) ?? 0;
-    return { field, focusCount: focus, abandonCount: abandon, abandonRate: focus > 0 ? abandon / focus : 0, errorCount: errorCount.get(field) ?? 0 };
-  }).sort((a, b) => b.abandonRate - a.abandonRate);
-}
-
-function percentile(values: number[], p: number): number {
-  if (values.length === 0) return 0;
-  const sorted = [...values].sort((a, b) => a - b);
-  const idx = Math.min(sorted.length - 1, Math.floor((p / 100) * sorted.length));
-  return sorted[idx];
-}
-
-export function computeRumVitals(events: EventRow[]) {
-  const vitals = events.filter((e) => e.type === "vital");
-  const lcps = vitals.map((e) => (e.payload as { lcp?: number })?.lcp ?? 0).filter((v) => v > 0);
-  const clss = vitals.map((e) => (e.payload as { cls?: number })?.cls ?? 0);
-  const inps = vitals.map((e) => (e.payload as { inp?: number })?.inp ?? 0).filter((v) => v > 0);
-  return {
-    sampleSize: vitals.length,
-    lcp: { p50: percentile(lcps, 50), p75: percentile(lcps, 75), p95: percentile(lcps, 95) },
-    cls: { p50: percentile(clss, 50), p75: percentile(clss, 75), p95: percentile(clss, 95) },
-    inp: { p50: percentile(inps, 50), p75: percentile(inps, 75), p95: percentile(inps, 95) },
-  };
+  return Array.from(focusCount.entries()).map(([field, count]) => ({ field, focusCount: count }));
 }
 
 export function segmentSessionCounts(events: EventRow[], dimension: "device" | "source") {

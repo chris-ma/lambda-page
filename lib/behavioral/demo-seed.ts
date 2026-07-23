@@ -1,4 +1,3 @@
-import type { FieldStat } from "./aggregate";
 import type { ChannelStat, CtaStat, EngagementStats, FlowLink, OutboundStat, PageStat, ReturnVisitStat } from "./campaign";
 
 /** Deterministic placeholder data shown until a page has real snippet traffic. Always labeled DEMO DATA in the UI. */
@@ -47,20 +46,6 @@ export const DEMO_SCROLL_DEPTH_GRID: number[] = (() => {
   });
   return grid;
 })();
-
-export const DEMO_FORM_FIELDS: FieldStat[] = [
-  { field: "email", focusCount: 420, abandonCount: 38, abandonRate: 0.09, errorCount: 12 },
-  { field: "phone", focusCount: 310, abandonCount: 211, abandonRate: 0.68, errorCount: 54 },
-  { field: "company", focusCount: 260, abandonCount: 22, abandonRate: 0.08, errorCount: 3 },
-  { field: "password", focusCount: 240, abandonCount: 31, abandonRate: 0.13, errorCount: 19 },
-];
-
-export const DEMO_RUM_VITALS = {
-  sampleSize: 842,
-  lcp: { p50: 1850, p75: 2400, p95: 4100 },
-  cls: { p50: 0.02, p75: 0.06, p95: 0.18 },
-  inp: { p50: 90, p75: 160, p95: 340 },
-};
 
 export const DEMO_SEGMENTS_DEVICE = [
   { label: "mobile", count: 612 },
