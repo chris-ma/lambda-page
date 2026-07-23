@@ -38,7 +38,7 @@ export default async function FiveSecondTestResults({ params }: { params: Promis
           </div>
         </div>
 
-        <div>
+        <div className="min-w-0">
           <div className="font-mono text-[10px] uppercase tracking-wide text-ink-soft">
             Submissions — {sessions.length}
           </div>

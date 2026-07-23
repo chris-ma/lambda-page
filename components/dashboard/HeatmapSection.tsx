@@ -74,7 +74,7 @@ export function HeatmapSection({
       </div>
 
       <div className="mt-10 grid gap-8 lg:grid-cols-2">
-        <div>
+        <div className="min-w-0">
           <h3 className="font-display text-[15px] font-semibold text-ink">Scroll depth</h3>
           <p className="mt-1 text-[12px] text-ink-soft">
             How far down the page sessions actually scroll — the same reach numbers the click
@@ -84,7 +84,7 @@ export function HeatmapSection({
             <FunnelChart stages={scrollDepth} />
           </div>
         </div>
-        <div>
+        <div className="min-w-0">
           <h3 className="font-display text-[15px] font-semibold text-ink">Clicks on page</h3>
           <p className="mt-1 text-[12px] text-ink-soft">
             Every click event captured for this page, feeding the density grid above — a rage click

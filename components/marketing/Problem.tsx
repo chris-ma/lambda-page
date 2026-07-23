@@ -5,7 +5,7 @@ import { Reveal } from "@/components/ui/Reveal";
 const STATS = [
   {
     value: "68%",
-    description: "of form abandons on a typical signup flow trace back to a single problem field — invisible without field-level tracking.",
+    description: "of form abandons on a typical signup flow trace back to a single problem field — invisible without session-level replay.",
   },
   {
     value: "11",

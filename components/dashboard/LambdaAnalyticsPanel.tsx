@@ -136,7 +136,7 @@ export function LambdaAnalyticsPanel({
       </div>
 
       <div className="mt-8 grid gap-8 sm:grid-cols-2">
-        <div>
+        <div className="min-w-0">
           <h3 className="font-display text-[15px] font-semibold text-ink">Top CTAs</h3>
           <p className="mt-1 text-[12px] text-ink-soft">Which specific button or link is actually getting clicked.</p>
           {topCtas.length === 0 ? (
@@ -153,7 +153,7 @@ export function LambdaAnalyticsPanel({
             />
           )}
         </div>
-        <div>
+        <div className="min-w-0">
           <h3 className="font-display text-[15px] font-semibold text-ink">Outbound clicks</h3>
           <p className="mt-1 text-[12px] text-ink-soft">Off-site links visitors follow away from the page.</p>
           {outboundClicks.length === 0 ? (

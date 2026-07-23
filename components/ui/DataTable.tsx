@@ -18,7 +18,7 @@ export function DataTable<T>({
   className?: string;
 }) {
   return (
-    <div className={cn("overflow-x-auto border-2 border-ink", className)}>
+    <div className={cn("min-w-0 overflow-x-auto border-2 border-ink", className)}>
       <table className="w-full min-w-[560px] border-collapse text-left">
         <thead>
           <tr>

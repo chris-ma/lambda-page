@@ -123,7 +123,7 @@ export default async function CompetitiveSetPage({ params }: { params: Promise<{
             quality, and market share — scored from the scraped page content, not verified
             metrics.
           </p>
-          <div className="mt-6">
+          <div className="mt-6 min-w-0 overflow-x-auto">
             <BuyingDriversRadarChart result={buyingDrivers} hostnames={hostnames} />
           </div>
         </Card>
@@ -157,7 +157,7 @@ export default async function CompetitiveSetPage({ params }: { params: Promise<{
             Price positioning vs. perceived value; bubble size is a rough relative &ldquo;share of
             attention&rdquo; estimate within this scanned set, not verified market-share data.
           </p>
-          <div className="mt-6">
+          <div className="mt-6 min-w-0 overflow-x-auto">
             <PricingValueBubbleChart result={competitorDetail} hostnames={hostnames} />
           </div>
         </Card>
