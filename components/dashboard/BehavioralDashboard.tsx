@@ -11,7 +11,7 @@ import { DataTable } from "@/components/ui/DataTable";
 import { Tag } from "@/components/ui/Tag";
 import { ToolExplainer } from "@/components/ui/ToolExplainer";
 import type { FieldStat } from "@/lib/behavioral/aggregate";
-import type { ChannelStat, CtaStat, OutboundStat, PageStat, ReturnVisitStat } from "@/lib/behavioral/campaign";
+import type { ChannelStat, CtaStat, FlowLink, OutboundStat, PageStat, ReturnVisitStat } from "@/lib/behavioral/campaign";
 import type { FunnelPlan } from "@/lib/db/funnel-plans";
 import type { GA4Report } from "@/lib/analytics/ga4";
 import { formatPercent } from "@/lib/utils";
@@ -47,6 +47,7 @@ export function BehavioralDashboard({
   outboundClicks,
   topPages,
   returnVisits,
+  trafficFlow,
   funnelPlan,
   initialTab,
 }: {
@@ -68,6 +69,7 @@ export function BehavioralDashboard({
   outboundClicks: OutboundStat[];
   topPages: PageStat[];
   returnVisits: ReturnVisitStat;
+  trafficFlow: FlowLink[];
   initialTab?: string;
 }) {
   const validInitialTab = (TABS as readonly string[]).includes(initialTab ?? "")
@@ -364,6 +366,7 @@ export function BehavioralDashboard({
                     outboundClicks={outboundClicks}
                     topPages={topPages}
                     returnVisits={returnVisits}
+                    trafficFlow={trafficFlow}
                   />
                 </div>
               </div>

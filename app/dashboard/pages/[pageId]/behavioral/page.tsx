@@ -23,6 +23,7 @@ import {
   computeOutboundClicks,
   computeTopPages,
   computeReturnVisitRate,
+  computeTrafficFlow,
 } from "@/lib/behavioral/campaign";
 import {
   DEMO_FUNNEL,
@@ -35,6 +36,7 @@ import {
   DEMO_OUTBOUND_CLICKS,
   DEMO_TOP_PAGES,
   DEMO_RETURN_VISIT,
+  DEMO_TRAFFIC_FLOW,
 } from "@/lib/behavioral/demo-seed";
 
 export const dynamic = "force-dynamic";
@@ -84,6 +86,7 @@ export default async function BehavioralPage({
       outboundClicks: DEMO_OUTBOUND_CLICKS,
       topPages: DEMO_TOP_PAGES,
       returnVisits: DEMO_RETURN_VISIT,
+      trafficFlow: DEMO_TRAFFIC_FLOW,
     };
   } else {
     const events = await eventsForPage(pageId);
@@ -112,6 +115,7 @@ export default async function BehavioralPage({
       outboundClicks: computeOutboundClicks(events),
       topPages: computeTopPages(events),
       returnVisits: computeReturnVisitRate(events),
+      trafficFlow: computeTrafficFlow(events),
     };
   }
 

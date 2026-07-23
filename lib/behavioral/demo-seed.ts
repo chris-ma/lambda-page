@@ -1,5 +1,5 @@
 import type { FieldStat } from "./aggregate";
-import type { ChannelStat, CtaStat, OutboundStat, PageStat, ReturnVisitStat } from "./campaign";
+import type { ChannelStat, CtaStat, FlowLink, OutboundStat, PageStat, ReturnVisitStat } from "./campaign";
 
 /** Deterministic placeholder data shown until a page has real snippet traffic. Always labeled DEMO DATA in the UI. */
 export const DEMO_FUNNEL = [
@@ -64,6 +64,22 @@ export const DEMO_OUTBOUND_CLICKS: OutboundStat[] = [
 ];
 
 export const DEMO_RETURN_VISIT: ReturnVisitStat = { returning: 214, total: 1000, rate: 0.214 };
+
+export const DEMO_TRAFFIC_FLOW: FlowLink[] = [
+  { source: "google / cpc", target: "/pricing", value: 168 },
+  { source: "google / cpc", target: "Clicked a CTA", value: 130 },
+  { source: "google / cpc", target: "Left without engaging", value: 114 },
+  { source: "linkedin / paid", target: "/webinar", value: 121 },
+  { source: "linkedin / paid", target: "Submitted a form", value: 71 },
+  { source: "linkedin / paid", target: "Left without engaging", value: 76 },
+  { source: "direct", target: "/pricing", value: 84 },
+  { source: "direct", target: "Submitted a form", value: 62 },
+  { source: "direct", target: "Left without engaging", value: 44 },
+  { source: "google / organic", target: "/blog/landing-page-checklist", value: 66 },
+  { source: "google / organic", target: "Left without engaging", value: 64 },
+  { source: "newsletter / email", target: "Submitted a form", value: 48 },
+  { source: "newsletter / email", target: "Clicked a CTA", value: 26 },
+];
 
 export const DEMO_TOP_PAGES: PageStat[] = [
   { path: "/", sessions: 480, formSubmits: 52 },

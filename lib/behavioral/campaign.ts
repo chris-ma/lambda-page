@@ -131,6 +131,63 @@ export function computeTopPages(events: EventRow[]): PageStat[] {
     .slice(0, 15);
 }
 
+export type FlowLink = { source: string; target: string; value: number };
+
+/**
+ * Traffic source → where that session went next, for a two-stage Sankey.
+ * "Next" is the path of the session's second pageview when the same
+ * snippet is installed on more than one page of the site; single-page
+ * setups have nowhere else on-site to go, so it falls back to the
+ * strongest engagement signal actually observed (form submit > CTA click >
+ * left without engaging) rather than showing every session dead-ending at
+ * the same page.
+ */
+export function computeTrafficFlow(events: EventRow[]): FlowLink[] {
+  const firstPv = sessionFirstPageview(events);
+
+  const pageviewsBySession = new Map<string, EventRow[]>();
+  for (const e of events) {
+    if (e.type !== "pageview") continue;
+    if (!pageviewsBySession.has(e.session_id)) pageviewsBySession.set(e.session_id, []);
+    pageviewsBySession.get(e.session_id)!.push(e);
+  }
+  for (const pvs of pageviewsBySession.values()) {
+    pvs.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+  }
+
+  const formSubmitSessions = new Set<string>();
+  const ctaClickSessions = new Set<string>();
+  for (const e of events) {
+    if (e.type !== "funnel_stage") continue;
+    const stage = (e.payload as { stage?: string })?.stage;
+    if (stage === "form_submit") formSubmitSessions.add(e.session_id);
+    if (stage === "cta_click") ctaClickSessions.add(e.session_id);
+  }
+
+  const counts = new Map<string, number>();
+  for (const [sid, pv] of firstPv) {
+    const source = channelLabel(pv);
+    const pvs = pageviewsBySession.get(sid) ?? [];
+    const target =
+      pvs.length > 1
+        ? pvs[1].path || "/"
+        : formSubmitSessions.has(sid)
+          ? "Submitted a form"
+          : ctaClickSessions.has(sid)
+            ? "Clicked a CTA"
+            : "Left without engaging";
+    const key = `${source}␟${target}`;
+    counts.set(key, (counts.get(key) ?? 0) + 1);
+  }
+
+  return Array.from(counts.entries())
+    .map(([key, value]) => {
+      const [source, target] = key.split("␟");
+      return { source, target, value };
+    })
+    .sort((a, b) => b.value - a.value);
+}
+
 export type ReturnVisitStat = { returning: number; total: number; rate: number };
 
 /** Share of sessions that are a return visit within the snippet's 30-day window. */

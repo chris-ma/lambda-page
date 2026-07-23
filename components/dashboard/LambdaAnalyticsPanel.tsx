@@ -1,6 +1,7 @@
 import { DataTable } from "@/components/ui/DataTable";
+import { SankeyChart } from "@/components/charts/SankeyChart";
 import { formatPercent } from "@/lib/utils";
-import type { ChannelStat, CtaStat, OutboundStat, PageStat, ReturnVisitStat } from "@/lib/behavioral/campaign";
+import type { ChannelStat, CtaStat, FlowLink, OutboundStat, PageStat, ReturnVisitStat } from "@/lib/behavioral/campaign";
 
 /**
  * The native, no-setup analytics option — reads the same tracking snippet
@@ -17,12 +18,14 @@ export function LambdaAnalyticsPanel({
   outboundClicks,
   topPages,
   returnVisits,
+  trafficFlow,
 }: {
   channels: ChannelStat[];
   topCtas: CtaStat[];
   outboundClicks: OutboundStat[];
   topPages: PageStat[];
   returnVisits: ReturnVisitStat;
+  trafficFlow: FlowLink[];
 }) {
   return (
     <div>
@@ -48,6 +51,22 @@ export function LambdaAnalyticsPanel({
             {channels[0] ? formatPercent(channels[0].conversionRate, 1) + " conversion" : "no sessions yet"}
           </p>
         </div>
+      </div>
+
+      <div className="mt-8">
+        <h3 className="font-display text-[15px] font-semibold text-ink">Traffic flow</h3>
+        <p className="mt-1 text-[12px] text-ink-soft">
+          Where sessions came from, and what they did immediately after — another page on the
+          site if the snippet is installed on more than one, otherwise the strongest engagement
+          signal seen (a form submit, a CTA click, or leaving without either).
+        </p>
+        {trafficFlow.length === 0 ? (
+          <p className="mt-3 text-[12.5px] text-ink-soft">No sessions yet.</p>
+        ) : (
+          <div className="mt-3">
+            <SankeyChart links={trafficFlow} sourceLabel="Traffic source" targetLabel="Went next to" />
+          </div>
+        )}
       </div>
 
       <div className="mt-8">
