@@ -109,55 +109,62 @@ export default async function SeoAnalysisPage({ params }: { params: Promise<{ pa
       )}
 
       <div className="mt-14">
-        {allFindings.length === 0 ? (
+        {allFindings.length === 0 && (
           <p className="border border-dashed border-ink p-8 text-center text-[13.5px] text-ink-soft">
             {run?.status === "error"
               ? `Last run failed: ${run.error}`
-              : "No findings yet. Run the diagnostic to get a first read."}
+              : "No findings yet. Run the diagnostic to get a first read — the sections below don't need one to get started, though."}
           </p>
-        ) : (
-          <>
-            <div className="mb-6">
-              <ResultActions />
-            </div>
-            {run?.stim_width ? (
-              <div className="grid gap-10 lg:grid-cols-[420px_1fr]">
-                <div className="min-w-0">
-                  <h2 className="font-display text-[16px] font-semibold text-ink">Screenshot</h2>
-                  <p className="mt-1 text-[12.5px] text-ink-soft">
-                    {pinned.length > 0
-                      ? "Findings with a real on-page location — the H1 and any FAQ/Q&A block — are pinned below. Most SEO checks (meta tags, structured data, robots.txt) live in the page's <head>, not on screen, so they're not pinnable and stay in the list instead."
-                      : "This mobile screenshot is what the DOM pass actually crawled — none of this run's findings had a specific on-page location to pin (that's normal: most SEO checks live in the page's <head>, not on screen)."}
-                  </p>
-                  <div className="mt-4">
-                    <AnnotatedStimulus
-                      stimulusUrl={`/api/runs/${run.id}/stimulus`}
-                      aspectRatio={aspectRatio}
-                      findings={allFindings.map((f) => ({ id: f.id, attribute: f.attribute, detail: f.detail, fix: f.fix, status: f.status, x: f.x, y: f.y }))}
-                    />
-                  </div>
-                </div>
-                <div className="min-w-0">
-                  <SeoHygieneGuide findings={allFindings} headings={headings} />
-                </div>
-              </div>
-            ) : (
-              <SeoHygieneGuide findings={allFindings} headings={headings} />
-            )}
-          </>
         )}
-      </div>
-
-      <div className="mt-16 border-t-2 border-ink pt-10">
-        <KeywordsSection pageId={page.id} keywords={keywords} suggestionRun={suggestionRun} />
-      </div>
-
-      <div className="mt-16 border-t-2 border-ink pt-10">
-        <AiMentionsSection pageId={page.id} checks={mentionChecks} />
-      </div>
-
-      <div className="mt-16 border-t-2 border-ink pt-10">
-        <ShareOfVoiceSection pageId={page.id} ownUrl={page.url} competitors={competitors} run={shareOfVoiceRun} termCount={termCount} />
+        {allFindings.length > 0 && (
+          <div className="mb-6">
+            <ResultActions />
+          </div>
+        )}
+        {run?.stim_width ? (
+          <div className="grid gap-10 lg:grid-cols-[420px_1fr]">
+            <div className="min-w-0">
+              <h2 className="font-display text-[16px] font-semibold text-ink">Screenshot</h2>
+              <p className="mt-1 text-[12.5px] text-ink-soft">
+                {pinned.length > 0
+                  ? "Findings with a real on-page location — the H1 and any FAQ/Q&A block — are pinned below. Most SEO checks (meta tags, structured data, robots.txt) live in the page's <head>, not on screen, so they're not pinnable and stay in the list instead."
+                  : "This mobile screenshot is what the DOM pass actually crawled — none of this run's findings had a specific on-page location to pin (that's normal: most SEO checks live in the page's <head>, not on screen)."}
+              </p>
+              <div className="mt-4">
+                <AnnotatedStimulus
+                  stimulusUrl={`/api/runs/${run.id}/stimulus`}
+                  aspectRatio={aspectRatio}
+                  findings={allFindings.map((f) => ({ id: f.id, attribute: f.attribute, detail: f.detail, fix: f.fix, status: f.status, x: f.x, y: f.y }))}
+                />
+              </div>
+            </div>
+            <div className="min-w-0 space-y-16">
+              <SeoHygieneGuide findings={allFindings} headings={headings} />
+              <div className="border-t-2 border-ink pt-10">
+                <KeywordsSection pageId={page.id} keywords={keywords} suggestionRun={suggestionRun} />
+              </div>
+              <div className="border-t-2 border-ink pt-10">
+                <AiMentionsSection pageId={page.id} checks={mentionChecks} />
+              </div>
+              <div className="border-t-2 border-ink pt-10">
+                <ShareOfVoiceSection pageId={page.id} ownUrl={page.url} competitors={competitors} run={shareOfVoiceRun} termCount={termCount} />
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-16">
+            <SeoHygieneGuide findings={allFindings} headings={headings} />
+            <div className="border-t-2 border-ink pt-10">
+              <KeywordsSection pageId={page.id} keywords={keywords} suggestionRun={suggestionRun} />
+            </div>
+            <div className="border-t-2 border-ink pt-10">
+              <AiMentionsSection pageId={page.id} checks={mentionChecks} />
+            </div>
+            <div className="border-t-2 border-ink pt-10">
+              <ShareOfVoiceSection pageId={page.id} ownUrl={page.url} competitors={competitors} run={shareOfVoiceRun} termCount={termCount} />
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
