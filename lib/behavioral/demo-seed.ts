@@ -23,29 +23,26 @@ export const DEMO_ENGAGEMENT: EngagementStats = {
   totalSessions: 1000,
 };
 
-export const DEMO_HEATMAP: number[] = (() => {
-  const cols = 20;
-  const rows = 12;
-  const buckets = new Array(cols * rows).fill(0);
-  const hot = [
-    [10, 1, 0.9], [11, 1, 0.7], [9, 2, 0.5],
-    [6, 4, 0.6], [13, 4, 0.8], [10, 5, 0.95],
-    [10, 8, 0.4], [11, 8, 0.5], [9, 9, 0.3],
-  ];
-  for (const [c, r, v] of hot) buckets[r * cols + c] = v;
-  return buckets;
-})();
+/** Same {x, y, count} shape computeClickPoints produces from real events — a handful of hot spots roughly matching a hero CTA and a mid-page section. */
+export const DEMO_CLICK_POINTS: { x: number; y: number; count: number }[] = [
+  { x: 0.525, y: 0.104, count: 214 },
+  { x: 0.575, y: 0.104, count: 96 },
+  { x: 0.475, y: 0.188, count: 58 },
+  { x: 0.325, y: 0.354, count: 71 },
+  { x: 0.675, y: 0.354, count: 133 },
+  { x: 0.525, y: 0.438, count: 189 },
+  { x: 0.525, y: 0.688, count: 44 },
+  { x: 0.575, y: 0.688, count: 52 },
+  { x: 0.475, y: 0.771, count: 31 },
+];
 
-/** Same per-row-reach shape computeScrollDepthGrid produces from real events — a smooth decay curve down the page, uniform across columns within a row. */
-export const DEMO_SCROLL_DEPTH_GRID: number[] = (() => {
-  const cols = 20;
-  const rowReach = [1, 0.97, 0.91, 0.83, 0.74, 0.65, 0.56, 0.48, 0.4, 0.34, 0.29, 0.24];
-  const grid = new Array(cols * rowReach.length).fill(0);
-  rowReach.forEach((v, row) => {
-    for (let col = 0; col < cols; col++) grid[row * cols + col] = v;
-  });
-  return grid;
-})();
+/** Same {depth, reachPct} shape computeScrollDepthMarkers produces from real events, matching DEMO_SCROLL_DEPTH's counts above. */
+export const DEMO_SCROLL_MARKERS: { depth: 25 | 50 | 75 | 100; reachPct: number }[] = [
+  { depth: 25, reachPct: 86 },
+  { depth: 50, reachPct: 74 },
+  { depth: 75, reachPct: 51 },
+  { depth: 100, reachPct: 30 },
+];
 
 export const DEMO_SEGMENTS_DEVICE = [
   { label: "mobile", count: 612 },

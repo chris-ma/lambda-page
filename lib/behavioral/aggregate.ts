@@ -73,22 +73,46 @@ export function computeFunnelBySegment(events: EventRow[], dimension: "device" |
   return result;
 }
 
-const MIN_REACH_SESSIONS = 3;
+/**
+ * Raw click counts clustered into a cols×rows grid, returned as points (each
+ * cell's center in normalized 0..1 page coordinates) rather than a full grid
+ * — only cells with at least one click are returned, since a dot on every
+ * empty cell would just be noise. Deliberately unweighted: this is "how many
+ * times did someone actually click here," a literal count shown as a label
+ * on the dot, not an attention-adjusted density score.
+ */
+export function computeClickPoints(events: EventRow[], cols = 20, rows = 12): { x: number; y: number; count: number }[] {
+  const counts = new Map<number, number>();
+  for (const e of events) {
+    if (e.type !== "click") continue;
+    const x = (e.payload as { x?: number })?.x ?? 0;
+    const y = (e.payload as { y?: number })?.y ?? 0;
+    const col = Math.min(cols - 1, Math.max(0, Math.floor(x * cols)));
+    const row = Math.min(rows - 1, Math.max(0, Math.floor(y * rows)));
+    const key = row * cols + col;
+    counts.set(key, (counts.get(key) ?? 0) + 1);
+  }
+  return Array.from(counts.entries()).map(([key, count]) => {
+    const col = key % cols;
+    const row = Math.floor(key / cols);
+    return { x: (col + 0.5) / cols, y: (row + 0.5) / rows, count };
+  });
+}
+
+const SCROLL_CHECKPOINTS = [25, 50, 75, 100] as const;
 
 /**
- * Fraction of sessions that scrolled far enough to see each row of the
- * heatmap grid, plus the total session count that fraction is drawn from.
- * Click y and scroll depth are already in the same normalized page-height
- * space (both computed against document height in the snippet), so a
- * scroll_depth checkpoint of D can stand in directly for "reached D% down
- * the page." Row 0 is always 1 — every session that loads the page sees the
- * initial fold regardless of whether it ever scrolls.
+ * Where each scroll-depth checkpoint actually ends, as a page-height
+ * fraction, plus what share of sessions reached it. Click y and scroll depth
+ * already share the same normalized page-height space, so the checkpoint's
+ * own depth IS the position to draw its line to — a vertical line from the
+ * top of the screenshot down to that depth, whose length marks exactly
+ * where that band ends, rather than a gradient a viewer has to eyeball.
  */
-function computeScrollReachByRow(events: EventRow[], rows: number): { reach: number[]; totalSessions: number } {
+export function computeScrollDepthMarkers(events: EventRow[]): { depth: (typeof SCROLL_CHECKPOINTS)[number]; reachPct: number }[] {
   const sessionIds = new Set<string>();
   for (const e of events) if (e.type === "pageview") sessionIds.add(e.session_id);
-  const totalSessions = sessionIds.size;
-  if (totalSessions === 0) return { reach: new Array(rows).fill(1), totalSessions: 0 };
+  const total = sessionIds.size;
 
   const maxDepthBySession = new Map<string, number>();
   for (const e of events) {
@@ -97,68 +121,10 @@ function computeScrollReachByRow(events: EventRow[], rows: number): { reach: num
     if (depth > (maxDepthBySession.get(e.session_id) ?? 0)) maxDepthBySession.set(e.session_id, depth);
   }
 
-  const reach: number[] = [];
-  for (let row = 0; row < rows; row++) {
-    if (row === 0) {
-      reach.push(1);
-      continue;
-    }
-    const rowTop = row / rows;
-    let reached = 0;
-    for (const sid of sessionIds) {
-      if (((maxDepthBySession.get(sid) ?? 0) / 100) >= rowTop) reached++;
-    }
-    reach.push(reached / totalSessions);
-  }
-  return { reach, totalSessions };
-}
-
-/**
- * Click density weighted by scroll-depth reach: a row only 30% of sessions
- * ever scrolled to isn't "cold" because people ignore it, it's cold because
- * most people never saw it — dividing by reach turns raw click counts into
- * clicks-per-viewer, so a hot spot below the fold reads as hot precisely
- * when the visitors who did reach it clicked heavily, not just when raw
- * click volume happens to be high near the top of the page. Rows too few
- * sessions ever reached (below MIN_REACH_SESSIONS) fall back to the raw
- * count instead, so a division by a tiny sample doesn't produce noise.
- */
-export function computeHeatmapBuckets(events: EventRow[], cols = 20, rows = 12): number[] {
-  const buckets = new Array(cols * rows).fill(0);
-  const clicks = events.filter((e) => e.type === "click");
-  for (const c of clicks) {
-    const x = (c.payload as { x?: number })?.x ?? 0;
-    const y = (c.payload as { y?: number })?.y ?? 0;
-    const col = Math.min(cols - 1, Math.max(0, Math.floor(x * cols)));
-    const row = Math.min(rows - 1, Math.max(0, Math.floor(y * rows)));
-    buckets[row * cols + col]++;
-  }
-
-  const { reach, totalSessions } = computeScrollReachByRow(events, rows);
-  const weighted = buckets.map((count, i) => {
-    const row = Math.floor(i / cols);
-    const reachedSessions = reach[row] * totalSessions;
-    return reachedSessions >= MIN_REACH_SESSIONS ? count / Math.max(reach[row], 1e-6) : count;
-  });
-
-  const max = Math.max(...weighted, 1e-9);
-  return weighted.map((b) => b / max);
-}
-
-/**
- * Same per-row reach fraction the click heatmap divides by internally, but
- * exposed as its own cols×rows grid (every cell in a row shares that row's
- * value) so it can be plotted spatially over the same screenshot the click
- * density grid uses — a Hotjar-style scroll map, toggled against clicks
- * rather than shown only as an abandonment funnel.
- */
-export function computeScrollDepthGrid(events: EventRow[], cols = 20, rows = 12): number[] {
-  const { reach } = computeScrollReachByRow(events, rows);
-  const grid = new Array(cols * rows).fill(0);
-  for (let row = 0; row < rows; row++) {
-    for (let col = 0; col < cols; col++) grid[row * cols + col] = reach[row];
-  }
-  return grid;
+  return SCROLL_CHECKPOINTS.map((depth) => ({
+    depth,
+    reachPct: total === 0 ? 0 : Math.round((Array.from(sessionIds).filter((sid) => (maxDepthBySession.get(sid) ?? 0) >= depth).length / total) * 100),
+  }));
 }
 
 /**

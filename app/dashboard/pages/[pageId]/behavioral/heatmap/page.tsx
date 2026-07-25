@@ -1,8 +1,8 @@
 import { getPage } from "@/lib/db/pages";
 import { eventsForPage, eventCountForPage } from "@/lib/db/events";
 import { getPageScreenshot } from "@/lib/db/page-screenshots";
-import { computeHeatmapBuckets, computeScrollDepthGrid, computeScrollDepthFunnel, computeRageClicks } from "@/lib/behavioral/aggregate";
-import { DEMO_HEATMAP, DEMO_SCROLL_DEPTH_GRID, DEMO_SCROLL_DEPTH } from "@/lib/behavioral/demo-seed";
+import { computeClickPoints, computeScrollDepthMarkers, computeScrollDepthFunnel, computeRageClicks } from "@/lib/behavioral/aggregate";
+import { DEMO_CLICK_POINTS, DEMO_SCROLL_MARKERS, DEMO_SCROLL_DEPTH } from "@/lib/behavioral/demo-seed";
 import { HeatmapSection } from "@/components/dashboard/HeatmapSection";
 
 export const dynamic = "force-dynamic";
@@ -20,8 +20,8 @@ export default async function BehavioralHeatmapPage({ params }: { params: Promis
   let data;
   if (isDemo) {
     data = {
-      heatmap: DEMO_HEATMAP,
-      scrollDepthGrid: DEMO_SCROLL_DEPTH_GRID,
+      clickPoints: DEMO_CLICK_POINTS,
+      scrollMarkers: DEMO_SCROLL_MARKERS,
       scrollDepth: DEMO_SCROLL_DEPTH,
       rageClicks: [] as { selector: string; count: number }[],
     };
@@ -40,8 +40,8 @@ export default async function BehavioralHeatmapPage({ params }: { params: Promis
     }
     const pageEvents = events.filter((e) => (e.path ?? "/") === pagePathname);
     data = {
-      heatmap: computeHeatmapBuckets(pageEvents),
-      scrollDepthGrid: computeScrollDepthGrid(pageEvents),
+      clickPoints: computeClickPoints(pageEvents),
+      scrollMarkers: computeScrollDepthMarkers(pageEvents),
       scrollDepth: computeScrollDepthFunnel(pageEvents),
       rageClicks: computeRageClicks(pageEvents),
     };

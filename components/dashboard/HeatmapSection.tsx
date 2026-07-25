@@ -9,15 +9,15 @@ import { ToolExplainer } from "@/components/ui/ToolExplainer";
 
 export function HeatmapSection({
   pageId,
-  heatmap,
-  scrollDepthGrid,
+  clickPoints,
+  scrollMarkers,
   scrollDepth,
   rageClicks,
   screenshotUrl,
 }: {
   pageId: string;
-  heatmap: number[];
-  scrollDepthGrid: number[];
+  clickPoints: { x: number; y: number; count: number }[];
+  scrollMarkers: { depth: number; reachPct: number }[];
   scrollDepth: FunnelStage[];
   rageClicks: { selector: string; count: number }[];
   screenshotUrl: string | null;
@@ -46,13 +46,11 @@ export function HeatmapSection({
     <div>
       <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
         <p className="max-w-[520px] text-[13px] text-ink-soft">
-          Click density and scroll depth, each bucketed into a 20×12 grid and shown in context on a
-          screenshot — toggle between them directly on the image. Scoped to this URL&rsquo;s own
-          path even if the snippet is installed site-wide, since coordinates only line up against
-          this page&rsquo;s own layout. Click density is already weighted by scroll depth, so a row
-          few visitors ever scrolled to reads as clicks-per-viewer rather than looking cold just
-          because fewer people saw it. Teal ramp only — never red-for-hot, since brick is reserved
-          for a failing status elsewhere in this system.
+          Clicks and scroll depth, shown in context on a screenshot — toggle between them directly
+          on the image. Scoped to this URL&rsquo;s own path even if the snippet is installed
+          site-wide, since coordinates only line up against this page&rsquo;s own layout. Clicks
+          are dots sized and labeled by the literal number of clicks that landed there; scroll
+          depth is drawn as lines whose length is exactly where each checkpoint band ends.
         </p>
         <button
           type="button"
@@ -64,13 +62,13 @@ export function HeatmapSection({
         </button>
       </div>
       <ToolExplainer
-        what="Click density and scroll depth together, overlaid on a real screenshot so you can see exactly where clicks land in context — plus rage-click detection."
-        problem="Without this, you're guessing whether visitors are actually clicking your CTA, ignoring a whole section, or clicking on something that looks interactive but isn't — and raw click counts alone mislead you further, since anything below the fold looks 'cold' just because fewer people scroll that far, not because they're ignoring it."
-        insight="Click coordinates and scroll-depth checkpoints both land in the same normalized page-height space, so each row's click count gets divided by the share of sessions that actually scrolled far enough to see it — a hot spot below the fold means the visitors who reached it clicked heavily, not that raw volume happens to be high near the top."
+        what="Real click locations and scroll-depth checkpoints, overlaid on a real screenshot so you can see exactly where clicks land and how far people actually scroll — plus rage-click detection."
+        problem="Without this, you're guessing whether visitors are actually clicking your CTA, ignoring a whole section, or clicking on something that looks interactive but isn't — and you can't tell whether a section going unclicked is because people saw it and skipped it, or never scrolled that far to begin with."
+        insight="Click coordinates and scroll-depth checkpoints both land in the same normalized page-height space, so a scroll checkpoint's line is drawn to exactly the depth it represents — pairing the two views tells you whether a quiet spot on the page was ignored or simply never seen."
       />
       {captureError && <p className="mt-4 mb-3 font-mono text-[11px] text-brick">{captureError}</p>}
       <div className="mt-6">
-        <HeatmapGrid clickBuckets={heatmap} scrollBuckets={scrollDepthGrid} cols={20} screenshotUrl={screenshotUrl} />
+        <HeatmapGrid clickPoints={clickPoints} scrollMarkers={scrollMarkers} screenshotUrl={screenshotUrl} />
       </div>
 
       <div className="mt-10 grid gap-8 lg:grid-cols-2">
@@ -87,7 +85,7 @@ export function HeatmapSection({
         <div className="min-w-0">
           <h3 className="font-display text-[15px] font-semibold text-ink">Clicks on page</h3>
           <p className="mt-1 text-[12px] text-ink-soft">
-            Every click event captured for this page, feeding the density grid above — a rage click
+            Every click event captured for this page, feeding the click dots above — a rage click
             is 3+ clicks in the same small area within a couple seconds, usually a sign visitors
             think something is clickable when it isn&rsquo;t.
           </p>
