@@ -24,6 +24,12 @@
     },
     "app/api/analyze/ideation/route.ts": {
       "maxDuration": 300
+    },
+    "app/api/analyze/mention-checks/route.ts": {
+      "maxDuration": 90
+    },
+    "app/api/analyze/share-of-voice/route.ts": {
+      "maxDuration": 90
     }
   }
 }
