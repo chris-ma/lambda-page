@@ -1,206 +1,153 @@
 /**
- * Static reference guide — general SEO/AEO/GEO hygiene, not this page's own
- * findings. Shown first on the SEO page so there's a "what good and bad
- * actually look like" reference to read the findings below against. Sourced
- * from Google Search Central guidance and Wix's AI-search visibility
- * research where noted; a few categories (marked unsourced) are this
- * product's own framing rather than a cited claim.
+ * Search hygiene criteria for this specific page. Each criterion maps to one
+ * or more real findings already produced by the structural crawl
+ * (lib/analysis/structural.ts) — this module doesn't invent a second scoring
+ * system, it just organizes the existing findings around the questions a
+ * person actually asks ("is this page crawlable," "are the headings right")
+ * instead of the internal component names they happen to be grouped under.
+ *
+ * A couple of criteria (content originality, authority/credibility) can't be
+ * determined from a single-page crawl at all — no backlink data, no way to
+ * compare against "what everyone else already says." Those are marked
+ * `notAutomatable` and always show practical self-check guidance instead of
+ * a fabricated pass/fail.
  */
 
-export type HygieneLine = { label: string; text: string };
-export type HygieneSource = "google" | "wix";
+export type FindingMatch = { component: string; attribute: string };
 
-export type HygieneCategory = {
+export type HygieneCriterion = {
   id: string;
   title: string;
-  lines: HygieneLine[];
-  sources: HygieneSource[];
+  group: string;
+  /** (component, attribute) pairs whose findings answer this criterion. attribute "*" matches every finding in that component. */
+  match: FindingMatch[];
+  /** Practical, plain-language guidance — shown for notAutomatable criteria, or as a lead-in even when real findings exist. */
+  guidance: string;
+  notAutomatable?: boolean;
 };
 
-export type HygieneGroup = {
-  title: string;
-  categories: HygieneCategory[];
-};
-
-export const SEO_HYGIENE_GROUPS: HygieneGroup[] = [
+export const SEO_HYGIENE_CRITERIA: HygieneCriterion[] = [
   {
-    title: "Crawlability & trust",
-    categories: [
-      {
-        id: "crawl-index",
-        title: "Crawl and index access",
-        lines: [
-          { label: "Good", text: "robots.txt allows the page, the page returns a 200 status, and the content is in HTML that can be read by crawlers." },
-          { label: "Bad", text: "The page is blocked by robots.txt, requires login, or returns a broken/error page." },
-        ],
-        sources: ["google"],
-      },
-      {
-        id: "https",
-        title: "HTTPS and basic trust signals",
-        lines: [
-          { label: "Good", text: "The page loads over HTTPS with a valid certificate and no mixed-content warnings." },
-          { label: "Bad", text: "The page is served over plain HTTP, or an HTTPS page still loads some resources insecurely." },
-          { label: "Why it helps", text: "Google has confirmed HTTPS as a (lightweight) ranking signal, and browsers actively flag HTTP pages as “Not secure.”" },
-        ],
-        sources: ["google"],
-      },
-      {
-        id: "sitemap",
-        title: "XML sitemap and discoverability",
-        lines: [
-          { label: "Good", text: "An accurate, up-to-date sitemap.xml lists the page, so crawlers can find it even if internal links to it are thin." },
-          { label: "Bad", text: "No sitemap, or a stale one that still lists removed pages and is missing new ones." },
-        ],
-        sources: ["google"],
-      },
-      {
-        id: "canonical",
-        title: "Canonical tags and duplicate content",
-        lines: [
-          { label: "Good", text: "One canonical URL per piece of content; parameter or tracking-tag variants (?utm=..., ?ref=...) point back to it." },
-          { label: "Bad", text: "The same content is reachable at multiple URLs with no canonical tag, splitting ranking signals across copies." },
-        ],
-        sources: ["google"],
-      },
+    id: "crawl-index",
+    title: "Crawl and index access",
+    group: "Crawlability & trust",
+    match: [
+      { component: "SEO Analysis", attribute: "Indexability" },
+      { component: "SEO Analysis", attribute: "robots.txt" },
+      { component: "AEO / GEO Analysis", attribute: "llms.txt presence" },
     ],
+    guidance: "Search and AI crawlers need to be able to actually fetch and read the page — blocked, gated, or broken pages can't be evaluated at all.",
   },
   {
-    title: "Content & structure",
-    categories: [
-      {
-        id: "titles-descriptions",
-        title: "Titles and descriptions",
-        lines: [
-          { label: "Good title", text: "“Beginner’s Guide to UX Research Testing Methods.”" },
-          { label: "Good meta description", text: "“Learn five practical UX research methods, when to use them, and how to interpret results.”" },
-          { label: "Why it helps", text: "Wix found stronger AI visibility on sites with longer titles and meta descriptions, and Google recommends making pages easy to understand and useful to searchers." },
-        ],
-        sources: ["wix", "google"],
-      },
-      {
-        id: "url-structure",
-        title: "URL structure",
-        lines: [
-          { label: "Good", text: "/usability-testing/card-sorting — short, readable, and describes the topic in plain words." },
-          { label: "Bad", text: "/p?id=48213&cat=7&ref=xyz — cryptic and parameter-heavy; tells a crawler or a person nothing about the page." },
-        ],
-        sources: ["google"],
-      },
-      {
-        id: "headings-structure",
-        title: "Headings and structure",
-        lines: [
-          { label: "Good", text: "One clear H1, then H2s like “When to Use Moderated Testing,” “Recruiting Participants,” and “Reporting Findings.”" },
-          { label: "Good formatting", text: "Short paragraphs, bullet lists, and sections that break the page into chunks AI can extract." },
-          { label: "Bad", text: "A giant wall of text with no headings or clear sections." },
-        ],
-        sources: ["wix", "google"],
-      },
-      {
-        id: "answer-first",
-        title: "Answer-first formatting for AI search",
-        lines: [
-          { label: "Good", text: "The direct answer to the likely question sits in the first sentence or two, with supporting detail and nuance after it." },
-          { label: "Bad", text: "The actual answer is buried several paragraphs down, after a long introduction an AI engine has to read through — or discard — to extract anything." },
-        ],
-        sources: [],
-      },
-      {
-        id: "internal-linking",
-        title: "Internal linking",
-        lines: [
-          { label: "Good", text: "A guide on usability testing links to related pages on card sorting, tree testing, and research recruitment." },
-          { label: "Why it helps", text: "Wix’s research found high-performing AI sites had stronger internal linking." },
-          { label: "Bad", text: "Important pages exist only in isolation, with no links from other relevant pages." },
-        ],
-        sources: ["wix"],
-      },
-      {
-        id: "originality",
-        title: "Content originality",
-        lines: [
-          { label: "Good", text: "A page that explains your team’s actual testing framework, includes examples, and answers common edge cases." },
-          { label: "Bad", text: "A rewritten generic article that repeats what every competitor already says." },
-          { label: "Why it helps", text: "Google explicitly says to focus on unique, non-commodity content that is helpful and satisfying." },
-        ],
-        sources: ["google"],
-      },
-    ],
+    id: "https",
+    title: "HTTPS and basic trust signals",
+    group: "Crawlability & trust",
+    match: [{ component: "SEO Analysis", attribute: "HTTPS" }],
+    guidance: "HTTPS is a lightweight but confirmed ranking signal, and browsers actively flag HTTP pages as \"Not secure\" — that warning alone costs trust before anyone reads a word.",
   },
   {
-    title: "Experience & media",
-    categories: [
-      {
-        id: "page-experience",
-        title: "Page experience",
-        lines: [
-          { label: "Good", text: "Fast load, mobile-friendly layout, readable typography, and the main content is immediately visible." },
-          { label: "Bad", text: "Slow page, intrusive pop-ups, cluttered layout, or confusing navigation." },
-          { label: "Why it helps", text: "Google says page experience matters even for AI search results." },
-        ],
-        sources: ["google"],
-      },
-      {
-        id: "structured-data",
-        title: "Structured data",
-        lines: [
-          { label: "Good", text: "A recipe page marks up ingredients, cook time, and servings that are also visible on the page." },
-          { label: "Good", text: "A product page uses product schema that matches the displayed price and availability." },
-          { label: "Bad", text: "Marking up hidden content, or using schema that says something the page does not actually show." },
-        ],
-        sources: ["google"],
-      },
-      {
-        id: "alt-text",
-        title: "Alt text and images",
-        lines: [
-          { label: "Good alt text", text: "“Screenshot of moderated usability testing notes showing task completion time and pain points.”" },
-          { label: "Good usage", text: "Relevant images that support the topic, with descriptive alt text." },
-          { label: "Bad", text: "“image1,” or stuffing keywords into every image description." },
-        ],
-        sources: ["wix", "google"],
-      },
-    ],
+    id: "sitemap",
+    title: "XML sitemap and discoverability",
+    group: "Crawlability & trust",
+    match: [{ component: "SEO Analysis", attribute: "sitemap.xml" }],
+    guidance: "A sitemap gives crawlers a direct list of pages to check, so discovery doesn't depend entirely on being linked to from somewhere else.",
   },
   {
-    title: "Ongoing signals",
-    categories: [
-      {
-        id: "freshness",
-        title: "Freshness and publishing rhythm",
-        lines: [
-          { label: "Good", text: "Updating cornerstone pages quarterly and publishing new supporting content regularly." },
-          { label: "Why it helps", text: "Wix found sites with more frequent publishing and more blog posts per month were more likely to surface in AI search." },
-          { label: "Bad", text: "Launching a page once and never revisiting it." },
-        ],
-        sources: ["wix"],
-      },
-      {
-        id: "authority",
-        title: "Authority and credibility",
-        lines: [
-          { label: "Good", text: "The site is cited by others, has expert authorship, and is clearly niche-focused." },
-          { label: "Why it helps", text: "Wix found niche sites with domain expertise could outperform larger generalist sites in AI visibility." },
-          { label: "Bad", text: "Thin site with no identifiable expertise, no external mentions, and no evidence of trust." },
-        ],
-        sources: ["wix"],
-      },
+    id: "canonical",
+    title: "Canonical tags and duplicate content",
+    group: "Crawlability & trust",
+    match: [{ component: "SEO Analysis", attribute: "Canonical tag" }],
+    guidance: "If the same content is reachable at more than one URL (tracking parameters, trailing slashes, http vs https), a canonical tag tells crawlers which one actually counts — without it, ranking signal splits across copies.",
+  },
+  {
+    id: "titles-descriptions",
+    title: "Titles and descriptions",
+    group: "Content & structure",
+    match: [
+      { component: "SEO Analysis", attribute: "Title tag" },
+      { component: "SEO Analysis", attribute: "Meta description" },
     ],
+    guidance: "The title and meta description are usually the first thing a person (or an AI summary) sees about the page before ever visiting it.",
+  },
+  {
+    id: "url-structure",
+    title: "URL structure",
+    group: "Content & structure",
+    match: [{ component: "SEO Analysis", attribute: "URL structure" }],
+    guidance: "A short, readable URL (/topic/subtopic) tells both people and crawlers what the page is about before they even click; a string of parameters or IDs tells them nothing.",
+  },
+  {
+    id: "page-structure",
+    title: "Page structure (headings)",
+    group: "Content & structure",
+    match: [
+      { component: "Content & Accessibility", attribute: "Heading hierarchy — single H1" },
+      { component: "Content & Accessibility", attribute: "Heading nesting" },
+      { component: "AEO / GEO Analysis", attribute: "Entity clarity (H1 states the subject)" },
+    ],
+    guidance: "One clear H1 that states the subject, then H2s and H3s that nest in order with no levels skipped — this is what lets both a skimming visitor and an AI crawler map the page's structure at a glance.",
+  },
+  {
+    id: "answer-first",
+    title: "Answer-first formatting for AI search",
+    group: "Content & structure",
+    match: [
+      { component: "AEO / GEO Analysis", attribute: "Content chunking (self-contained sections)" },
+      { component: "AEO / GEO Analysis", attribute: "Extractable Q&A / FAQ structure" },
+    ],
+    guidance: "AI answer engines quote and cite whichever passage most directly answers the query — content is more extractable when the answer sits in the first sentence or two of a self-contained section, not buried after a long wind-up.",
+  },
+  {
+    id: "internal-linking",
+    title: "Internal linking",
+    group: "Content & structure",
+    match: [{ component: "SEO Analysis", attribute: "Link structure" }],
+    guidance: "Links to related pages on your own site are how crawlers (and AI engines) discover that content and understand how it relates to what they're already reading.",
+  },
+  {
+    id: "originality",
+    title: "Content originality",
+    group: "Content & structure",
+    match: [],
+    notAutomatable: true,
+    guidance: "Can't be measured by crawling this page alone — there's no way to compare it against everyone else's content from here. Self-check: does this page explain your team's actual approach, with real examples and edge cases, or could it have been written about any competitor with the names swapped? Google explicitly says to prioritize unique, non-commodity content that's genuinely helpful — not a rewritten version of what every competitor already says.",
+  },
+  {
+    id: "page-experience",
+    title: "Page experience",
+    group: "Experience & media",
+    match: [{ component: "Page Vitals", attribute: "*" }],
+    guidance: "Fast load, a mobile-friendly layout, and content that's visible immediately — Google has said page experience matters even for AI search results, not just classic rankings.",
+  },
+  {
+    id: "structured-data",
+    title: "Structured data",
+    group: "Experience & media",
+    match: [{ component: "SEO Analysis", attribute: "Structured data (schema.org)" }],
+    guidance: "Schema markup (JSON-LD) gives crawlers an explicit, structured version of what's already on the page — it should always match what a visitor actually sees, never describe content that isn't really there.",
+  },
+  {
+    id: "alt-text",
+    title: "Alt text and images",
+    group: "Experience & media",
+    match: [{ component: "Content & Accessibility", attribute: "Image alt text" }],
+    guidance: "Descriptive alt text is how crawlers and AI engines understand what an image actually shows — \"image1\" or keyword-stuffed alt text tells them nothing (and stuffing can read as manipulative).",
+  },
+  {
+    id: "freshness",
+    title: "Freshness and publishing rhythm",
+    group: "Ongoing signals",
+    match: [{ component: "SEO Analysis", attribute: "Freshness signal" }],
+    guidance: "A visible or structured published/updated date lets visitors and AI crawlers tell how current the content is — sites that revisit cornerstone pages regularly and publish new supporting content tend to surface more often in AI search.",
+  },
+  {
+    id: "authority",
+    title: "Authority and credibility",
+    group: "Ongoing signals",
+    match: [],
+    notAutomatable: true,
+    guidance: "Can't be measured by crawling this one page — it depends on signals from across the web (who links to you, who cites you) that a single-page crawl has no access to. Self-check: is there a named, credible author on this content? Do other sites reference it? Research on AI-search visibility has found that a focused, niche-expert site can outperform a larger generalist one — depth in a specific area reads as more trustworthy than breadth without it.",
   },
 ];
 
-export const SEO_HYGIENE_EXAMPLE = {
-  title: "Practical page example",
-  intro: "A strong AI-search-friendly page for a UX research topic might have:",
-  points: [
-    "Title: “How to Run a Card Sort Test.”",
-    "H1: “Card Sorting for Information Architecture.”",
-    "Sections: “When to Use It,” “Remote vs In-Person,” “Sample Tasks,” and “How to Analyze Results.”",
-    "Internal links to related research methods.",
-    "One diagram with descriptive alt text.",
-    "Schema that matches visible FAQ content.",
-    "A fast, clean mobile layout.",
-  ],
-  sources: ["google", "wix"] as HygieneSource[],
-};
+export const SEO_HYGIENE_GROUPS = Array.from(new Set(SEO_HYGIENE_CRITERIA.map((c) => c.group)));

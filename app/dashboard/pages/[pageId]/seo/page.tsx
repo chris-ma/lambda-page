@@ -2,19 +2,18 @@ import Link from "next/link";
 import { getPage } from "@/lib/db/pages";
 import { latestRunWithFindings } from "@/lib/db/runs";
 import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
-import { FindingsReport } from "@/components/dashboard/FindingsReport";
 import { RunAnalysisButton } from "@/components/dashboard/RunAnalysisButton";
 import { AnnotatedStimulus } from "@/components/dashboard/AnnotatedStimulus";
 import { ResultActions } from "@/components/dashboard/ResultActions";
 import { AddPageShortcut } from "@/components/dashboard/AddPageShortcut";
 import { SeoHygieneGuide } from "@/components/dashboard/SeoHygieneGuide";
 import { StatCard } from "@/components/ui/StatCard";
-import { explainVital, withVitalsExplained } from "@/lib/vitals-copy";
+import { explainVital } from "@/lib/vitals-copy";
 import type { Status } from "@/lib/status";
 
 export const dynamic = "force-dynamic";
 
-const SEO_AI_COMPONENTS = new Set(["SEO Analysis", "AEO / GEO Analysis"]);
+const SEO_AI_COMPONENTS = new Set(["SEO Analysis", "AEO / GEO Analysis", "Content & Accessibility"]);
 
 const STATUS_ACCENT: Record<Status, string> = {
   PASS: "text-teal-deep",
@@ -33,7 +32,10 @@ export default async function SeoAnalysisPage({ params }: { params: Promise<{ pa
   const { run, findings } = await latestRunWithFindings(pageId, 1);
   const seoFindings = findings.filter((f) => SEO_AI_COMPONENTS.has(f.component));
   const vitalsFindings = findings.filter((f) => f.component === "Page Vitals");
-  const allFindings = [...seoFindings, ...withVitalsExplained(vitalsFindings)];
+  const allFindings = [...seoFindings, ...vitalsFindings];
+
+  const summary = (run?.summary as Record<string, unknown> | null) ?? {};
+  const headings = Array.isArray(summary.headings) ? (summary.headings as { level: number; text: string }[]) : null;
 
   const stats = [
     statFor(vitalsFindings, "Largest Contentful Paint"),
@@ -69,10 +71,6 @@ export default async function SeoAnalysisPage({ params }: { params: Promise<{ pa
           payload={{ pageId: page.id }}
           label={findings.length > 0 ? "Re-run diagnostic" : "Run diagnostic"}
         />
-      </div>
-
-      <div className="mt-10">
-        <SeoHygieneGuide />
       </div>
 
       {stats.length > 0 && (
@@ -125,11 +123,11 @@ export default async function SeoAnalysisPage({ params }: { params: Promise<{ pa
                   </div>
                 </div>
                 <div className="min-w-0">
-                  <FindingsReport findings={allFindings} />
+                  <SeoHygieneGuide findings={allFindings} headings={headings} />
                 </div>
               </div>
             ) : (
-              <FindingsReport findings={allFindings} />
+              <SeoHygieneGuide findings={allFindings} headings={headings} />
             )}
           </>
         )}

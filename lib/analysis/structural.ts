@@ -31,6 +31,8 @@ export type DomSnapshot = {
   h1Position: { x: number; y: number } | null;
   /** Same, for the first element actually matching the FAQ/Q&A selector (not the looser body-text regex fallback, which has no single position). */
   faqPosition: { x: number; y: number } | null;
+  articlePublishedTime: string | null;
+  articleModifiedTime: string | null;
 };
 
 export async function extractDom(page: Page): Promise<DomSnapshot> {
@@ -211,8 +213,25 @@ export async function extractDom(page: Page): Promise<DomSnapshot> {
       fontFamiliesUsed: Array.from(fontSet),
       h1Position,
       faqPosition,
+      articlePublishedTime: document.querySelector('meta[property="article:published_time"]')?.getAttribute("content") || null,
+      articleModifiedTime: document.querySelector('meta[property="article:modified_time"]')?.getAttribute("content") || null,
     };
   });
+}
+
+/** Flags a URL whose path is dominated by query parameters or an opaque numeric/hex ID rather than readable words — harder for both people and crawlers to make sense of at a glance. Returns null when the URL looks fine. */
+function urlStructureIssue(url: string): string | null {
+  let u: URL;
+  try {
+    u = new URL(url);
+  } catch {
+    return null;
+  }
+  const paramCount = Array.from(u.searchParams.keys()).length;
+  if (paramCount > 2) return `The URL carries ${paramCount} query parameters`;
+  if (/\/[0-9a-f]{8,}(?=[/?]|$)/i.test(u.pathname)) return "The URL path contains a long hex ID instead of a readable word";
+  if (/\/\d{5,}(?=[/?]|$)/.test(u.pathname)) return "The URL path contains a long numeric ID instead of a readable word";
+  return null;
 }
 
 export type BrandSpec = {
@@ -254,6 +273,9 @@ export async function runStructuralAnalysis(
     // — "load" is deterministic; the settle wait covers late-rendering content.
     await page.goto(targetUrl, { waitUntil: "load", timeout: 30000 });
     await page.waitForTimeout(1000);
+    // The URL actually rendered, after any redirect — the one the check
+    // below should judge, not necessarily the one the run was started with.
+    const finalUrl = page.url();
     const dom = await extractDom(page);
     const origin = new URL(targetUrl).origin;
     // Reuses this same already-open page/session rather than a separate
@@ -476,6 +498,19 @@ export async function runStructuralAnalysis(
         : { component: "SEO Analysis", attribute: "Canonical tag", status: "FLAGGED", detail: "No canonical link tag found.", fix: "Add <link rel=\"canonical\"> pointing to the preferred URL." },
     );
 
+    findings.push(
+      finalUrl.startsWith("https://")
+        ? { component: "SEO Analysis", attribute: "HTTPS", status: "PASS", detail: "The page is served over HTTPS." }
+        : { component: "SEO Analysis", attribute: "HTTPS", status: "FAILING", detail: "The page is served over plain HTTP, not HTTPS.", fix: "Get a TLS certificate — most hosts issue one free — and redirect all HTTP traffic to HTTPS." },
+    );
+
+    const urlIssue = urlStructureIssue(finalUrl);
+    findings.push(
+      urlIssue
+        ? { component: "SEO Analysis", attribute: "URL structure", status: "FLAGGED", detail: `${urlIssue} — that's harder for both people and crawlers to read at a glance.`, fix: "Use a short, descriptive path (e.g. /topic/subtopic) instead of query parameters or opaque IDs where possible." }
+        : { component: "SEO Analysis", attribute: "URL structure", status: "PASS", detail: "The URL is short and describes the page in readable words." },
+    );
+
     const noindex = dom.robotsMeta?.toLowerCase().includes("noindex") ?? false;
     findings.push(
       noindex
@@ -493,6 +528,7 @@ export async function runStructuralAnalysis(
 
     const schemaTypes: string[] = [];
     let schemaValid = 0;
+    let structuredDate: string | null = null;
     for (const raw of dom.jsonLd) {
       try {
         const parsed = JSON.parse(raw);
@@ -502,18 +538,40 @@ export async function runStructuralAnalysis(
             schemaValid++;
             schemaTypes.push(item["@type"]);
           }
+          if (item.dateModified || item.datePublished) {
+            structuredDate = item.dateModified || item.datePublished;
+          }
         }
       } catch {
         // invalid JSON-LD block, skip
       }
     }
+
+    const freshnessSignal = dom.articleModifiedTime || structuredDate || dom.articlePublishedTime;
+    findings.push(
+      freshnessSignal
+        ? { component: "SEO Analysis", attribute: "Freshness signal", status: "PASS", value: freshnessSignal, detail: "The page exposes a published/updated date, so visitors and AI crawlers can tell how current it is." }
+        : { component: "SEO Analysis", attribute: "Freshness signal", status: "FLAGGED", detail: "No published or last-updated date found in the page's metadata or structured data.", fix: "Add a visible \"last updated\" date, and include dateModified (or datePublished) in your JSON-LD, or an article:modified_time meta tag, so it's machine-readable too." },
+    );
+
     findings.push(
       schemaValid > 0
         ? { component: "SEO Analysis", attribute: "Structured data (schema.org)", status: "PASS", value: schemaTypes.join(", "), detail: `${schemaValid} valid JSON-LD block(s) found.` }
         : { component: "SEO Analysis", attribute: "Structured data (schema.org)", status: "FLAGGED", detail: "No valid JSON-LD structured data found.", fix: "Add JSON-LD structured data (e.g. Organization, Product, FAQPage) matching the page content." },
     );
 
-    findings.push({ component: "SEO Analysis", attribute: "Link structure", status: "INFO", value: `${dom.internalLinks} internal / ${dom.externalLinks} external`, detail: "Counted from visible anchor elements." });
+    findings.push(
+      dom.internalLinks === 0
+        ? {
+            component: "SEO Analysis",
+            attribute: "Link structure",
+            status: "FLAGGED",
+            value: `${dom.internalLinks} internal / ${dom.externalLinks} external`,
+            detail: "No internal links found on this page.",
+            fix: "Link out to a few related pages on your own site — internal links are how both crawlers and AI answer engines discover related content and understand how pages connect.",
+          }
+        : { component: "SEO Analysis", attribute: "Link structure", status: "PASS", value: `${dom.internalLinks} internal / ${dom.externalLinks} external`, detail: "Counted from visible anchor elements." },
+    );
 
     // ---- AEO / GEO Analysis (scored separately from SEO) ----
     findings.push(
@@ -551,6 +609,7 @@ export async function runStructuralAnalysis(
         missingAlt: missingAlt.length,
         readability: score,
         wordCount: words,
+        headings: dom.headings,
       },
       screenshot,
     };
