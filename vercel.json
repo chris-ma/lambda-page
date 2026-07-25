@@ -30,6 +30,12 @@
     },
     "app/api/analyze/share-of-voice/route.ts": {
       "maxDuration": 90
+    },
+    "app/api/analyze/keyword-suggestions/route.ts": {
+      "maxDuration": 60
+    },
+    "app/api/analyze/funnel-plan/route.ts": {
+      "maxDuration": 60
     }
   }
 }
