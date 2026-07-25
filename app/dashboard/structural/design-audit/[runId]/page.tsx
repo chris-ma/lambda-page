@@ -4,6 +4,7 @@ import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
 import { Tag } from "@/components/ui/Tag";
 import { Card } from "@/components/ui/Card";
 import { AnnotatedStimulus } from "@/components/dashboard/AnnotatedStimulus";
+import { FindingsReport } from "@/components/dashboard/FindingsReport";
 import { ResultActions } from "@/components/dashboard/ResultActions";
 
 export const dynamic = "force-dynamic";
@@ -44,11 +45,18 @@ export default async function DesignAuditRunPage({ params }: { params: Promise<{
                 <p className="mt-2 text-[14px] leading-relaxed text-ink">{overallImpression}</p>
               </Card>
             )}
-            <AnnotatedStimulus
-              stimulusUrl={`/api/runs/${run.id}/stimulus`}
-              aspectRatio={aspectRatio}
-              findings={findings.map((f) => ({ id: f.id, attribute: f.attribute, detail: f.detail, fix: f.fix, status: f.status, x: f.x, y: f.y }))}
-            />
+            <div className="grid gap-8 lg:grid-cols-2">
+              <div className="min-w-0">
+                <AnnotatedStimulus
+                  stimulusUrl={`/api/runs/${run.id}/stimulus`}
+                  aspectRatio={aspectRatio}
+                  findings={findings.map((f) => ({ id: f.id, attribute: f.attribute, detail: f.detail, fix: f.fix, status: f.status, x: f.x, y: f.y }))}
+                />
+              </div>
+              <div className="min-w-0">
+                <FindingsReport findings={findings} />
+              </div>
+            </div>
           </>
         )}
       </div>

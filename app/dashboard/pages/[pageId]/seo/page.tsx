@@ -102,24 +102,30 @@ export default async function SeoAnalysisPage({ params }: { params: Promise<{ pa
             <div className="mb-6">
               <ResultActions />
             </div>
-            {run?.stim_width && (
-              <div className="mb-10">
-                <h2 className="font-display text-[16px] font-semibold text-ink">Screenshot</h2>
-                <p className="mt-1 max-w-[640px] text-[12.5px] text-ink-soft">
-                  {pinned.length > 0
-                    ? "Findings with a real on-page location — the H1 and any FAQ/Q&A block — are pinned below. Most SEO checks (meta tags, structured data, robots.txt) live in the page's <head>, not on screen, so they're not pinnable and stay in the list below instead."
-                    : "This mobile screenshot is what the DOM pass actually crawled — none of this run's findings had a specific on-page location to pin (that's normal: most SEO checks live in the page's <head>, not on screen)."}
-                </p>
-                <div className="mt-4 max-w-[420px]">
-                  <AnnotatedStimulus
-                    stimulusUrl={`/api/runs/${run.id}/stimulus`}
-                    aspectRatio={aspectRatio}
-                    findings={allFindings.map((f) => ({ id: f.id, attribute: f.attribute, detail: f.detail, fix: f.fix, status: f.status, x: f.x, y: f.y }))}
-                  />
+            {run?.stim_width ? (
+              <div className="grid gap-10 lg:grid-cols-[420px_1fr]">
+                <div className="min-w-0">
+                  <h2 className="font-display text-[16px] font-semibold text-ink">Screenshot</h2>
+                  <p className="mt-1 text-[12.5px] text-ink-soft">
+                    {pinned.length > 0
+                      ? "Findings with a real on-page location — the H1 and any FAQ/Q&A block — are pinned below. Most SEO checks (meta tags, structured data, robots.txt) live in the page's <head>, not on screen, so they're not pinnable and stay in the list instead."
+                      : "This mobile screenshot is what the DOM pass actually crawled — none of this run's findings had a specific on-page location to pin (that's normal: most SEO checks live in the page's <head>, not on screen)."}
+                  </p>
+                  <div className="mt-4">
+                    <AnnotatedStimulus
+                      stimulusUrl={`/api/runs/${run.id}/stimulus`}
+                      aspectRatio={aspectRatio}
+                      findings={allFindings.map((f) => ({ id: f.id, attribute: f.attribute, detail: f.detail, fix: f.fix, status: f.status, x: f.x, y: f.y }))}
+                    />
+                  </div>
+                </div>
+                <div className="min-w-0">
+                  <FindingsReport findings={allFindings} />
                 </div>
               </div>
+            ) : (
+              <FindingsReport findings={allFindings} />
             )}
-            <FindingsReport findings={allFindings} />
           </>
         )}
       </div>
