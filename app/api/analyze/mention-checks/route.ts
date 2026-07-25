@@ -13,11 +13,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "pageId is required" }, { status: 400 });
   }
 
-  const page = await getPage(pageId);
-  const existing = await listMentionChecks(pageId);
-  const existingPrompts = Array.from(new Set(existing.map((c) => c.prompt)));
-
   try {
+    const page = await getPage(pageId);
+    const existing = await listMentionChecks(pageId);
+    const existingPrompts = Array.from(new Set(existing.map((c) => c.prompt)));
+
     const results = await generateMentionPrompts(page.url, existingPrompts);
     for (const r of results) {
       await insertMentionGroup(pageId, r.prompt, r.claude);

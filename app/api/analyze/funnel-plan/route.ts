@@ -19,16 +19,16 @@ export async function POST(request: Request) {
     return NextResponse.json({ planId: plan.id }, { status: 201 });
   }
 
-  const page = await getPage(pageId);
-  const events = await eventsForPage(pageId);
-
   try {
+    const page = await getPage(pageId);
+    const events = await eventsForPage(pageId);
+
     const { stages, overallNote, primaryGoal, purposeSummary } = await generateFunnelPlan(page.url, events);
     const plan = await createFunnelPlan(pageId, stages, overallNote, primaryGoal, purposeSummary);
     return NextResponse.json({ planId: plan.id }, { status: 201 });
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
-    await createFailedFunnelPlan(pageId, message);
+    await createFailedFunnelPlan(pageId, message).catch(() => {});
     return NextResponse.json({ error: "The AI funnel plan failed to generate." }, { status: 500 });
   }
 }
