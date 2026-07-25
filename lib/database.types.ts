@@ -100,6 +100,55 @@ export type Database = {
           { foreignKeyName: "analytics_connections_page_id_fkey"; columns: ["page_id"]; isOneToOne: true; referencedRelation: "pages"; referencedColumns: ["id"] },
         ];
       };
+      page_keywords: {
+        Row: { id: string; page_id: string; term: string; kind: string; user_rank: string | null; notes: string | null; created_at: string };
+        Insert: { id?: string; page_id: string; term: string; kind?: string; user_rank?: string | null; notes?: string | null; created_at?: string };
+        Update: { id?: string; page_id?: string; term?: string; kind?: string; user_rank?: string | null; notes?: string | null; created_at?: string };
+        Relationships: [
+          { foreignKeyName: "page_keywords_page_id_fkey"; columns: ["page_id"]; isOneToOne: false; referencedRelation: "pages"; referencedColumns: ["id"] },
+        ];
+      };
+      keyword_suggestion_runs: {
+        Row: { id: string; page_id: string; status: string; error: string | null; suggestions: Json; created_at: string };
+        Insert: { id?: string; page_id: string; status?: string; error?: string | null; suggestions?: Json; created_at?: string };
+        Update: { id?: string; page_id?: string; status?: string; error?: string | null; suggestions?: Json; created_at?: string };
+        Relationships: [
+          { foreignKeyName: "keyword_suggestion_runs_page_id_fkey"; columns: ["page_id"]; isOneToOne: false; referencedRelation: "pages"; referencedColumns: ["id"] },
+        ];
+      };
+      mention_checks: {
+        Row: {
+          id: string; page_id: string; group_id: string; prompt: string; engine: string; source: string;
+          status: string | null; detail: string | null; checked_at: string | null; created_at: string;
+        };
+        Insert: {
+          id?: string; page_id: string; group_id?: string; prompt: string; engine: string; source?: string;
+          status?: string | null; detail?: string | null; checked_at?: string | null; created_at?: string;
+        };
+        Update: {
+          id?: string; page_id?: string; group_id?: string; prompt?: string; engine?: string; source?: string;
+          status?: string | null; detail?: string | null; checked_at?: string | null; created_at?: string;
+        };
+        Relationships: [
+          { foreignKeyName: "mention_checks_page_id_fkey"; columns: ["page_id"]; isOneToOne: false; referencedRelation: "pages"; referencedColumns: ["id"] },
+        ];
+      };
+      page_competitors: {
+        Row: { id: string; page_id: string; url: string; label: string | null; created_at: string };
+        Insert: { id?: string; page_id: string; url: string; label?: string | null; created_at?: string };
+        Update: { id?: string; page_id?: string; url?: string; label?: string | null; created_at?: string };
+        Relationships: [
+          { foreignKeyName: "page_competitors_page_id_fkey"; columns: ["page_id"]; isOneToOne: false; referencedRelation: "pages"; referencedColumns: ["id"] },
+        ];
+      };
+      share_of_voice_runs: {
+        Row: { id: string; page_id: string; status: string; error: string | null; result: Json; created_at: string };
+        Insert: { id?: string; page_id: string; status?: string; error?: string | null; result?: Json; created_at?: string };
+        Update: { id?: string; page_id?: string; status?: string; error?: string | null; result?: Json; created_at?: string };
+        Relationships: [
+          { foreignKeyName: "share_of_voice_runs_page_id_fkey"; columns: ["page_id"]; isOneToOne: false; referencedRelation: "pages"; referencedColumns: ["id"] },
+        ];
+      };
       funnel_plans: {
         Row: {
           id: string; page_id: string; status: string; error: string | null;

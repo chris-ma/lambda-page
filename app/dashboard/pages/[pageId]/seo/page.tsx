@@ -7,8 +7,14 @@ import { AnnotatedStimulus } from "@/components/dashboard/AnnotatedStimulus";
 import { ResultActions } from "@/components/dashboard/ResultActions";
 import { AddPageShortcut } from "@/components/dashboard/AddPageShortcut";
 import { SeoHygieneGuide } from "@/components/dashboard/SeoHygieneGuide";
+import { KeywordsSection } from "@/components/dashboard/KeywordsSection";
+import { AiMentionsSection } from "@/components/dashboard/AiMentionsSection";
+import { ShareOfVoiceSection } from "@/components/dashboard/ShareOfVoiceSection";
 import { StatCard } from "@/components/ui/StatCard";
 import { explainVital } from "@/lib/vitals-copy";
+import { listKeywords, getLatestSuggestionRun } from "@/lib/db/keywords";
+import { listMentionChecks } from "@/lib/db/mention-checks";
+import { listCompetitors, getLatestShareOfVoiceRun } from "@/lib/db/competitors";
 import type { Status } from "@/lib/status";
 
 export const dynamic = "force-dynamic";
@@ -47,6 +53,15 @@ export default async function SeoAnalysisPage({ params }: { params: Promise<{ pa
 
   const pinned = allFindings.filter((f) => f.x !== null && f.y !== null);
   const aspectRatio = run?.stim_width && run?.stim_height ? `${run.stim_width} / ${run.stim_height}` : "9 / 16";
+
+  const [keywords, suggestionRun, mentionChecks, competitors, shareOfVoiceRun] = await Promise.all([
+    listKeywords(pageId),
+    getLatestSuggestionRun(pageId),
+    listMentionChecks(pageId),
+    listCompetitors(pageId),
+    getLatestShareOfVoiceRun(pageId),
+  ]);
+  const termCount = new Set([...keywords.map((k) => k.term), ...mentionChecks.map((c) => c.prompt)]).size;
 
   return (
     <div>
@@ -131,6 +146,18 @@ export default async function SeoAnalysisPage({ params }: { params: Promise<{ pa
             )}
           </>
         )}
+      </div>
+
+      <div className="mt-16 border-t-2 border-ink pt-10">
+        <KeywordsSection pageId={page.id} keywords={keywords} suggestionRun={suggestionRun} />
+      </div>
+
+      <div className="mt-16 border-t-2 border-ink pt-10">
+        <AiMentionsSection pageId={page.id} checks={mentionChecks} />
+      </div>
+
+      <div className="mt-16 border-t-2 border-ink pt-10">
+        <ShareOfVoiceSection pageId={page.id} ownUrl={page.url} competitors={competitors} run={shareOfVoiceRun} termCount={termCount} />
       </div>
     </div>
   );
