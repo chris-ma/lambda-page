@@ -7,6 +7,7 @@ import { RunAnalysisButton } from "@/components/dashboard/RunAnalysisButton";
 import { AnnotatedStimulus } from "@/components/dashboard/AnnotatedStimulus";
 import { ResultActions } from "@/components/dashboard/ResultActions";
 import { AddPageShortcut } from "@/components/dashboard/AddPageShortcut";
+import { SeoHygieneGuide } from "@/components/dashboard/SeoHygieneGuide";
 import { StatCard } from "@/components/ui/StatCard";
 import { explainVital, withVitalsExplained } from "@/lib/vitals-copy";
 import type { Status } from "@/lib/status";
@@ -68,6 +69,10 @@ export default async function SeoAnalysisPage({ params }: { params: Promise<{ pa
           payload={{ pageId: page.id }}
           label={findings.length > 0 ? "Re-run diagnostic" : "Run diagnostic"}
         />
+      </div>
+
+      <div className="mt-10">
+        <SeoHygieneGuide />
       </div>
 
       {stats.length > 0 && (
