@@ -7,8 +7,8 @@ import "@/app/atlas.css";
 
 export function PlaceholderPage({ eyebrow, title, body }: { eyebrow: string; title: string; body: string }) {
   return (
-    <div className={`atlas ${atlasSans.variable} ${atlasMono.variable} flex min-h-screen flex-col`} data-theme="light">
-      <Nav themeSwitchable={false} />
+    <div className={`atlas ${atlasSans.variable} ${atlasMono.variable} flex min-h-screen flex-col`}>
+      <Nav />
       <main className="flex flex-1 flex-col items-center justify-center px-6 py-28 text-center">
         <LambdaMark size={48} />
         <EyebrowLabel className="mt-8 justify-center">{eyebrow}</EyebrowLabel>

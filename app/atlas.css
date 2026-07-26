@@ -35,6 +35,28 @@
   --atlas-status-info: var(--atlas-data-3);
   --atlas-status-failing: var(--atlas-failing);
 
+  /*
+   * Bridges pages that haven't been individually migrated yet. Tailwind
+   * compiles `text-ink`, `bg-paper`, `text-teal-deep`, etc. straight to
+   * `var(--color-ink)`, `var(--color-paper)`, `var(--color-teal-deep)` —
+   * confirmed in the built CSS, not assumed — so redefining those same
+   * custom properties here re-themes every not-yet-converted component
+   * for free, including alpha-modified use (`border-ink/15` recomputes
+   * against whatever --color-ink currently is). Status hues collapse to
+   * the ramp in both themes, matching the Tag/StatusIcon remap. ink/paper/
+   * cream/line are left alone here — they're overridden only in the
+   * dark-mode block below, since the originals are already the correct
+   * paper-mode look. */
+  --color-teal: var(--atlas-status-pass);
+  --color-teal-deep: var(--atlas-status-pass);
+  --color-mustard: var(--atlas-status-flagged);
+  --color-mustard-deep: var(--atlas-status-flagged);
+  --color-pink: var(--atlas-status-info);
+  --color-pink-deep: var(--atlas-status-info);
+  --color-brick: var(--atlas-status-failing);
+  --color-terracotta: var(--atlas-data-4);
+  --color-terracotta-deep: var(--atlas-data-5);
+
   --atlas-bg: oklch(15% 0.014 var(--atlas-hue));
   --atlas-surface: oklch(19.5% 0.016 var(--atlas-hue));
   --atlas-ink: oklch(95% 0.006 var(--atlas-hue));
@@ -59,6 +81,24 @@
   --atlas-ink-faint: oklch(56% 0.016 78);
   --atlas-line: oklch(55% 0.018 78 / 35%);
   --atlas-line-strong: oklch(40% 0.02 78 / 55%);
+}
+
+/*
+ * Instrument (dark) mode only — the default, i.e. `.atlas` without an
+ * explicit `data-theme="light"`. Un-migrated components built on the old
+ * paper/ink pair (near-white bg, near-black text) would go illegible
+ * against an instrument-dark background without this: `paper` (elevated
+ * surfaces) maps to the lighter of the two atlas tones, `cream`/`cream-2`
+ * (base page fill) to the darker one — same relative relationship as the
+ * original pair, just inverted in absolute lightness for the dark surface.
+ */
+.atlas:not([data-theme="light"]) {
+  --color-paper: var(--atlas-surface);
+  --color-cream: var(--atlas-bg);
+  --color-cream-2: var(--atlas-bg);
+  --color-ink: var(--atlas-ink);
+  --color-ink-soft: var(--atlas-ink-soft);
+  --color-line: var(--atlas-line);
 }
 
 .atlas ::selection {
