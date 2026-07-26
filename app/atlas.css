@@ -1,0 +1,251 @@
+/**
+ * Parametric Atlas — the design system for the marketing site only.
+ * Scoped entirely under `.atlas` so the dashboard's editorial-plate system
+ * (mustard/teal/brick/pink status colors, Playfair display, bordered cards)
+ * is untouched by this file.
+ */
+
+.atlas {
+  /* One base hue drives the entire data ramp — lightness and chroma step,
+     hue never moves. A second hue exists exactly once, reserved for the
+     failing intrusion. */
+  --atlas-hue: 213;
+  --atlas-fail-hue: 27;
+
+  --atlas-data-1: oklch(91% 0.032 var(--atlas-hue));
+  --atlas-data-2: oklch(80% 0.065 var(--atlas-hue));
+  --atlas-data-3: oklch(68% 0.095 var(--atlas-hue));
+  --atlas-data-4: oklch(56% 0.115 var(--atlas-hue));
+  --atlas-data-5: oklch(44% 0.105 var(--atlas-hue));
+  --atlas-failing: oklch(63% 0.19 var(--atlas-fail-hue));
+  --atlas-failing-strong: oklch(50% 0.17 var(--atlas-fail-hue));
+
+  --atlas-bg: oklch(15% 0.014 var(--atlas-hue));
+  --atlas-surface: oklch(19.5% 0.016 var(--atlas-hue));
+  --atlas-ink: oklch(95% 0.006 var(--atlas-hue));
+  --atlas-ink-soft: oklch(70% 0.016 var(--atlas-hue));
+  --atlas-ink-faint: oklch(50% 0.016 var(--atlas-hue));
+  --atlas-line: oklch(45% 0.018 var(--atlas-hue) / 45%);
+  --atlas-line-strong: oklch(60% 0.02 var(--atlas-hue) / 70%);
+
+  background: var(--atlas-bg);
+  color: var(--atlas-ink);
+  font-family: var(--atlas-font-sans), ui-sans-serif, system-ui, sans-serif;
+  font-feature-settings: "ss01" 1;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Paper mode — same tokens, same plate, warm off-white instead of near-black. */
+.atlas[data-theme="light"] {
+  --atlas-bg: oklch(97% 0.016 78);
+  --atlas-surface: oklch(93.5% 0.018 78);
+  --atlas-ink: oklch(23% 0.014 78);
+  --atlas-ink-soft: oklch(42% 0.018 78);
+  --atlas-ink-faint: oklch(56% 0.016 78);
+  --atlas-line: oklch(55% 0.018 78 / 35%);
+  --atlas-line-strong: oklch(40% 0.02 78 / 55%);
+}
+
+.atlas ::selection {
+  background: var(--atlas-data-4);
+  color: var(--atlas-bg);
+}
+
+/* ---------- Typography ---------- */
+
+.atlas-mono {
+  font-family: var(--atlas-font-mono), ui-monospace, SFMono-Regular, monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+/* The only place mono ever appears: a measurement. 12px, grey, dense. */
+.atlas-annot {
+  font-family: var(--atlas-font-mono), ui-monospace, monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--atlas-ink-soft);
+  letter-spacing: 0;
+}
+
+.atlas h1,
+.atlas h2,
+.atlas h3,
+.atlas p,
+.atlas span,
+.atlas button,
+.atlas a {
+  font-family: inherit;
+}
+
+.atlas h1,
+.atlas h2,
+.atlas h3 {
+  margin: 0;
+  letter-spacing: -0.02em;
+  font-weight: 520;
+}
+
+.atlas p {
+  margin: 0;
+}
+
+/* ---------- Structure ---------- */
+
+.atlas-rule {
+  height: 1px;
+  background: var(--atlas-line);
+  border: 0;
+}
+
+.atlas-rule-strong {
+  height: 1px;
+  background: var(--atlas-line-strong);
+  border: 0;
+}
+
+/* Asymmetric layout: narrow left annotation column, wide plate/content column. */
+.atlas-frame {
+  display: grid;
+  gap: clamp(24px, 4vw, 56px);
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 900px) {
+  .atlas-frame {
+    grid-template-columns: minmax(180px, 240px) 1fr;
+    align-items: start;
+  }
+}
+
+.atlas-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---------- Interactive ---------- */
+
+.atlas button,
+.atlas a {
+  color: inherit;
+}
+
+.atlas-focusable:focus-visible,
+.atlas a:focus-visible,
+.atlas button:focus-visible {
+  outline: 2px solid var(--atlas-data-3);
+  outline-offset: 3px;
+}
+
+/* Specificity note: `.atlas a { color: inherit }` above is (0,1,1). These
+   button classes are used on <a> and <button> alike, so each is qualified
+   with the `.atlas` ancestor to reach (0,2,0) and reliably win — otherwise
+   the inherited near-white ink text sits on the near-white button fill. */
+.atlas .atlas-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 20px;
+  font-size: 13.5px;
+  font-weight: 560;
+  background: var(--atlas-ink);
+  color: var(--atlas-bg);
+  border: 1px solid var(--atlas-ink);
+  transition: opacity 0.15s ease;
+}
+.atlas .atlas-btn:hover {
+  opacity: 0.85;
+}
+
+.atlas .atlas-btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  font-size: 13.5px;
+  font-weight: 500;
+  background: transparent;
+  color: var(--atlas-ink);
+  border: 1px solid var(--atlas-line-strong);
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease;
+}
+.atlas .atlas-btn-ghost:hover {
+  border-color: var(--atlas-ink-soft);
+}
+
+.atlas .atlas-theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  font-size: 11px;
+  font-family: var(--atlas-font-mono), ui-monospace, monospace;
+  letter-spacing: 0.02em;
+  border: 1px solid var(--atlas-line-strong);
+  color: var(--atlas-ink-soft);
+  background: transparent;
+}
+.atlas .atlas-theme-toggle:hover {
+  color: var(--atlas-ink);
+  border-color: var(--atlas-ink-soft);
+}
+
+/* ---------- Plate ---------- */
+
+.atlas-plate-surface {
+  background: var(--atlas-surface);
+}
+
+.atlas-stage:focus-visible {
+  outline: 2px solid var(--atlas-data-3);
+  outline-offset: 4px;
+}
+
+.atlas-plate-table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 13px;
+}
+.atlas-plate-table th,
+.atlas-plate-table td {
+  text-align: left;
+  padding: 8px 14px 8px 0;
+  border-bottom: 1px solid var(--atlas-line);
+  font-weight: 400;
+}
+.atlas-plate-table th {
+  font-family: var(--atlas-font-mono), ui-monospace, monospace;
+  font-size: 11px;
+  color: var(--atlas-ink-soft);
+  font-weight: 400;
+  text-transform: lowercase;
+}
+.atlas-plate-table td.is-failing {
+  color: var(--atlas-failing);
+}
+
+.atlas-disclosure summary {
+  cursor: pointer;
+  list-style: none;
+}
+.atlas-disclosure summary::-webkit-details-marker {
+  display: none;
+}
+
+/* ---------- Motion ---------- */
+/* The plate's morph is driven in JS (so it can honor reduced-motion and
+   interpolate arbitrary path data); nothing in this stylesheet animates. */
+
+@media (prefers-reduced-motion: reduce) {
+  .atlas * {
+    transition-duration: 0.001ms !important;
+  }
+}

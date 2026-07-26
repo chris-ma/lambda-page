@@ -1,60 +1,75 @@
 import Link from "next/link";
-import { Card } from "@/components/ui/Card";
-import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
-import { PillarIcon, PILLAR_COLOR } from "@/components/icons/PillarIcon";
-import { Reveal } from "@/components/ui/Reveal";
 import { PILLARS_NAV } from "@/lib/pillars";
-import { cn } from "@/lib/utils";
 
-const DESCRIPTIONS: Record<number, string> = {
-  0: "Test the concept before a designer touches it. Message and headline variants get checked for comprehension against a real panel, competitor positioning gets mapped automatically, and wireframes get the same scrutiny a finished page would.",
-  1: "Runs against the page itself — no live traffic required. Covers design and content, SEO, AEO/GEO, and lab-based Core Web Vitals. This is the pillar that runs on every deploy and can block a launch before a single visitor sees the problem.",
-  2: "Once the page is live, this is what real visitors are actually doing on it: heatmaps and session replay, funnel drop-off by stage, and campaign/channel quality — built in, or pulled from Google Analytics 4.",
-  3: "The “why” behind the numbers. Eye tracking, moderated and unmoderated usability sessions, five-second comprehension tests, card sorting, pricing strategy testing (Van Westendorp and Gabor-Granger), and A/B testing with proper statistical significance.",
+const CADENCE: Record<number, { label: string; rank: number }> = {
+  0: { label: "on-demand, pre-launch", rank: 1 },
+  1: { label: "every deploy", rank: 3 },
+  2: { label: "continuous, once live", rank: 2 },
+  3: { label: "on-demand", rank: 1 },
 };
 
-export function Pillars() {
-  return (
-    <section id="pillars" className="border-b-2 border-ink bg-cream px-6 py-24">
-      <div className="mx-auto max-w-[1180px] text-center">
-        <Reveal>
-          <EyebrowLabel className="justify-center">Four Pillars</EyebrowLabel>
-        </Reveal>
-        <Reveal delay={60}>
-          <h2 className="mx-auto mt-4 max-w-[620px] font-display text-[32px] leading-[1.1] font-semibold text-ink sm:text-[42px]">
-            How Lambda <em className="text-terracotta-deep font-normal italic">measures</em> a page
-          </h2>
-        </Reveal>
+const TITLES: Record<number, string> = {
+  0: "Pre-Build Validation",
+  1: "Structural Analysis",
+  2: "Behavioral Analysis",
+  3: "User Testing",
+};
 
-        <div className="mt-14 grid gap-6 text-left sm:grid-cols-2 lg:grid-cols-4">
-          {PILLARS_NAV.map((p, i) => {
-            const accent = PILLAR_COLOR[p.id];
-            return (
-              <Reveal key={p.id} delay={120 + i * 60}>
-                <Link href={`/pillars#${p.slug}`} className="group block h-full">
-                  <Card className={`flex h-full flex-col p-6 ${p.comingSoon ? "opacity-70" : ""}`}>
-                    <div className="flex items-center justify-between">
-                      <span className={cn("font-mono text-[11px] font-semibold", accent.text)}>No. {String(p.id).padStart(2, "0")}</span>
-                      <span className={cn("flex h-10 w-10 items-center justify-center border-2 border-ink", accent.chip)}>
-                        <PillarIcon pillar={p.id} size={22} />
-                      </span>
-                    </div>
-                    <div className={cn("mt-4 h-[3px] w-9", accent.bar)} />
-                    <h3 className="mt-3 font-display text-[19px] font-semibold text-ink">
-                      {p.label === "Pre-Build" ? "Pre-Build Validation" : p.label === "Structural" ? "Structural Analysis" : p.label === "Behavioral" ? "Behavioral Analysis" : "User Testing"}
-                      {p.comingSoon && (
-                        <span className="ml-2 align-middle font-mono text-[9px] text-terracotta-deep uppercase">Coming soon</span>
-                      )}
-                    </h3>
-                    <p className="mt-3 max-w-none text-[13px] leading-relaxed text-ink-soft">
-                      {DESCRIPTIONS[p.id]}
-                    </p>
-                    <span className={cn("mt-4 font-mono text-[10.5px]", accent.text)}>Why it exists, and the tools inside →</span>
-                  </Card>
-                </Link>
-              </Reveal>
-            );
-          })}
+const DESCRIPTIONS: Record<number, string> = {
+  0: "Message and headline variants get checked for comprehension against a real panel, competitor positioning gets mapped, and wireframes get the same scrutiny a finished page would.",
+  1: "Runs against the page itself — no live traffic required. Design and content, SEO, AEO/GEO, and lab-based Core Web Vitals. The only pillar that runs on every deploy, and the one that can block a launch before a single visitor sees the problem.",
+  2: "Heatmaps and session replay, funnel drop-off by stage, and campaign/channel quality — built in, or pulled from Google Analytics 4.",
+  3: "Eye tracking, moderated and unmoderated usability sessions, five-second comprehension tests, card sorting, pricing strategy testing, and A/B testing with statistical significance.",
+};
+
+/** font-weight mapped directly to operating cadence — the pillar that runs most often reads heaviest, not the one a designer decided should. */
+function weightFor(rank: number): number {
+  return 400 + rank * 110;
+}
+
+export function Pillars() {
+  const structural = PILLARS_NAV.find((p) => p.id === 1)!;
+  const rest = PILLARS_NAV.filter((p) => p.id !== 1);
+
+  return (
+    <section id="pillars" className="px-6 py-20" style={{ borderBottom: "1px solid var(--atlas-line)" }}>
+      <div className="mx-auto max-w-[1240px]">
+        <h2 className="max-w-[560px] text-[26px] leading-[1.15] sm:text-[30px]" style={{ fontWeight: 540 }}>
+          How Lambda measures a page
+        </h2>
+
+        <div className="mt-12 grid gap-12 lg:grid-cols-[1.5fr_1fr]">
+          <Link href={`/pillars#${structural.slug}`} className="atlas-focusable block">
+            <div className="atlas-annot flex items-center justify-between">
+              <span>cadence: {CADENCE[1].label}</span>
+            </div>
+            <h3 className="mt-3 text-[24px]" style={{ fontWeight: weightFor(CADENCE[1].rank) }}>
+              {TITLES[1]}
+            </h3>
+            <p className="mt-3 max-w-[560px] text-[14px] leading-relaxed" style={{ color: "var(--atlas-ink-soft)" }}>
+              {DESCRIPTIONS[1]}
+            </p>
+            <span className="atlas-annot mt-4 inline-block underline underline-offset-2">
+              Why it exists, and the tools inside →
+            </span>
+          </Link>
+
+          <div className="space-y-8">
+            {rest.map((p) => (
+              <Link key={p.id} href={`/pillars#${p.slug}`} className="atlas-focusable block pt-6" style={{ borderTop: "1px solid var(--atlas-line)" }}>
+                <div className="atlas-annot flex items-center justify-between">
+                  <span>cadence: {CADENCE[p.id].label}</span>
+                  {p.comingSoon && <span>coming soon</span>}
+                </div>
+                <h3 className="mt-2 text-[16px]" style={{ fontWeight: weightFor(CADENCE[p.id].rank) }}>
+                  {TITLES[p.id]}
+                </h3>
+                <p className="mt-2 max-w-none text-[12.5px] leading-relaxed" style={{ color: "var(--atlas-ink-soft)" }}>
+                  {DESCRIPTIONS[p.id]}
+                </p>
+              </Link>
+            ))}
+          </div>
         </div>
       </div>
     </section>

@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { LambdaMark } from "@/components/ui/LambdaMark";
 
 const COLUMNS = [
   {
@@ -22,26 +21,28 @@ const COLUMNS = [
 
 export function Footer() {
   return (
-    <footer className="mt-auto bg-cream px-6 py-16">
+    <footer className="mt-auto px-6 py-14" style={{ background: "var(--atlas-bg)", color: "var(--atlas-ink)" }}>
       <div className="mx-auto max-w-[1100px]">
         <div className="grid gap-10 sm:grid-cols-[1.3fr_1fr_1fr_1fr]">
           <div>
-            <div className="flex items-center gap-3">
-              <LambdaMark size={30} />
-              <span className="font-display text-[17px] font-semibold text-ink">Lambda</span>
+            <div className="flex items-center gap-2.5">
+              <span aria-hidden="true" style={{ fontWeight: 620 }}>
+                λ
+              </span>
+              <span style={{ fontWeight: 560 }}>Lambda</span>
             </div>
-            <p className="mt-3 max-w-[230px] text-[12.5px] leading-relaxed text-ink-soft">
+            <p className="mt-3 max-w-[230px] text-[12.5px] leading-relaxed" style={{ color: "var(--atlas-ink-soft)" }}>
               The function between traffic and conversion, made visible.
             </p>
           </div>
 
           {COLUMNS.map((col) => (
             <div key={col.heading}>
-              <div className="font-mono text-[10px] tracking-[0.14em] text-ink-soft uppercase">{col.heading}</div>
+              <div className="atlas-annot">{col.heading}</div>
               <ul className="mt-3 space-y-2">
                 {col.links.map((l) => (
                   <li key={l.label}>
-                    <Link href={l.href} className="text-[13px] text-ink hover:text-terracotta-deep">
+                    <Link href={l.href} className="atlas-focusable text-[13px]">
                       {l.label}
                     </Link>
                   </li>
@@ -51,12 +52,8 @@ export function Footer() {
           ))}
         </div>
 
-        <div className="mt-14 flex flex-col items-center justify-between gap-3 border-t border-ink/15 pt-6 sm:flex-row">
-          <p className="font-mono text-[10.5px] tracking-wide text-ink-soft uppercase">
-            Lambda — Diagnostic Toolkit
-          </p>
-          <p className="font-mono text-[10.5px] tracking-wide text-ink-soft uppercase">Vol. I — No. 04 — 2026</p>
-        </div>
+        <div className="atlas-rule mt-12 mb-6" />
+        <p className="atlas-annot">Lambda — diagnostic toolkit</p>
       </div>
     </footer>
   );

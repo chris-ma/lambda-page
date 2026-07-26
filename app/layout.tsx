@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Playfair_Display } from "next/font/google";
+import { appBaseUrl } from "@/lib/app-url";
 import "./globals.css";
 
 // Playfair Display — the high-contrast editorial serif this reskin is built
@@ -13,7 +14,10 @@ const playfair = Playfair_Display({
   style: ["normal", "italic"],
 });
 
+const baseUrl = appBaseUrl();
+
 export const metadata: Metadata = {
+  ...(baseUrl ? { metadataBase: new URL(baseUrl) } : {}),
   title: "Lambda — Diagnostic Toolkit for Landing Pages",
   description:
     "The function between traffic and conversion, made visible. See exactly where a landing page breaks — before you build, while it's live, and everywhere in between.",

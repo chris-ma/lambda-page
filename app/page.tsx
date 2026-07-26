@@ -9,10 +9,12 @@ import { HowItWorks } from "@/components/marketing/HowItWorks";
 import { UseCases } from "@/components/marketing/UseCases";
 import { ClosingCta } from "@/components/marketing/ClosingCta";
 import { Footer } from "@/components/marketing/Footer";
+import { atlasSans, atlasMono } from "@/components/atlas/fonts";
+import "@/app/atlas.css";
 
 export default function Home() {
   return (
-    <>
+    <div className={`atlas ${atlasSans.variable} ${atlasMono.variable}`}>
       <Nav />
       <main>
         <Hero />
@@ -26,6 +28,6 @@ export default function Home() {
         <ClosingCta />
       </main>
       <Footer />
-    </>
+    </div>
   );
 }
