@@ -4,9 +4,13 @@ import type { ComponentPropsWithoutRef, MouseEvent } from "react";
 import { gsap } from "@/lib/gsap";
 import { cn } from "@/lib/utils";
 
+// Same fallback pattern as Button: `.atlas`-scoped pages (the dashboard) get
+// the new surface tokens, everything else (public test-runner pages, not
+// yet migrated) keeps the original paper/cream pair via the fallback value.
 export function Card({
   className,
   hover = true,
+  style,
   ...props
 }: ComponentPropsWithoutRef<"div"> & { hover?: boolean }) {
   function onEnter(e: MouseEvent<HTMLDivElement>) {
@@ -20,9 +24,20 @@ export function Card({
 
   return (
     <div
-      className={cn("border-2 border-ink bg-paper transition-colors duration-150", hover && "hover:bg-cream", className)}
-      onMouseEnter={onEnter}
-      onMouseLeave={onLeave}
+      className={cn("border-2 transition-colors duration-150", className)}
+      style={{
+        borderColor: "var(--atlas-line-strong, #171717)",
+        background: "var(--atlas-bg, #ffffff)",
+        ...style,
+      }}
+      onMouseEnter={(e) => {
+        if (hover) e.currentTarget.style.background = "var(--atlas-surface, #fafafa)";
+        onEnter(e);
+      }}
+      onMouseLeave={(e) => {
+        if (hover) e.currentTarget.style.background = "var(--atlas-bg, #ffffff)";
+        onLeave(e);
+      }}
       {...props}
     />
   );

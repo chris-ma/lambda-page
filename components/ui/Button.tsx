@@ -1,23 +1,41 @@
 "use client";
 
 import Link from "next/link";
-import type { ComponentPropsWithoutRef, MouseEvent } from "react";
+import type { ComponentPropsWithoutRef, CSSProperties, MouseEvent } from "react";
 import { gsap } from "@/lib/gsap";
 import { cn } from "@/lib/utils";
 
 type Variant = "primary" | "ghost" | "ink";
 
 const base =
-  "inline-flex items-center justify-center gap-2 border-2 border-ink px-5 py-3 font-mono text-[12.5px] font-semibold tracking-[0.08em] uppercase";
+  "inline-flex items-center justify-center gap-2 border-2 px-5 py-3 font-mono text-[12.5px] font-semibold tracking-[0.08em] uppercase";
 
-const variants: Record<Variant, string> = {
-  // Ink text on terracotta — white text only reaches ~4.2:1 here, just under
-  // WCAG AA for text this size, so ink stays the corrected, passing choice.
-  primary: "bg-terracotta text-ink",
-  ghost: "bg-paper text-ink",
+// Colors are set via CSS variables with an explicit fallback to the
+// original editorial-plate hex values, not Tailwind's bg-*/text-* utilities.
+// This component is shared with public, unauthenticated test-runner pages
+// that are never wrapped in the `.atlas` scope — the fallback is what keeps
+// those pages looking exactly as they did; the `.atlas`-scoped value is what
+// makes the same component read as the new system inside the dashboard.
+const VARIANT_STYLE: Record<Variant, CSSProperties> = {
+  // Ink text on terracotta/data-accent — text stays the corrected, passing
+  // choice in both palettes rather than switching to background-colored text.
+  primary: {
+    background: "var(--atlas-data-4, #c2603c)",
+    color: "var(--atlas-ink, #171717)",
+    borderColor: "var(--atlas-data-4, #c2603c)",
+  },
+  ghost: {
+    background: "var(--atlas-bg, #ffffff)",
+    color: "var(--atlas-ink, #171717)",
+    borderColor: "var(--atlas-ink, #171717)",
+  },
   // Solid ink fill — the highest-contrast CTA, reserved for the single most
-  // important action on a page (the hero's primary diagnostic run).
-  ink: "bg-ink text-paper",
+  // important action on a page.
+  ink: {
+    background: "var(--atlas-ink, #171717)",
+    color: "var(--atlas-bg, #ffffff)",
+    borderColor: "var(--atlas-ink, #171717)",
+  },
 };
 
 // The animation target comes from the event's own currentTarget rather than
@@ -42,18 +60,20 @@ function onUp(e: MouseEvent<HTMLElement>) {
 export function Button({
   variant = "primary",
   className,
+  style,
   href,
   ...props
 }: ComponentPropsWithoutRef<"button"> & { variant?: Variant; href?: string }) {
-  const classes = cn(base, variants[variant], className);
+  const classes = cn(base, className);
+  const mergedStyle = { ...VARIANT_STYLE[variant], ...style };
   const handlers = { onMouseEnter: onEnter, onMouseLeave: onLeave, onMouseDown: onDown, onMouseUp: onUp };
 
   if (href) {
     return (
-      <Link href={href} className={classes} {...handlers}>
+      <Link href={href} className={classes} style={mergedStyle} {...handlers}>
         {props.children}
       </Link>
     );
   }
-  return <button className={classes} {...handlers} {...props} />;
+  return <button className={classes} style={mergedStyle} {...handlers} {...props} />;
 }

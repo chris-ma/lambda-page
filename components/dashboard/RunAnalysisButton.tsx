@@ -37,11 +37,15 @@ export function RunAnalysisButton({
 
   return (
     <div>
-      <Button onClick={run} disabled={loading}>
+      <Button variant="ink" onClick={run} disabled={loading}>
         {loading ? "Running diagnostic…" : label}
       </Button>
       {loading && <ThinkingOverlay label="Scanning structure, content, and vitals — this takes 20-40 seconds." />}
-      {error && <p className="mt-2 font-mono text-[11px] text-brick">{error}</p>}
+      {error && (
+        <p className="atlas-annot mt-2" style={{ color: "var(--atlas-status-failing, #BD5A3F)" }}>
+          {error}
+        </p>
+      )}
     </div>
   );
 }

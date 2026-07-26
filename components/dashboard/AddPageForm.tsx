@@ -33,17 +33,22 @@ export function AddPageForm() {
 
   return (
     <form onSubmit={onSubmit} className="flex flex-wrap items-start gap-3">
-      <div className="flex-1 min-w-[240px]">
+      <div className="min-w-[240px] flex-1">
         <input
           value={url}
           onChange={(e) => setUrl(e.target.value)}
           placeholder="https://example.com/landing-page"
-          className="w-full border-2 border-ink bg-paper px-4 py-3 font-body text-[14px] text-ink placeholder:text-ink-soft/60 focus:outline-none focus:ring-2 focus:ring-teal-deep"
+          className="atlas-focusable w-full px-4 py-3 text-[14px]"
+          style={{ border: "1px solid var(--atlas-line-strong)", background: "var(--atlas-bg)", color: "var(--atlas-ink)" }}
           required
         />
-        {error && <p className="mt-2 font-mono text-[11px] text-brick">{error}</p>}
+        {error && (
+          <p className="atlas-annot mt-2" style={{ color: "var(--atlas-status-failing)" }}>
+            {error}
+          </p>
+        )}
       </div>
-      <Button type="submit" disabled={loading}>
+      <Button variant="ink" type="submit" disabled={loading}>
         {loading ? "Connecting…" : "Connect a page"}
       </Button>
     </form>

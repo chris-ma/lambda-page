@@ -1,8 +1,8 @@
 /**
- * Parametric Atlas — the design system for the marketing site only.
- * Scoped entirely under `.atlas` so the dashboard's editorial-plate system
- * (mustard/teal/brick/pink status colors, Playfair display, bordered cards)
- * is untouched by this file.
+ * Parametric Atlas — the design system for the marketing site and the
+ * dashboard app. Scoped entirely under `.atlas` so anything not yet wrapped
+ * in that class (public, unauthenticated test-runner pages) keeps rendering
+ * from the original editorial-plate tokens in globals.css untouched.
  */
 
 .atlas {
@@ -19,6 +19,21 @@
   --atlas-data-5: oklch(44% 0.105 var(--atlas-hue));
   --atlas-failing: oklch(63% 0.19 var(--atlas-fail-hue));
   --atlas-failing-strong: oklch(50% 0.17 var(--atlas-fail-hue));
+
+  /*
+   * Status semantics, remapped from four unrelated hues (teal/mustard/
+   * brick/pink) to three steps of the one data hue plus the one reserved
+   * failing hue — PASS/FLAGGED/INFO stay distinguishable by shape (see
+   * StatusIcon) and label, never by hue alone, so collapsing them into one
+   * family doesn't cost accessibility. Only the ramp's darker half (steps
+   * 3-5) is used here: both themes sit at a lightness extreme (near-black
+   * or near-white), and only those steps read at sufficient contrast
+   * against both without a per-theme override.
+   */
+  --atlas-status-pass: var(--atlas-data-5);
+  --atlas-status-flagged: var(--atlas-data-4);
+  --atlas-status-info: var(--atlas-data-3);
+  --atlas-status-failing: var(--atlas-failing);
 
   --atlas-bg: oklch(15% 0.014 var(--atlas-hue));
   --atlas-surface: oklch(19.5% 0.016 var(--atlas-hue));
@@ -77,12 +92,34 @@
   font-family: inherit;
 }
 
+/* Safety net for pages not yet fully migrated off the old editorial-plate
+   classes: `font-display` (Playfair) and `font-body` (Georgia) resolve to
+   the grotesque inside `.atlas` too, so a component that still carries one
+   of those classNames doesn't read as a stray serif once its container
+   moves onto this system. */
+.atlas .font-display,
+.atlas .font-body {
+  font-family: var(--atlas-font-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
 .atlas h1,
 .atlas h2,
 .atlas h3 {
   margin: 0;
   letter-spacing: -0.02em;
   font-weight: 520;
+}
+
+/* Overrides the shared `.eyebrow` component (still mono/uppercase for the
+   pages that haven't migrated) — mono is for measurements only here, never
+   a section label, so inside `.atlas` the eyebrow moves to the grotesque. */
+.atlas .eyebrow {
+  font-family: var(--atlas-font-sans), ui-sans-serif, system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 560;
+  letter-spacing: -0.01em;
+  text-transform: none;
+  color: var(--atlas-ink-soft);
 }
 
 .atlas p {

@@ -37,30 +37,28 @@ export function AddPageShortcut({ toolPath }: { toolPath: string }) {
 
   if (!open) {
     return (
-      <button
-        type="button"
-        onClick={() => setOpen(true)}
-        className="print:hidden font-mono text-[11px] tracking-wide text-ink-soft uppercase hover:text-ink"
-      >
+      <button type="button" onClick={() => setOpen(true)} className="atlas-focusable atlas-annot print:hidden">
         + Analyze another page
       </button>
     );
   }
 
   return (
-    <form onSubmit={onSubmit} className="print:hidden flex flex-wrap items-start gap-2">
+    <form onSubmit={onSubmit} className="flex flex-wrap items-start gap-2 print:hidden">
       <input
         autoFocus
         value={url}
         onChange={(e) => setUrl(e.target.value)}
         placeholder="https://example.com/landing-page"
-        className="min-w-[220px] flex-1 border-2 border-ink bg-paper px-3 py-2 font-body text-[13px] text-ink placeholder:text-ink-soft/60 focus:outline-none focus:ring-2 focus:ring-teal-deep"
+        className="atlas-focusable min-w-[220px] flex-1 px-3 py-2 text-[13px]"
+        style={{ border: "1px solid var(--atlas-line-strong)", background: "var(--atlas-bg)", color: "var(--atlas-ink)" }}
         required
       />
       <button
         type="submit"
         disabled={loading}
-        className="border-2 border-ink bg-paper px-3 py-2 font-mono text-[10.5px] text-ink-soft uppercase tracking-wide hover:text-ink"
+        className="atlas-focusable atlas-annot px-3 py-2"
+        style={{ border: "1px solid var(--atlas-line-strong)", background: "var(--atlas-bg)" }}
       >
         {loading ? "Adding…" : "Go"}
       </button>
@@ -70,11 +68,15 @@ export function AddPageShortcut({ toolPath }: { toolPath: string }) {
           setOpen(false);
           setError(null);
         }}
-        className="px-2 py-2 font-mono text-[10.5px] text-ink-soft uppercase tracking-wide hover:text-ink"
+        className="atlas-focusable atlas-annot px-2 py-2"
       >
         Cancel
       </button>
-      {error && <p className="w-full font-mono text-[11px] text-brick">{error}</p>}
+      {error && (
+        <p className="atlas-annot w-full" style={{ color: "var(--atlas-status-failing, #BD5A3F)" }}>
+          {error}
+        </p>
+      )}
     </form>
   );
 }

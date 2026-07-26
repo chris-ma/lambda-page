@@ -20,8 +20,10 @@ export default async function PageDetail({ params }: { params: Promise<{ pageId:
   return (
     <div>
       <EyebrowLabel>Page</EyebrowLabel>
-      <h1 className="mt-3 break-all font-display text-[28px] font-semibold text-ink">{page.url}</h1>
-      <p className="mt-2 font-mono text-[11px] text-ink-soft">
+      <h1 className="mt-3 text-[26px] break-all" style={{ fontWeight: 560 }}>
+        {page.url}
+      </h1>
+      <p className="atlas-annot mt-2">
         tracking_id: {page.tracking_id} — connected {new Date(page.created_at).toLocaleDateString()}
       </p>
 
@@ -33,13 +35,15 @@ export default async function PageDetail({ params }: { params: Promise<{ pageId:
           findings={structural.findings}
           emptyLabel="Not analyzed yet — no live traffic required."
         />
-        <Link href={`/dashboard/pages/${page.id}/behavioral`}>
+        <Link href={`/dashboard/pages/${page.id}/behavioral`} className="atlas-focusable">
           <Card className="h-full p-6">
             <div className="flex items-center justify-between">
-              <h3 className="font-display text-[17px] font-semibold text-ink">02 — Behavioral Analysis</h3>
+              <h3 className="text-[16px]" style={{ fontWeight: 560 }}>
+                02 — Behavioral Analysis
+              </h3>
               {eventCount < 20 && <Tag status="INFO" label="Demo data" size="sm" />}
             </div>
-            <p className="mt-3 text-[13px] text-ink-soft">
+            <p className="mt-3 text-[13px]" style={{ color: "var(--atlas-ink-soft)" }}>
               {eventCount} event{eventCount === 1 ? "" : "s"} received
               {eventCount < 20 && " — install the snippet to unlock real visitor data."}
             </p>

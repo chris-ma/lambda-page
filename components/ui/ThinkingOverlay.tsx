@@ -40,16 +40,30 @@ export function ThinkingOverlay({ label }: { label?: string }) {
   }, []);
 
   return (
-    <div className="fixed inset-0 z-[200] flex flex-col items-center justify-center gap-6 bg-paper/92 backdrop-blur-[1px]">
+    <div
+      className="fixed inset-0 z-[200] flex flex-col items-center justify-center gap-6 backdrop-blur-[1px]"
+      style={{ background: "color-mix(in srgb, var(--atlas-bg, #ffffff) 92%, transparent)" }}
+    >
       <div
         role="status"
         aria-label="Loading"
-        className="texture flex items-center justify-center border-2 border-ink bg-cream font-display font-bold text-ink shadow-depth-lg"
-        style={{ width: 96, height: 96, fontSize: 44 }}
+        className="flex items-center justify-center border-2 font-display font-bold"
+        style={{
+          width: 96,
+          height: 96,
+          fontSize: 44,
+          borderColor: "var(--atlas-ink, #171717)",
+          background: "var(--atlas-surface, #fafafa)",
+          color: "var(--atlas-ink, #171717)",
+        }}
       >
         <span aria-hidden="true">{GREEK[index]}</span>
       </div>
-      {label && <p className="max-w-[360px] text-center font-mono text-[11.5px] uppercase tracking-wide text-ink-soft">{label}</p>}
+      {label && (
+        <p className="max-w-[360px] text-center font-mono text-[11.5px] uppercase tracking-wide" style={{ color: "var(--atlas-ink-soft, #555555)" }}>
+          {label}
+        </p>
+      )}
     </div>
   );
 }

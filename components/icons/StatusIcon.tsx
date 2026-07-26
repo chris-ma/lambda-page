@@ -1,10 +1,15 @@
 import type { Status } from "@/lib/status";
 
+// Falls back to the original per-status hex outside `.atlas` (unmigrated
+// pages); inside `.atlas` these resolve to the shared status aliases in
+// atlas.css — three steps of the one data hue plus the one reserved
+// failing hue. Shape (the four distinct glyphs below) is what actually
+// keeps PASS/FLAGGED/INFO apart, not the hue.
 const STROKES: Record<Status, string> = {
-  PASS: "#396460",
-  FLAGGED: "#B8842B",
-  FAILING: "#BD5A3F",
-  INFO: "#C97A70",
+  PASS: "var(--atlas-status-pass, #396460)",
+  FLAGGED: "var(--atlas-status-flagged, #B8842B)",
+  FAILING: "var(--atlas-status-failing, #BD5A3F)",
+  INFO: "var(--atlas-status-info, #C97A70)",
 };
 
 export function StatusIcon({ status, size = 20 }: { status: Status; size?: number }) {

@@ -25,26 +25,32 @@ export function PillarSummaryCard({
   const worst = findings.length > 0 ? worstStatus(findings.map((f) => f.status as Status)) : null;
 
   return (
-    <Link href={href}>
+    <Link href={href} className="atlas-focusable">
       <Card className="h-full p-6">
         <div className="flex items-center justify-between">
-          <h3 className="font-display text-[17px] font-semibold text-ink">{title}</h3>
+          <h3 className="text-[16px]" style={{ fontWeight: 560 }}>
+            {title}
+          </h3>
           {worst && <Tag status={worst} size="sm" />}
         </div>
-        {run?.status === "running" && (
-          <p className="mt-3 font-mono text-[11px] text-ink-soft">Running…</p>
-        )}
+        {run?.status === "running" && <p className="atlas-annot mt-3">Running…</p>}
         {run?.status === "error" && (
-          <p className="mt-3 font-mono text-[11px] text-brick">Last run failed: {run.error}</p>
+          <p className="atlas-annot mt-3" style={{ color: "var(--atlas-status-failing, #BD5A3F)" }}>
+            Last run failed: {run.error}
+          </p>
         )}
         {findings.length > 0 ? (
-          <div className="mt-4 flex gap-4 font-mono text-[11px] text-ink-soft">
+          <div className="atlas-annot mt-4 flex gap-4">
             <span>{counts.PASS} pass</span>
             <span>{counts.FLAGGED} flagged</span>
             <span>{counts.FAILING} failing</span>
           </div>
         ) : (
-          run?.status !== "running" && <p className="mt-3 text-[13px] text-ink-soft">{emptyLabel}</p>
+          run?.status !== "running" && (
+            <p className="mt-3 text-[13px]" style={{ color: "var(--atlas-ink-soft)" }}>
+              {emptyLabel}
+            </p>
+          )
         )}
       </Card>
     </Link>

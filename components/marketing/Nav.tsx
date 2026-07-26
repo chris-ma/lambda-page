@@ -6,7 +6,7 @@ import { ThemeToggle } from "@/components/atlas/ThemeToggle";
 import { PILLARS_NAV } from "@/lib/pillars";
 import { cn } from "@/lib/utils";
 
-export function Nav() {
+export function Nav({ themeSwitchable = true }: { themeSwitchable?: boolean } = {}) {
   const [open, setOpen] = useState<number | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -63,11 +63,11 @@ export function Nav() {
           <Link href="/dashboard" className="atlas-btn atlas-focusable">
             Sign up
           </Link>
-          <ThemeToggle />
+          {themeSwitchable && <ThemeToggle />}
         </div>
 
         <div className="flex items-center gap-3 md:hidden">
-          <ThemeToggle />
+          {themeSwitchable && <ThemeToggle />}
           <button
             type="button"
             aria-label={mobileOpen ? "Close menu" : "Open menu"}
