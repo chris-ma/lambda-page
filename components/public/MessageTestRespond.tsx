@@ -66,7 +66,7 @@ export function MessageTestRespond({
               key={opt.label}
               type="button"
               onClick={() => setComprehension(opt.value)}
-              className={`border-2 border-ink px-4 py-2 font-body text-[13px] ${comprehension === opt.value ? "bg-mustard text-ink" : "bg-paper text-ink-soft"}`}
+              className={`border-2 border-ink px-4 py-2 font-body text-[13px] ${comprehension === opt.value ? "bg-ink text-paper" : "bg-paper text-ink-soft"}`}
             >
               {opt.label}
             </button>

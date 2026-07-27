@@ -30,20 +30,20 @@ export function LambdaMark({
           width="144"
           height="144"
           fill="none"
-          stroke="#171717"
+          stroke="var(--atlas-ink, #171717)"
           strokeWidth="1.5"
           strokeDasharray="1 5"
         />
         <g style={{ transformOrigin: "80px 76px" }}>
-          <rect x="34" y="30" width="92" height="92" fill="#fafafa" />
-          <rect x="34" y="30" width="92" height="92" fill="none" stroke="#171717" strokeWidth="2" />
+          <rect x="34" y="30" width="92" height="92" fill="var(--atlas-surface, #fafafa)" />
+          <rect x="34" y="30" width="92" height="92" fill="none" stroke="var(--atlas-ink, #171717)" strokeWidth="2" />
           <text
             x="80"
             y="97"
             fontFamily="var(--font-display)"
             fontWeight="700"
             fontSize="46"
-            fill="#171717"
+            fill="var(--atlas-ink, #171717)"
             textAnchor="middle"
           >
             λ
@@ -55,7 +55,7 @@ export function LambdaMark({
           fontFamily="var(--font-mono)"
           fontSize="8.5"
           letterSpacing="2.5"
-          fill="#171717"
+          fill="var(--atlas-ink, #171717)"
           textAnchor="middle"
         >
           LANDING PAGE FUNCTION

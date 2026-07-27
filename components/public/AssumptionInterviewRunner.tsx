@@ -135,7 +135,7 @@ export function AssumptionInterviewRunner({
                           onClick={() => setPriceAnswers((prev) => ({ ...prev, [p.id]: l }))}
                           className={cn(
                             "border-2 border-ink px-3 py-1.5 font-mono text-[10px] uppercase tracking-wide",
-                            priceAnswers[p.id] === l ? "bg-terracotta text-ink" : "bg-cream text-ink-soft",
+                            priceAnswers[p.id] === l ? "bg-ink text-paper" : "bg-paper text-ink-soft",
                           )}
                         >
                           {LIKELIHOOD_LABEL[l]}
@@ -164,7 +164,7 @@ export function AssumptionInterviewRunner({
                           onClick={() => setVerdicts((p) => ({ ...p, [s.id]: v }))}
                           className={cn(
                             "border-2 border-ink px-3 py-1.5 font-mono text-[10.5px] uppercase tracking-wide",
-                            verdicts[s.id] === v ? "bg-mustard text-ink" : "bg-cream text-ink-soft",
+                            verdicts[s.id] === v ? "bg-ink text-paper" : "bg-paper text-ink-soft",
                           )}
                         >
                           {v}

@@ -126,7 +126,7 @@ export function NewCardSortForm() {
             key={value}
             type="button"
             onClick={() => setSortMode(value)}
-            className={`flex-1 border-2 border-ink px-4 py-3 text-left font-body text-[12.5px] ${sortMode === value ? "bg-mustard text-ink" : "bg-paper text-ink-soft"}`}
+            className={`flex-1 border-2 border-ink px-4 py-3 text-left font-body text-[12.5px] ${sortMode === value ? "bg-ink text-paper" : "bg-paper text-ink-soft"}`}
           >
             {label}
           </button>

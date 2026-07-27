@@ -200,9 +200,7 @@ export function EyeTrackingDashboard({
             onClick={() => setRange(r.value)}
             className={cn(
               "border-2 border-ink px-3 py-1.5 font-mono text-[11px] uppercase tracking-wide",
-              // No hatch-fill here — the diagonal texture reads fine behind
-              // a bare funnel bar but smothers a text label at this size.
-              range === r.value ? "bg-mustard text-ink" : "bg-paper text-ink-soft",
+              range === r.value ? "bg-ink text-paper" : "bg-paper text-ink-soft",
             )}
           >
             {r.label}

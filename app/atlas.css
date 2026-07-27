@@ -220,9 +220,20 @@
 
 /* ---------- Interactive ---------- */
 
-.atlas button,
-.atlas a {
-  color: inherit;
+/* @layer base (not a plain rule) so this stays a *default* — sensible
+   fallback for a button/link with no explicit color, rather than an
+   unconditional override. Unlayered, this used to beat every Tailwind
+   text-color utility (text-paper, text-ink-soft, text-brick, ...) applied
+   directly to a <button>/<a> regardless of specificity, since Tailwind's
+   utilities live in a layer declared after any unlayered rule — so e.g. an
+   active toggle styled `bg-ink text-paper` rendered invisible: forced to
+   inherit the ambient (often near-white, in instrument mode) ink color
+   instead of the dark text its own bg-ink fill needed. */
+@layer base {
+  .atlas button,
+  .atlas a {
+    color: inherit;
+  }
 }
 
 .atlas-focusable:focus-visible,

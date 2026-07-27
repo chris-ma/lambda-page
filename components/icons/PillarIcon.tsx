@@ -32,8 +32,10 @@ export const PILLAR_COLOR: Record<
 
 export function PillarIcon({ pillar, size = 26 }: { pillar: PillarId; size?: number }) {
   // Ink stroke always — this icon sits on chips of all four accent colors,
-  // and ink is the one tone that reads clearly against each of them.
-  const stroke = "#171717";
+  // and ink is the one tone that reads clearly against each of them. The
+  // token (not a literal hex) so it still flips light/dark with the rest
+  // of the theme rather than staying pinned to black.
+  const stroke = "var(--atlas-ink, #171717)";
   return (
     <svg width={size} height={size} viewBox="0 0 26 26" aria-hidden="true">
       {pillar === 0 && (
