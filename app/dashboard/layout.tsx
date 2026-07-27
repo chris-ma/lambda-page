@@ -11,10 +11,7 @@ import "@/app/atlas.css";
 // override — the originals already are that look.
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div
-      className={`atlas ${atlasSans.variable} ${atlasMono.variable} flex min-h-screen min-w-0 flex-col`}
-      style={{ background: "var(--atlas-surface)" }}
-    >
+    <div className={`atlas ${atlasSans.variable} ${atlasMono.variable} flex min-h-screen min-w-0 flex-col`}>
       <Nav />
       <main className="mx-auto w-full min-w-0 max-w-[1180px] flex-1 px-6 py-10">{children}</main>
     </div>

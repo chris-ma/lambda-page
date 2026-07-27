@@ -30,14 +30,14 @@ export function Tag({
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-2 border-1.5 font-mono uppercase tracking-wide",
+        "inline-flex items-center gap-2 rounded-full border-1.5 font-mono uppercase tracking-wide backdrop-blur-[var(--glass-blur)]",
         size === "md" ? "px-4 py-2 text-[11px] border-2" : "px-2 py-1 text-[9.5px]",
         className,
       )}
       style={{
         color: size === "sm" ? color : "var(--atlas-ink, #171717)",
-        borderColor: size === "sm" ? color : "var(--atlas-line-strong, #171717)",
-        background: size === "md" ? "var(--atlas-bg, #ffffff)" : undefined,
+        borderColor: size === "sm" ? color : "var(--glass-border, rgba(23,23,23,0.14))",
+        background: size === "md" ? "color-mix(in oklch, var(--atlas-bg, #ffffff) 55%, transparent)" : undefined,
       }}
     >
       <span

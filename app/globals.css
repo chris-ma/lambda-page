@@ -26,15 +26,25 @@
   --font-body: Georgia, Cambria, "Times New Roman", Times, serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Courier New", monospace;
 
-  /* Retired with the flat editorial reskin — every shadow-depth-* utility
-     now resolves to no shadow at all, so any component still referencing
-     one (rather than having been revisited directly) degrades safely flat
-     instead of leaving a stray 3D bevel behind. */
-  --shadow-depth-xs: none;
-  --shadow-depth-sm: none;
-  --shadow-depth-md: none;
-  --shadow-depth-lg: none;
-  --shadow-depth-press: none;
+  /* Glassmorphism reskin — soft, diffuse shadows replace the retired flat
+     "no shadow" tokens, giving every surface that already asks for one
+     (shadow-depth-*) real lift again. */
+  --shadow-depth-xs: 0 1px 3px rgba(23, 23, 23, 0.07);
+  --shadow-depth-sm: 0 6px 20px -4px rgba(23, 23, 23, 0.14), 0 1px 2px rgba(23, 23, 23, 0.06);
+  --shadow-depth-md: 0 16px 40px -8px rgba(23, 23, 23, 0.18), 0 2px 6px rgba(23, 23, 23, 0.08);
+  --shadow-depth-lg: 0 32px 72px -12px rgba(23, 23, 23, 0.22), 0 4px 12px rgba(23, 23, 23, 0.1);
+  --shadow-depth-press: 0 2px 8px rgba(23, 23, 23, 0.12);
+
+  /* Frosted-panel tokens: a translucent tint of the current surface color
+     (so it still tracks light/dark theme swaps) plus a blur radius and a
+     softened, translucent version of the ink border. */
+  --glass-blur: 14px;
+  --glass-blur-strong: 26px;
+  --glass-bg: color-mix(in oklch, var(--color-paper) 58%, transparent);
+  --glass-bg-strong: color-mix(in oklch, var(--color-paper) 80%, transparent);
+  --glass-border: color-mix(in oklch, var(--color-ink) 14%, transparent);
+  --radius-glass: 18px;
+  --radius-glass-sm: 10px;
 }
 
 html {
@@ -54,6 +64,50 @@ html {
 
 body {
   position: relative;
+  background-image:
+    radial-gradient(560px circle at 8% 6%, color-mix(in oklch, var(--color-teal) 42%, transparent), transparent 60%),
+    radial-gradient(620px circle at 92% 14%, color-mix(in oklch, var(--color-terracotta) 34%, transparent), transparent 60%),
+    radial-gradient(680px circle at 20% 96%, color-mix(in oklch, var(--color-pink) 34%, transparent), transparent 60%),
+    radial-gradient(520px circle at 88% 92%, color-mix(in oklch, var(--color-teal-deep) 30%, transparent), transparent 60%);
+  background-repeat: no-repeat;
+}
+
+/* ============================================================
+   Glassmorphism retrofit
+   ============================================================
+   Tailwind compiles `bg-paper`/`bg-cream`/`bg-cream-2` and `border-ink`
+   (plus its opacity-modified forms, e.g. `border-ink/20`) to literal
+   `.bg-paper`, `.bg-cream`, `.bg-cream-2`, `.border-ink`, `.border-ink\/20`
+   class selectors — the same fact Button.tsx and atlas.css already lean on
+   to re-theme these utilities from one place (see their comments). That
+   lets every existing panel/card/input/dropdown/modal built on the old
+   flat "hard border + solid fill" combo pick up frosted glass here,
+   without touching every one of the ~60 files that carry it. Living in
+   `@layer base` (merged into Tailwind's own base layer, which is why this
+   file's `@import "tailwindcss"` has to come first) means any component
+   that explicitly asks for its own radius/shadow/color utility — a
+   `rounded-full` status dot, a `shadow-depth-lg` modal — still wins,
+   since Tailwind's utilities layer is declared after base and beats it on
+   conflicting properties regardless of selector specificity. Left OUT on
+   purpose: solid accent fills (mustard/terracotta/teal/brick/pink) stay
+   opaque — the vivid accents are meant to float on top of frosted neutral
+   containers, not go translucent themselves. */
+@layer base {
+  :where(.bg-paper, .bg-cream, .bg-cream-2).border-ink,
+  :where(.bg-paper, .bg-cream, .bg-cream-2)[class*="border-ink/"] {
+    background-color: var(--glass-bg);
+    border-color: var(--glass-border);
+    border-radius: var(--radius-glass);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    box-shadow: var(--shadow-depth-sm);
+  }
+
+  .border-ink:not(.bg-paper):not(.bg-cream):not(.bg-cream-2):not(.bg-mustard),
+  [class*="border-ink/"]:not(.bg-paper):not(.bg-cream):not(.bg-cream-2):not(.bg-mustard) {
+    border-color: var(--glass-border);
+    border-radius: var(--radius-glass-sm);
+  }
 }
 
 /* Editorial heading reset — plain-CSS rules sit outside Tailwind's layered

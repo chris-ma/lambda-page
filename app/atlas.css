@@ -65,7 +65,19 @@
   --atlas-line: oklch(45% 0.018 var(--atlas-hue) / 45%);
   --atlas-line-strong: oklch(60% 0.02 var(--atlas-hue) / 70%);
 
+  /* Ambient glass backdrop — glass panels only read as "glass" against a
+     varied backdrop, so this scope carries its own blob field (rather than
+     relying on the body-level one in globals.css, which this opaque root
+     would otherwise occlude entirely). */
+  --atlas-blob-1: oklch(70% 0.09 var(--atlas-hue) / 40%);
+  --atlas-blob-2: oklch(60% 0.13 var(--atlas-fail-hue) / 26%);
   background: var(--atlas-bg);
+  background-image:
+    radial-gradient(600px circle at 6% 4%, var(--atlas-blob-1), transparent 60%),
+    radial-gradient(560px circle at 96% 18%, var(--atlas-blob-2), transparent 60%),
+    radial-gradient(640px circle at 22% 100%, var(--atlas-blob-1), transparent 60%);
+  background-repeat: no-repeat;
+  background-attachment: fixed;
   color: var(--atlas-ink);
   font-family: var(--atlas-font-sans), ui-sans-serif, system-ui, sans-serif;
   font-feature-settings: "ss01" 1;
@@ -234,10 +246,15 @@
   background: var(--atlas-ink);
   color: var(--atlas-bg);
   border: 1px solid var(--atlas-ink);
-  transition: opacity 0.15s ease;
+  border-radius: var(--radius-glass-sm, 10px);
+  box-shadow: var(--shadow-depth-sm);
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease;
 }
 .atlas .atlas-btn:hover {
   opacity: 0.85;
+  transform: translateY(-1px);
 }
 
 .atlas .atlas-btn-ghost {
@@ -247,9 +264,12 @@
   padding: 10px 18px;
   font-size: 13.5px;
   font-weight: 500;
-  background: transparent;
+  background: color-mix(in oklch, var(--atlas-surface) 55%, transparent);
   color: var(--atlas-ink);
   border: 1px solid var(--atlas-line-strong);
+  border-radius: var(--radius-glass-sm, 10px);
+  backdrop-filter: blur(var(--glass-blur, 14px));
+  -webkit-backdrop-filter: blur(var(--glass-blur, 14px));
   transition:
     border-color 0.15s ease,
     background 0.15s ease;
@@ -267,8 +287,11 @@
   font-family: var(--atlas-font-mono), ui-monospace, monospace;
   letter-spacing: 0.02em;
   border: 1px solid var(--atlas-line-strong);
+  border-radius: var(--radius-glass-sm, 10px);
   color: var(--atlas-ink-soft);
-  background: transparent;
+  background: color-mix(in oklch, var(--atlas-surface) 45%, transparent);
+  backdrop-filter: blur(var(--glass-blur, 14px));
+  -webkit-backdrop-filter: blur(var(--glass-blur, 14px));
 }
 .atlas .atlas-theme-toggle:hover {
   color: var(--atlas-ink);
@@ -278,7 +301,11 @@
 /* ---------- Plate ---------- */
 
 .atlas-plate-surface {
-  background: var(--atlas-surface);
+  background: color-mix(in oklch, var(--atlas-surface) 68%, transparent);
+  border-radius: var(--radius-glass, 18px);
+  backdrop-filter: blur(var(--glass-blur-strong, 26px));
+  -webkit-backdrop-filter: blur(var(--glass-blur-strong, 26px));
+  box-shadow: var(--shadow-depth-md);
 }
 
 .atlas-stage:focus-visible {

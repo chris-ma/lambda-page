@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 type Variant = "primary" | "ghost" | "ink";
 
 const base =
-  "inline-flex items-center justify-center gap-2 border-2 px-5 py-3 font-mono text-[12.5px] font-semibold tracking-[0.08em] uppercase";
+  "inline-flex items-center justify-center gap-2 rounded-[var(--radius-glass-sm)] border-2 px-5 py-3 font-mono text-[12.5px] font-semibold tracking-[0.08em] uppercase shadow-[var(--shadow-depth-sm)] backdrop-blur-[var(--glass-blur)]";
 
 // Colors are set via CSS variables with an explicit fallback to the
 // original editorial-plate hex values, not Tailwind's bg-*/text-* utilities.
@@ -25,9 +25,9 @@ const VARIANT_STYLE: Record<Variant, CSSProperties> = {
     borderColor: "var(--atlas-data-4, #c2603c)",
   },
   ghost: {
-    background: "var(--atlas-bg, #ffffff)",
+    background: "color-mix(in oklch, var(--atlas-bg, #ffffff) 55%, transparent)",
     color: "var(--atlas-ink, #171717)",
-    borderColor: "var(--atlas-ink, #171717)",
+    borderColor: "var(--glass-border, rgba(23,23,23,0.14))",
   },
   // Solid ink fill — the highest-contrast CTA, reserved for the single most
   // important action on a page.

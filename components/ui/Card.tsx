@@ -24,18 +24,19 @@ export function Card({
 
   return (
     <div
-      className={cn("border-2 transition-colors duration-150", className)}
+      className={cn("rounded-[var(--radius-glass)] border-2 backdrop-blur-[var(--glass-blur)] transition-colors duration-150", className)}
       style={{
-        borderColor: "var(--atlas-line-strong, #171717)",
-        background: "var(--atlas-bg, #ffffff)",
+        borderColor: "var(--glass-border, rgba(23,23,23,0.14))",
+        background: "color-mix(in oklch, var(--atlas-bg, #ffffff) 58%, transparent)",
+        boxShadow: "var(--shadow-depth-sm)",
         ...style,
       }}
       onMouseEnter={(e) => {
-        if (hover) e.currentTarget.style.background = "var(--atlas-surface, #fafafa)";
+        if (hover) e.currentTarget.style.background = "color-mix(in oklch, var(--atlas-surface, #fafafa) 68%, transparent)";
         onEnter(e);
       }}
       onMouseLeave={(e) => {
-        if (hover) e.currentTarget.style.background = "var(--atlas-bg, #ffffff)";
+        if (hover) e.currentTarget.style.background = "color-mix(in oklch, var(--atlas-bg, #ffffff) 58%, transparent)";
         onLeave(e);
       }}
       {...props}

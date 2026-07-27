@@ -33,7 +33,17 @@ export function Nav({ themeSwitchable = true }: { themeSwitchable?: boolean } = 
   const active = PILLARS_NAV.find((p) => p.id === open);
 
   return (
-    <div ref={ref} className="sticky top-0 z-50" style={{ background: "var(--atlas-bg)", borderBottom: "1px solid var(--atlas-line)" }}>
+    <div
+      ref={ref}
+      className="sticky top-0 z-50"
+      style={{
+        background: "color-mix(in oklch, var(--atlas-bg) 62%, transparent)",
+        borderBottom: "1px solid var(--atlas-line)",
+        backdropFilter: "blur(var(--glass-blur-strong, 26px))",
+        WebkitBackdropFilter: "blur(var(--glass-blur-strong, 26px))",
+        boxShadow: "var(--shadow-depth-xs)",
+      }}
+    >
       <nav className="mx-auto flex h-[72px] max-w-[1240px] items-center justify-between px-6">
         <Link href="/" className="flex items-center gap-2.5 atlas-focusable" onClick={() => setMobileOpen(false)}>
           <span aria-hidden="true" style={{ fontWeight: 620 }}>
