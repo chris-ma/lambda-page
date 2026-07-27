@@ -37,7 +37,7 @@ export function RunAnalysisButton({
 
   return (
     <div>
-      <Button variant="ink" onClick={run} disabled={loading}>
+      <Button onClick={run} disabled={loading}>
         {loading ? "Running diagnostic…" : label}
       </Button>
       {loading && <ThinkingOverlay label="Scanning structure, content, and vitals — this takes 20-40 seconds." />}

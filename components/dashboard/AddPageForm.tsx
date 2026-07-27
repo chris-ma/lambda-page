@@ -48,7 +48,7 @@ export function AddPageForm() {
           </p>
         )}
       </div>
-      <Button variant="ink" type="submit" disabled={loading}>
+      <Button type="submit" disabled={loading}>
         {loading ? "Connecting…" : "Connect a page"}
       </Button>
     </form>

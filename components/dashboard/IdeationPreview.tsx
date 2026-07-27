@@ -37,7 +37,7 @@ export function IdeationPreview({ html, businessName, pageTitle }: { html: strin
           <Button variant="ghost" type="button" onClick={openInNewTab}>
             Open full preview
           </Button>
-          <Button variant="ink" type="button" onClick={download}>
+          <Button type="button" onClick={download}>
             Download code
           </Button>
         </div>
