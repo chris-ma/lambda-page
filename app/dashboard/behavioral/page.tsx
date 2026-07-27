@@ -23,11 +23,12 @@ export default async function BehavioralHub({
   return (
     <div>
       <EyebrowLabel>Pillar 02</EyebrowLabel>
-      <h1 className="mt-3 font-display text-[28px] font-semibold text-ink">Behavioral Analysis</h1>
+      <h1 className="mt-3 font-display text-[28px] font-semibold text-ink">Reach, Engagement &amp; Conversion</h1>
       <p className="mt-2 max-w-[640px] text-[13.5px] text-ink-soft">
-        Campaign/channel analytics, heatmaps &amp; session replay, and funnel drop-off by stage —
-        each its own page per connected page, built in or pulled from Google Analytics 4. Install
-        the tracking snippet and everything below starts filling in from real traffic.
+        Reach (campaign/channel quality), Engagement (heatmaps &amp; session replay), and
+        Conversion (funnel drop-off by stage) — each its own page per connected page, built in or
+        pulled from Google Analytics 4. Install the tracking snippet and everything below starts
+        filling in from real traffic.
       </p>
 
       {pages.length === 0 ? (
@@ -36,7 +37,7 @@ export default async function BehavioralHub({
           <Link href="/dashboard" className="underline">
             Connect a page
           </Link>{" "}
-          to get its install snippet and start seeing behavioral data.
+          to get its install snippet and start seeing reach, engagement, and conversion data.
         </Card>
       ) : (
         <div className="mt-8">

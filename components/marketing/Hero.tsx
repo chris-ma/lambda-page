@@ -55,7 +55,7 @@ export function Hero() {
         <FunnelPlate
           stages={stages}
           figureLabel="Fig. 01"
-          caption="Live demo data — same funnel the behavioral dashboard tracks from a connected page."
+          caption="Live demo data — same funnel the Conversion tab tracks from a connected page."
         />
       </div>
     </section>

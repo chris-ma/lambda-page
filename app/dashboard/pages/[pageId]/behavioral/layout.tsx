@@ -33,10 +33,10 @@ export default async function BehavioralLayout({
         ← {page.url}
       </Link>
       <EyebrowLabel className="mt-3">Pillar 02</EyebrowLabel>
-      <h1 className="mt-2 font-display text-[28px] font-semibold text-ink">Behavioral Analysis</h1>
+      <h1 className="mt-2 font-display text-[28px] font-semibold text-ink">Reach, Engagement &amp; Conversion</h1>
       <p className="mt-2 max-w-[620px] text-[13.5px] text-ink-soft">
-        Campaign/channel analytics, heatmaps &amp; session replay, and funnel drop-off — requires
-        the tracking snippet running on the live page.
+        Reach (campaign/channel quality), Engagement (heatmaps &amp; session replay), and
+        Conversion (funnel drop-off) — requires the tracking snippet running on the live page.
       </p>
 
       <div className="mt-6 border-2 border-ink bg-cream p-5">
@@ -46,9 +46,9 @@ export default async function BehavioralLayout({
         </code>
         <p className="mt-2 text-[11.5px] text-ink-soft">
           Site-wide: paste this exact tag into every page you want tracked, not just this one URL
-          — every event still records which path it fired on, so heatmaps and funnels stay
-          per-page while Lambda Analytics (under Analytics) rolls channels and landing pages up
-          across the whole site.
+          — every event still records which path it fired on, so Engagement and Conversion stay
+          per-page while Lambda Analytics (under Reach) rolls channels and landing pages up across
+          the whole site.
         </p>
         <p className="mt-2 text-[11.5px] text-ink-soft">
           {eventCount} event{eventCount === 1 ? "" : "s"} received for this page

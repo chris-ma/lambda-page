@@ -6,9 +6,9 @@ import { cn } from "@/lib/utils";
 import { Tag } from "@/components/ui/Tag";
 
 const TABS = [
-  { slug: "analytics", label: "Analytics" },
-  { slug: "heatmap", label: "Heatmap" },
-  { slug: "funnel", label: "Funnel" },
+  { slug: "analytics", label: "Reach" },
+  { slug: "heatmap", label: "Engagement" },
+  { slug: "funnel", label: "Conversion" },
 ] as const;
 
 export function BehavioralTabNav({ pageId, isDemo }: { pageId: string; isDemo: boolean }) {

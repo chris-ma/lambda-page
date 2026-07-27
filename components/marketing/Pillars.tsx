@@ -11,14 +11,14 @@ const CADENCE: Record<number, { label: string; rank: number }> = {
 const TITLES: Record<number, string> = {
   0: "Pre-Build Validation",
   1: "Structural Analysis",
-  2: "Behavioral Analysis",
+  2: "Reach, Engagement & Conversion",
   3: "User Testing",
 };
 
 const DESCRIPTIONS: Record<number, string> = {
   0: "Message and headline variants get checked for comprehension against a real panel, competitor positioning gets mapped, and wireframes get the same scrutiny a finished page would.",
   1: "Runs against the page itself — no live traffic required. Design and content, SEO, AEO/GEO, and lab-based Core Web Vitals. The only pillar that runs on every deploy, and the one that can block a launch before a single visitor sees the problem.",
-  2: "Heatmaps and session replay, funnel drop-off by stage, and campaign/channel quality — built in, or pulled from Google Analytics 4.",
+  2: "Campaign/channel quality for Reach, heatmaps and session replay for Engagement, and funnel drop-off by stage for Conversion — built in, or pulled from Google Analytics 4.",
   3: "Eye tracking, moderated and unmoderated usability sessions, five-second comprehension tests, card sorting, pricing strategy testing, and A/B testing with statistical significance.",
 };
 

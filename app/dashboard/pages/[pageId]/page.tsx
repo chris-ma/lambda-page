@@ -39,7 +39,7 @@ export default async function PageDetail({ params }: { params: Promise<{ pageId:
           <Card className="h-full p-6">
             <div className="flex items-center justify-between">
               <h3 className="text-[16px]" style={{ fontWeight: 560 }}>
-                02 — Behavioral Analysis
+                02 — Reach, Engagement &amp; Conversion
               </h3>
               {eventCount < 20 && <Tag status="INFO" label="Demo data" size="sm" />}
             </div>

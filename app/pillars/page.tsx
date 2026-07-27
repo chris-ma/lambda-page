@@ -9,7 +9,7 @@ import "@/app/atlas.css";
 const PILLAR_TITLE: Record<number, string> = {
   0: "Pre-Build Validation",
   1: "Structural Analysis",
-  2: "Behavioral Analysis",
+  2: "Reach, Engagement & Conversion",
   3: "User Testing",
 };
 
