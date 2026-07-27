@@ -25,7 +25,9 @@ export function BehavioralTabNav({ pageId, isDemo }: { pageId: string; isDemo: b
             href={href}
             className={cn(
               "border-2 border-ink px-4 py-2 font-mono text-[11px] uppercase tracking-wide",
-              active ? "hatch-fill bg-mustard text-ink" : "bg-paper text-ink-soft hover:text-ink",
+              // No hatch-fill here — the diagonal texture reads fine behind
+              // a bare funnel bar but smothers a text label at this size.
+              active ? "bg-mustard text-ink" : "bg-paper text-ink-soft hover:text-ink",
             )}
           >
             {t.label}
