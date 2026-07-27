@@ -59,13 +59,15 @@ export function FunnelSankey({ stages }: { stages: FunnelStage[] }) {
 
           return (
             <g key={stage.label}>
-              {channelPath && <path d={channelPath} fill="#171717" fillOpacity="0.1" stroke="#171717" strokeWidth="1" />}
+              {channelPath && (
+                <path d={channelPath} fill="var(--atlas-ink, #171717)" fillOpacity="0.1" stroke="var(--atlas-ink, #171717)" strokeWidth="1" />
+              )}
 
               {drop > 0 && (
                 <path
                   d={`M ${CENTER_X + hw} ${y + 8} C ${CENTER_X + 170} ${ribbonY}, ${ribbonEndX - 90} ${ribbonY}, ${ribbonEndX} ${ribbonY}`}
                   fill="none"
-                  stroke="#171717"
+                  stroke="var(--atlas-ink, #171717)"
                   strokeOpacity="0.18"
                   strokeWidth={dropThickness}
                 >
@@ -73,15 +75,36 @@ export function FunnelSankey({ stages }: { stages: FunnelStage[] }) {
                 </path>
               )}
               {drop > 0 && (
-                <text x={ribbonEndX} y={ribbonY - dropThickness / 2 - 6} textAnchor="end" fontFamily="var(--font-mono)" fontSize="10.5" fill="#555555">
+                <text
+                  x={ribbonEndX}
+                  y={ribbonY - dropThickness / 2 - 6}
+                  textAnchor="end"
+                  fontFamily="var(--font-mono)"
+                  fontSize="10.5"
+                  fill="var(--atlas-ink-soft, #555555)"
+                >
                   {`−${drop} (${formatPercent(dropPct)})`}
                 </text>
               )}
 
-              <text x={CENTER_X - MAX_HALF_WIDTH - 14} y={y + 4} textAnchor="end" fontFamily="var(--font-mono)" fontSize="11" fill="#171717">
+              <text
+                x={CENTER_X - MAX_HALF_WIDTH - 14}
+                y={y + 4}
+                textAnchor="end"
+                fontFamily="var(--font-mono)"
+                fontSize="11"
+                fill="var(--atlas-ink, #171717)"
+              >
                 {stage.label}
               </text>
-              <text x={CENTER_X - MAX_HALF_WIDTH - 14} y={y + 17} textAnchor="end" fontFamily="var(--font-mono)" fontSize="9.5" fill="#555555">
+              <text
+                x={CENTER_X - MAX_HALF_WIDTH - 14}
+                y={y + 17}
+                textAnchor="end"
+                fontFamily="var(--font-mono)"
+                fontSize="9.5"
+                fill="var(--atlas-ink-soft, #555555)"
+              >
                 {stage.count}
               </text>
             </g>

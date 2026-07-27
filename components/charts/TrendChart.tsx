@@ -29,7 +29,7 @@ export function TrendChart({
   return (
     <div className="border-2 border-ink bg-paper p-5">
       <svg width="100%" height={h} viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="xMidYMid meet">
-        <g stroke="#171717" strokeOpacity="0.12" strokeWidth="1">
+        <g stroke="var(--atlas-ink, #171717)" strokeOpacity="0.12" strokeWidth="1">
           <line x1={padL} y1={padT} x2={padL} y2={h - padB} />
           <line x1={padL} y1={h - padB} x2={w - padR} y2={h - padB} />
           {gridLines.map((gy) => (
@@ -43,12 +43,12 @@ export function TrendChart({
               y1={y(target)}
               x2={w - padR}
               y2={y(target)}
-              stroke="#171717"
+              stroke="var(--atlas-ink, #171717)"
               strokeWidth="1"
               strokeDasharray="3 4"
               opacity="0.5"
             />
-            <text x={w - padR + 3} y={y(target) + 3} fontFamily="var(--font-mono)" fontSize="8" fill="#5C4F41">
+            <text x={w - padR + 3} y={y(target) + 3} fontFamily="var(--font-mono)" fontSize="8" fill="var(--atlas-ink-soft, #555555)">
               target
             </text>
           </>
@@ -56,18 +56,18 @@ export function TrendChart({
         <polyline
           points={linePoints}
           fill="none"
-          stroke="#4E8580"
+          stroke="var(--color-teal-deep, #396460)"
           strokeWidth="2.5"
           strokeLinejoin="round"
           strokeLinecap="round"
         />
-        <g fill="#4E8580" stroke="#FBF6EA" strokeWidth="1.5">
+        <g fill="var(--color-teal-deep, #396460)" stroke="var(--atlas-bg, #ffffff)" strokeWidth="1.5">
           {points.map((v, i) => (
             <circle key={i} cx={x(i)} cy={y(v)} r="3.5" />
           ))}
         </g>
         {gridLines.concat([h - padB]).map((gy, i) => (
-          <text key={i} x={8} y={gy + 3} fontFamily="var(--font-mono)" fontSize="8" fill="#5C4F41">
+          <text key={i} x={8} y={gy + 3} fontFamily="var(--font-mono)" fontSize="8" fill="var(--atlas-ink-soft, #555555)">
             {yFormat(min + (max - min) * (1 - (gy - padT) / innerH))}
           </text>
         ))}

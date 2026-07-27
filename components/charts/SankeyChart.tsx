@@ -125,7 +125,7 @@ export function SankeyChart({
             key={`${r.source}␟${r.target}`}
             d={r.d}
             fill="none"
-            stroke="#171717"
+            stroke="var(--atlas-ink, #171717)"
             strokeWidth={r.thickness}
             strokeOpacity={hovered === null ? 0.16 : hovered === i ? 0.4 : 0.06}
             style={{ transition: "stroke-opacity 0.12s ease" }}
@@ -138,14 +138,30 @@ export function SankeyChart({
 
         {Array.from(sources.values()).map((n) => (
           <g key={`s-${n.key}`}>
-            <rect x={sourceX} y={n.y} width={NODE_W} height={n.h} fill="#171717">
+            <rect x={sourceX} y={n.y} width={NODE_W} height={n.h} fill="var(--atlas-ink, #171717)">
               <title>{n.key}</title>
             </rect>
-            <text x={sourceX - 8} y={n.y + n.h / 2} textAnchor="end" dominantBaseline="middle" fontFamily="var(--font-mono)" fontSize="10.5" fill="#171717">
+            <text
+              x={sourceX - 8}
+              y={n.y + n.h / 2}
+              textAnchor="end"
+              dominantBaseline="middle"
+              fontFamily="var(--font-mono)"
+              fontSize="10.5"
+              fill="var(--atlas-ink, #171717)"
+            >
               {truncate(n.key)}
               <title>{n.key}</title>
             </text>
-            <text x={sourceX - 8} y={n.y + n.h / 2 + 13} textAnchor="end" dominantBaseline="middle" fontFamily="var(--font-mono)" fontSize="9.5" fill="#555555">
+            <text
+              x={sourceX - 8}
+              y={n.y + n.h / 2 + 13}
+              textAnchor="end"
+              dominantBaseline="middle"
+              fontFamily="var(--font-mono)"
+              fontSize="9.5"
+              fill="var(--atlas-ink-soft, #555555)"
+            >
               {n.total}
             </text>
           </g>
@@ -153,14 +169,30 @@ export function SankeyChart({
 
         {Array.from(targets.values()).map((n) => (
           <g key={`t-${n.key}`}>
-            <rect x={targetX} y={n.y} width={NODE_W} height={n.h} fill="#171717">
+            <rect x={targetX} y={n.y} width={NODE_W} height={n.h} fill="var(--atlas-ink, #171717)">
               <title>{n.key}</title>
             </rect>
-            <text x={targetX + NODE_W + 8} y={n.y + n.h / 2} textAnchor="start" dominantBaseline="middle" fontFamily="var(--font-mono)" fontSize="10.5" fill="#171717">
+            <text
+              x={targetX + NODE_W + 8}
+              y={n.y + n.h / 2}
+              textAnchor="start"
+              dominantBaseline="middle"
+              fontFamily="var(--font-mono)"
+              fontSize="10.5"
+              fill="var(--atlas-ink, #171717)"
+            >
               {truncate(n.key)}
               <title>{n.key}</title>
             </text>
-            <text x={targetX + NODE_W + 8} y={n.y + n.h / 2 + 13} textAnchor="start" dominantBaseline="middle" fontFamily="var(--font-mono)" fontSize="9.5" fill="#555555">
+            <text
+              x={targetX + NODE_W + 8}
+              y={n.y + n.h / 2 + 13}
+              textAnchor="start"
+              dominantBaseline="middle"
+              fontFamily="var(--font-mono)"
+              fontSize="9.5"
+              fill="var(--atlas-ink-soft, #555555)"
+            >
               {n.total}
             </text>
           </g>
