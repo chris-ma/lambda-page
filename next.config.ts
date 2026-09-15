@@ -16,6 +16,16 @@ import type { NextConfig } from "next";
 // "ENOENT .../lighthouse/flow-report/assets/standalone-flow-template.html".
 const playwrightTrace = ["./node_modules/playwright-core/**/*", "./node_modules/@sparticuz/chromium/**/*"];
 const lighthouseTrace = ["./node_modules/lighthouse/**/*"];
+// sharp resolves its native binding at runtime by picking a platform-specific
+// package (@img/sharp-linux-x64, its libvips-cpp.so, etc.) rather than
+// requiring it directly, so nft's static analysis drops it exactly like the
+// playwright/lighthouse binaries above — the function then throws "Could not
+// load the 'sharp' module ... ERR_DLOPEN_FAILED: libvips-cpp.so.8.18.3:
+// cannot open shared object file" the first time judge() (lib/ai/client.ts)
+// runs. Being in serverExternalPackages keeps the bundler from mangling the
+// import; this is what actually gets the binary onto disk in the deployed
+// function.
+const sharpTrace = ["./node_modules/sharp/**/*", "./node_modules/@img/**/*"];
 
 const nextConfig: NextConfig = {
   // These use dynamic requires / ship native binaries that the bundler can't
@@ -29,15 +39,26 @@ const nextConfig: NextConfig = {
   outputFileTracingIncludes: {
     "/api/analyze/structural": [...playwrightTrace, ...lighthouseTrace],
     "/api/analyze/competitive": playwrightTrace,
-    "/api/analyze/competitive-set": playwrightTrace,
-    "/api/analyze/design-audit": playwrightTrace,
-    "/api/analyze/content-fit": playwrightTrace,
+    // Every route below transitively imports lib/ai/client.ts (judge()),
+    // which imports sharp at module scope — so all of them need sharpTrace
+    // even the ones that never end up sending an image, since the crash
+    // happens on import, not on first use.
+    "/api/analyze/competitive-set": [...playwrightTrace, ...sharpTrace],
+    "/api/analyze/design-audit": [...playwrightTrace, ...sharpTrace],
+    "/api/analyze/content-fit": [...playwrightTrace, ...sharpTrace],
+    "/api/analyze/funnel-plan": [...playwrightTrace, ...sharpTrace],
+    "/api/analyze/wireframe": [...playwrightTrace, ...sharpTrace],
+    "/api/analyze/ideation": sharpTrace,
+    "/api/analyze/keyword-suggestions": sharpTrace,
+    "/api/analyze/mention-checks": sharpTrace,
+    "/api/analyze/share-of-voice": sharpTrace,
     "/api/eye-projects": playwrightTrace,
     // Dynamic segment brackets must be escaped for outputFileTracingIncludes'
     // picomatch route-glob keys — an unescaped [pageId] is a character class,
     // not a literal, and silently fails to match this route at all.
     "/api/eye-pages/\\[pageId\\]/capture-screenshot": playwrightTrace,
     "/api/pages/\\[pageId\\]/capture-screenshot": playwrightTrace,
+    "/api/pages/\\[pageId\\]/mention-checks": sharpTrace,
   },
   async headers() {
     return [
